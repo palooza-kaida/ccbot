@@ -1,0 +1,4 @@
+.env
+.ccbot/
+dist/
+node_modules/

@@ -1,0 +1,67 @@
+{
+  "name": "ccbot",
+  "version": "1.0.0",
+  "description": "Claude Code Telegram Notification Bot — get notified when Claude Code completes a response",
+  "type": "module",
+  "license": "MIT",
+  "author": {
+    "name": "Khong Anh Dung (KAD)",
+    "email": "kaida.palooza@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/palooza-kaida/ccbot.git"
+  },
+  "homepage": "https://github.com/palooza-kaida/ccbot#readme",
+  "bugs": {
+    "url": "https://github.com/palooza-kaida/ccbot/issues"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "telegram",
+    "notification",
+    "bot",
+    "cli",
+    "developer-tools",
+    "typescript",
+    "automation"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "README.en.md"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "ccbot": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "setup": "tsx src/index.ts setup",
+    "uninstall": "tsx src/index.ts uninstall",
+    "help": "tsx src/index.ts help",
+    "deploy:web": "gh-pages -d public"
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.0.1",
+    "express": "^5.0.1",
+    "node-telegram-bot-api": "^0.66.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "@types/node-telegram-bot-api": "^0.64.8",
+    "gh-pages": "^6.3.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

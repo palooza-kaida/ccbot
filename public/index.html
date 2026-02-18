@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ccbot — Code mọi nơi với AI Agents</title>
+  <meta name="description" content="Tương tác 2 chiều với Claude Code từ Telegram, Discord, Zalo. Code mọi lúc mọi nơi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="logo.svg?v=3">
+  <link rel="apple-touch-icon" href="logo.svg?v=3">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --color-bg: #FFFFFF;
+      --color-bg-warm: #FAF9F7;
+      --color-bg-code: #1A1A2E;
+      --color-bg-code-2: #222239;
+      --color-txt: #1A1A2E;
+      --color-txt-2: #5A5A72;
+      --color-txt-3: #8E8E9F;
+      --color-accent: #D97757;
+      --color-accent-hover: #C4623F;
+      --color-accent-light: #FFF0EB;
+      --color-emerald: #2E8B57;
+      --color-emerald-light: #E8F5EE;
+      --color-sky: #4A7FD4;
+      --color-sky-light: #EBF2FC;
+      --color-plum: #7C5CBF;
+      --color-plum-light: #F1ECF9;
+      --color-border: #EBEBEB;
+      --color-term-text: #E0E0E0;
+      --color-term-sub: #B0B0C0;
+      --color-term-muted: #666666;
+      --color-term-muted-hover: #CCCCCC;
+      --color-term-dim: #999999;
+      --color-term-dim-hover: #DDDDDD;
+      --color-term-border-hover: #555555;
+      --color-feat-icon: #F0F0F2;
+      --color-plat-more: #F5F5F5;
+      --color-term-comment: #606078;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --max-width-content: 880px;
+    }
+
+    html { scroll-behavior: smooth }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-txt);
+      line-height: 1.625;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--color-accent); text-decoration: none; transition: color .15s }
+    a:hover { color: var(--color-accent-hover) }
+
+    .flow-line {
+      width: 2.5rem;
+      height: 2px;
+      background: var(--color-accent);
+      position: relative;
+    }
+    .flow-line::after {
+      content: '';
+      position: absolute;
+      right: -3px;
+      top: -3px;
+      border: 4px solid transparent;
+      border-left-color: var(--color-accent);
+    }
+    .flow-line.reverse::after { display: none }
+    .flow-line.reverse::before {
+      content: '';
+      position: absolute;
+      left: -3px;
+      top: -3px;
+      border: 4px solid transparent;
+      border-right-color: var(--color-accent);
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 1.25rem;
+      transform: translateX(-50%);
+      top: 0.25rem;
+      bottom: 0.25rem;
+      width: 3px;
+      border-radius: 2px;
+      background: linear-gradient(to bottom, var(--color-emerald) 0%, var(--color-emerald) 16%, var(--color-accent) 16%, var(--color-accent) 32%, var(--color-border) 32%, var(--color-border) 100%);
+    }
+
+    .tl-dot {
+      position: absolute;
+      left: -30px;
+      top: 0.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 50%;
+      border: 3px solid var(--color-bg);
+      z-index: 2;
+    }
+    .tl-dot.done { background: var(--color-emerald); box-shadow: 0 0 0 4px var(--color-emerald-light) }
+    .tl-dot.wip { background: var(--color-accent); box-shadow: 0 0 0 4px var(--color-accent-light) }
+    .tl-dot.soon { background: var(--color-border); box-shadow: 0 0 0 4px var(--color-feat-icon) }
+
+    .step-term .d { color: var(--color-accent); user-select: none }
+    .step-term .c { color: var(--color-term-comment) }
+    .step-term { white-space: pre; }
+
+    @media (max-width: 700px) {
+      .flow-grid { grid-template-columns: 1fr }
+      .flow-center-wrap { flex-direction: row; justify-content: center; padding: 1rem 0 }
+      .flow-line { width: 2px; height: 1.5rem }
+      .flow-line::after {
+        right: auto; left: -3px; top: auto; bottom: -3px;
+        border: 4px solid transparent;
+        border-top-color: var(--color-accent);
+      }
+      .flow-line.reverse::before {
+        left: auto; right: -3px; top: -3px;
+        border: 4px solid transparent;
+        border-bottom-color: var(--color-accent);
+      }
+      .nav-hide-mobile { display: none }
+      .hero-section { padding: 3rem 0 2rem }
+      .sect-section { padding: 3.5rem 0 }
+      .t-right-wrap { display: none }
+      .t-body-wrap { flex-direction: column; gap: 0.75rem; align-items: flex-start }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sticky top-0 z-[100] bg-white/85 backdrop-blur-[12px] border-b border-border">
+    <div class="max-w-content mx-auto px-6 h-14 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5 no-underline text-txt">
+        <img src="logo.svg" alt="ccbot logo" class="w-10 h-10">
+        <span class="font-bold text-base tracking-tight">ccbot</span>
+      </a>
+      <ul class="flex items-center gap-7 list-none">
+        <li class="nav-hide-mobile"><a href="#how-it-works" class="text-sm font-medium text-txt-2 hover:text-txt">Cách hoạt động</a></li>
+        <li class="nav-hide-mobile"><a href="#features" class="text-sm font-medium text-txt-2 hover:text-txt">Tính năng</a></li>
+        <li class="nav-hide-mobile"><a href="#setup" class="text-sm font-medium text-txt-2 hover:text-txt">Cài đặt</a></li>
+        <li class="nav-hide-mobile"><a href="#roadmap" class="text-sm font-medium text-txt-2 hover:text-txt">Roadmap</a></li>
+        <li>
+          <a href="https://github.com/palooza-kaida/ccbot" target="_blank" rel="noopener"
+             class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-txt text-white !text-white text-[0.82rem] font-semibold transition-opacity hover:opacity-85 hover:no-underline cursor-pointer">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="max-w-content mx-auto px-6">
+
+    <section class="hero-section pt-14 pb-10 text-center">
+      <div class="mb-5">
+        <img src="logo.svg" alt="ccbot hero logo" class="mx-auto w-[72px] h-[72px]">
+      </div>
+      <h1 class="text-[clamp(2.2rem,5.5vw,3.4rem)] font-extrabold tracking-tighter leading-[1.12] mb-3">
+        Code mọi nơi, <span class="text-accent">mọi lúc</span>
+      </h1>
+      <p class="text-[1.05rem] text-txt-2 max-w-[540px] mx-auto mb-8 leading-[1.7]">
+        Tương tác 2 chiều với Claude Code qua Telegram, Discord, Zalo. Cầm điện thoại mà vẫn code.
+      </p>
+
+      <div class="bg-bg-code rounded-xl overflow-hidden max-w-[600px] mx-auto" id="tw">
+        <div class="flex items-center justify-between px-4 py-2.5 bg-bg-code-2">
+          <div class="flex gap-[7px]">
+            <i class="w-2.5 h-2.5 rounded-full block bg-[#FF5F57]"></i>
+            <i class="w-2.5 h-2.5 rounded-full block bg-[#FEBC2E]"></i>
+            <i class="w-2.5 h-2.5 rounded-full block bg-[#28C840]"></i>
+          </div>
+          <div class="t-right-wrap flex items-center gap-0.5 bg-white/[0.05] rounded-lg p-0.5">
+            <button class="pm-tab px-3 py-1 font-sans text-xs font-semibold text-term-muted bg-transparent border-none rounded-md cursor-pointer transition-all duration-150 hover:text-term-dim-hover" data-pm="npm">npm</button>
+            <button class="pm-tab px-3 py-1 font-sans text-xs font-semibold text-term-muted bg-transparent border-none rounded-md cursor-pointer transition-all duration-150 hover:text-term-dim-hover" data-pm="yarn">yarn</button>
+            <button class="pm-tab active px-3 py-1 font-sans text-xs font-semibold text-white bg-white/[0.1] border-none rounded-md cursor-pointer transition-all duration-150" data-pm="pnpm">pnpm</button>
+            <button class="pm-tab px-3 py-1 font-sans text-xs font-semibold text-term-muted bg-transparent border-none rounded-md cursor-pointer transition-all duration-150 hover:text-term-dim-hover" data-pm="bun">bun</button>
+          </div>
+        </div>
+        <div class="t-body-wrap flex items-center justify-between gap-4 px-5 py-4">
+          <div class="font-mono text-[0.88rem] text-term-text">
+            <span class="text-accent select-none mr-2.5">$</span><span id="cmdtxt">pnpm add -g ccbot</span>
+          </div>
+          <button id="cpbtn"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[7px] bg-white/[0.06] border border-white/10 text-term-dim font-sans text-[0.78rem] font-semibold cursor-pointer transition-all duration-150 shrink-0 hover:bg-white/10 hover:text-term-dim-hover">
+            <svg class="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            <span id="cplbl">Copy</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="sect-section py-20" id="how-it-works">
+      <div class="mb-12">
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Cách hoạt động</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">Bridge 2 chiều giữa terminal và điện thoại</h2>
+        <p class="text-[0.95rem] text-txt-2 max-w-[460px]">Gửi prompt, nhận kết quả, approve quyền — tất cả từ nền tảng chat bạn đang dùng.</p>
+      </div>
+
+      <div class="flow-grid grid grid-cols-[1fr_80px_1fr]">
+        <div class="p-8 bg-bg-warm rounded-2xl h-full">
+          <h3 class="text-[0.95rem] font-bold mb-2 flex items-center gap-2.5 text-txt">
+            <svg class="text-accent shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            Terminal
+          </h3>
+          <p class="text-sm text-txt-2 leading-relaxed">Claude Code chạy trên máy. ccbot lắng nghe hook event và JSONL transcript.</p>
+        </div>
+
+        <div class="flow-center-wrap flex flex-col items-center gap-1 relative self-center">
+          <span class="text-[0.6rem] font-bold uppercase tracking-wider text-accent bg-accent-light px-2 py-0.5 rounded">ccbot</span>
+          <div class="flow-line"></div>
+          <div class="flow-line reverse"></div>
+          <span class="text-[0.6rem] font-bold uppercase tracking-wider text-accent bg-accent-light px-2 py-0.5 rounded">real-time</span>
+        </div>
+
+        <div class="p-8 bg-bg-warm rounded-2xl h-full">
+          <h3 class="text-[0.95rem] font-bold mb-2 flex items-center gap-2.5 text-txt">
+            <svg class="text-accent shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            Bạn
+          </h3>
+          <p class="text-sm text-txt-2 leading-relaxed">Chat, review, approve từ bất kỳ đâu.</p>
+          <div class="flex flex-wrap gap-1.5 mt-3.5">
+            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-[#E3F2FD] text-[#1976D2]">Telegram</span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-[#EDE7F6] text-[#5E35B1]">Discord</span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-[#E8F5E9] text-[#2E7D32]">Zalo</span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-plat-more text-txt-3">+ more</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="sect-section py-20" id="features">
+      <div class="mb-12">
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Tính năng</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">Không chỉ notification</h2>
+      </div>
+
+      <div class="flex flex-col">
+        <div class="grid grid-cols-[48px_1fr] gap-5 items-start py-7 border-b border-border">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-accent-light text-accent">
+            <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold mb-1 flex items-center gap-2">
+              Push notification
+              <span class="text-[0.6rem] font-bold px-[7px] py-0.5 rounded uppercase tracking-wider bg-accent-light text-accent">Hook-based</span>
+            </h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Claude Code xong &rarr; notification đẩy ngay. Không polling, không delay.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[48px_1fr] gap-5 items-start py-7 border-b border-border">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-plum-light text-plum">
+            <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold mb-1 flex items-center gap-2">
+              Tương tác 2 chiều
+              <span class="text-[0.6rem] font-bold px-[7px] py-0.5 rounded uppercase tracking-wider bg-plum-light text-plum">Tier 2</span>
+            </h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Gửi prompt từ điện thoại, Claude Code nhận và xử lý, response gửi ngược lại. Approve/deny quyền ngay trên chat.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[48px_1fr] gap-5 items-start py-7 border-b border-border">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-light text-emerald">
+            <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold mb-1">Git diff tự động</h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Mỗi notification kèm danh sách file: added, modified, deleted. Biết Claude Code thay đổi gì mà không cần mở máy.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[48px_1fr] gap-5 items-start py-7 border-b border-border">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-sky-light text-sky">
+            <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold mb-1">Tóm tắt response + chi phí</h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Trích xuất nội dung response từ transcript JSONL, kèm thời gian xử lý.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[48px_1fr] gap-5 items-start py-7">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-feat-icon text-txt">
+            <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div>
+            <h3 class="text-base font-bold mb-1">Self-hosted, code không rời máy</h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Whitelist User ID, unauthorized bị ignore im lặng. Mọi thứ chạy trên máy bạn.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETUP -->
+    <section class="sect-section py-20" id="setup">
+      <div class="mb-12">
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Cài đặt</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">3 bước, 2 phút</h2>
+        <p class="text-[0.95rem] text-txt-2 max-w-[460px]">Cần Node.js &ge; 18 và một Telegram Bot Token.</p>
+      </div>
+
+      <div class="flex flex-col gap-8">
+        <div class="grid grid-cols-[32px_1fr] gap-4">
+          <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">1</div>
+          <div>
+            <h3 class="text-base font-bold mb-1.5">Tạo Bot Token</h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed">
+              Mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> trên Telegram &rarr;
+              <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; lưu token.<br>
+              Lấy User ID từ <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a>.
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[32px_1fr] gap-4">
+          <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">2</div>
+          <div>
+            <h3 class="text-base font-bold mb-1.5">Cài đặt &amp; chạy setup</h3>
+            <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto"><span class="d">$ </span>pnpm add -g ccbot
+<span class="d">$ </span>ccbot setup
+
+<span class="c">┌  🤖 ccbot setup</span>
+<span class="c">│</span>
+<span class="c">◇  Telegram Bot Token</span>
+<span class="c">│  ****:ABC-xxx</span>
+<span class="c">│</span>
+<span class="c">◇  Your Telegram User ID</span>
+<span class="c">│  123456789</span>
+<span class="c">│</span>
+<span class="c">◆  Config saved</span>
+<span class="c">◆  Hook installed → ~/.claude/settings.json</span>
+<span class="c">◆  Chat ID registered</span>
+<span class="c">│</span>
+<span class="c">└  🎉 Setup complete!</span></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-[32px_1fr] gap-4">
+          <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">3</div>
+          <div>
+            <h3 class="text-base font-bold mb-1.5">Chạy bot</h3>
+            <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto"><span class="d">$ </span>ccbot
+
+<span class="c">ccbot: hook server listening on localhost:9377</span>
+<span class="c">ccbot: telegram bot started</span>
+<span class="c">ccbot: registered chat ID 123456789</span></div>
+            <p class="mt-2.5 text-[0.88rem] text-txt-2 leading-relaxed">
+              Mở Telegram &rarr; gửi <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> &rarr; xong. Dùng Claude Code bình thường.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section class="sect-section py-20" id="roadmap">
+      <div class="mb-12">
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Roadmap</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">Lộ trình dài hơi</h2>
+        <p class="text-[0.95rem] text-txt-2 max-w-[520px]">Telegram-first — hoàn thiện trải nghiệm trên Telegram trước, sau đó mở rộng ra các nền tảng khác.</p>
+      </div>
+
+      <div class="timeline relative pl-10 max-w-[680px]">
+
+        <div class="tl-item done relative pb-11">
+          <div class="tl-dot done"></div>
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-emerald">Phase 1 · Hoàn thành</p>
+          <h3 class="text-lg font-bold mb-1.5">Notification cơ bản</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3">Push thông báo từ Claude Code hook đến Telegram.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Stop hook</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Git diff</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Markdown format</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">User auth</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Response summary</span>
+          </div>
+        </div>
+
+        <div class="tl-item wip relative pb-11">
+          <div class="tl-dot wip"></div>
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-accent">Phase 2 · Đang phát triển</p>
+          <h3 class="text-lg font-bold mb-1.5">Chat 2 chiều</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3">Gửi prompt và nhận response trực tiếp từ Telegram.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Gửi prompt</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Approve / Deny</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Response streaming</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Session management</span>
+          </div>
+        </div>
+
+        <div class="tl-item relative pb-11">
+          <div class="tl-dot soon"></div>
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 3</p>
+          <h3 class="text-lg font-bold mb-1.5">Terminal control</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3">Điều khiển terminal từ xa qua Telegram.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">tmux bridge</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Screenshot capture</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Live output</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">File browser</span>
+          </div>
+        </div>
+
+        <div class="tl-item relative pb-11">
+          <div class="tl-dot soon"></div>
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 4</p>
+          <h3 class="text-lg font-bold mb-1.5">Developer experience</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3">Nâng cao trải nghiệm lập trình viên.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Multi-project</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Config profiles</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Webhook API</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">CI/CD hooks</span>
+          </div>
+        </div>
+
+        <div class="tl-item relative pb-11">
+          <div class="tl-dot soon"></div>
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 5</p>
+          <h3 class="text-lg font-bold mb-1.5">Multi-platform</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3">Mở rộng sang các nền tảng chat khác sau khi Telegram ổn định.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Discord</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Zalo</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Slack</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Platform adapter SDK</span>
+          </div>
+        </div>
+
+        <div class="tl-item relative pb-0">
+          <div class="tl-dot soon"></div>
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 6</p>
+          <h3 class="text-lg font-bold mb-1.5">Ecosystem</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3">Hệ sinh thái mở rộng cho team và cộng đồng.</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Plugin system</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Team collaboration</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Web dashboard</span>
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Analytics</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="py-12 text-center border-t border-border mt-5">
+    <div class="max-w-content mx-auto px-6">
+      <p class="text-[0.82rem] text-txt-3">MIT &middot; TypeScript &middot; <a href="https://github.com/palooza-kaida/ccbot" class="text-txt-3 hover:text-txt-2">github.com/palooza-kaida/ccbot</a></p>
+    </div>
+  </footer>
+
+  <script>
+    const cmds = {
+      npm:  'npm i -g ccbot',
+      yarn: 'yarn global add ccbot',
+      pnpm: 'pnpm add -g ccbot',
+      bun:  'bun add -g ccbot',
+    };
+    let pm = 'pnpm';
+    const ct = document.getElementById('cmdtxt');
+    const cb = document.getElementById('cpbtn');
+    const cl = document.getElementById('cplbl');
+
+    function upd() { ct.textContent = cmds[pm] }
+
+    document.querySelectorAll('.pm-tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.pm-tab').forEach(x => {
+          x.classList.remove('active', 'text-white', 'bg-white/[0.1]');
+          x.classList.add('text-term-muted');
+        });
+        t.classList.add('active', 'text-white', 'bg-white/[0.1]');
+        t.classList.remove('text-term-muted');
+        pm = t.dataset.pm;
+        upd();
+      });
+    });
+
+    cb.addEventListener('click', () => {
+      navigator.clipboard.writeText(cmds[pm]);
+      cb.classList.add('bg-[rgba(46,139,87,0.2)]', 'text-emerald', 'border-[rgba(46,139,87,0.3)]');
+      cl.textContent = 'Copied!';
+      setTimeout(() => {
+        cb.classList.remove('bg-[rgba(46,139,87,0.2)]', 'text-emerald', 'border-[rgba(46,139,87,0.3)]');
+        cl.textContent = 'Copy';
+      }, 1500);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shadow - bg-code -->
+  <rect x="10" y="10" width="20" height="18" rx="4" fill="#1A1A2E"/>
+  <!-- Robot Head - accent -->
+  <rect x="6" y="6" width="20" height="18" rx="4" fill="#D97757"/>
+  <!-- Eyes -->
+  <path d="M10 13L13 16L10 19" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M22 13L19 16L22 19" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
