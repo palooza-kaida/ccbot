@@ -9,6 +9,8 @@ import { runUpdate } from "./commands/update.js";
 import { runUninstall } from "./commands/uninstall.js";
 import { runHelp } from "./commands/help.js";
 import { formatError } from "./utils/error-utils.js";
+import { CliCommand } from "./utils/constants.js";
+import { t } from "./i18n/index.js";
 
 const args = process.argv.slice(2);
 
@@ -18,19 +20,19 @@ if (args.length > 0) {
   startBot();
 }
 
-function startBot(): void {
+async function startBot(): Promise<void> {
   const cfg = ConfigManager.load();
   const bot = new Bot(cfg);
   const handler = new HookHandler((text) => bot.sendNotification(text));
   const hookServer = new HookServer(cfg.hook_port, cfg.hook_secret, handler);
 
   hookServer.start();
-  console.log(`ccbot: started (hook port: ${cfg.hook_port})`);
-  bot.start();
+  console.log(t("bot.started", { port: cfg.hook_port }));
+  await bot.start();
 
   const shutdown = async () => {
-    console.log("\nccbot: shutting down...");
-    bot.stop();
+    console.log(`\n${t("bot.shuttingDown")}`);
+    await bot.stop();
     await hookServer.stop();
     process.exit(0);
   };
@@ -40,31 +42,39 @@ function startBot(): void {
 }
 
 function handleSubcommand(args: string[]): void {
+  tryLoadLocale();
+
   switch (args[0]) {
-    case "setup":
+    case CliCommand.Setup:
       runSetup().catch((err: unknown) => {
-        console.error(`ccbot: setup failed: ${formatError(err)}`);
+        console.error(t("common.setupFailed", { error: formatError(err) }));
         process.exit(1);
       });
       break;
 
-    case "update":
+    case CliCommand.Update:
       runUpdate();
       break;
 
-    case "uninstall":
+    case CliCommand.Uninstall:
       runUninstall();
       break;
 
-    case "help":
-    case "--help":
-    case "-h":
+    case CliCommand.Help:
+    case CliCommand.HelpFlag:
+    case CliCommand.HelpShort:
       runHelp();
       break;
 
     default:
-      console.error(`unknown command: ${args[0]}`);
+      console.error(t("common.unknownCommand", { command: args[0] }));
       runHelp();
       process.exit(1);
   }
+}
+
+function tryLoadLocale(): void {
+  try {
+    ConfigManager.load();
+  } catch {}
 }

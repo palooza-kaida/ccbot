@@ -1,29 +1,29 @@
 import { existsSync } from "node:fs";
 import { join, dirname } from "node:path";
-
-export type InstallMethod = "global" | "git-clone" | "npx";
+import { InstallMethod } from "./constants.js";
+export type { InstallMethod } from "./constants.js";
 
 export function detectInstallMethod(): InstallMethod {
   const execPath = process.argv[1] ?? "";
 
   if (execPath.includes("npx") || execPath.includes(".npm/_npx")) {
-    return "npx";
+    return InstallMethod.Npx;
   }
 
   const scriptDir = dirname(execPath);
   if (isGitRepo(scriptDir)) {
-    return "git-clone";
+    return InstallMethod.GitClone;
   }
 
-  return "global";
+  return InstallMethod.Global;
 }
 
 export function detectCliPrefix(): string {
   const method = detectInstallMethod();
   switch (method) {
-    case "npx":
+    case InstallMethod.Npx:
       return "npx ccbot";
-    case "git-clone":
+    case InstallMethod.GitClone:
       return "node dist/index.js";
     default:
       return "ccbot";

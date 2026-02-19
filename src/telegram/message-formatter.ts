@@ -1,8 +1,10 @@
 import { basename } from "node:path";
+import { t } from "../i18n/index.js";
+import { GitChangeStatus } from "../utils/constants.js";
 
 export interface GitChange {
   file: string;
-  status: "modified" | "added" | "deleted" | "renamed";
+  status: GitChangeStatus;
 }
 
 export interface NotificationData {
@@ -15,7 +17,7 @@ export interface NotificationData {
 export function formatNotification(data: NotificationData): string {
   const parts: string[] = [];
 
-  parts.push("🤖 *Claude Code Response*");
+  parts.push(t("notification.title"));
 
   let projectLine = `📂 \`${escapeMarkdownV2(data.projectName)}\``;
   if (data.durationMs > 0) {
@@ -34,7 +36,7 @@ export function formatNotification(data: NotificationData): string {
 
   if (data.gitChanges.length > 0) {
     parts.push("");
-    parts.push("📂 *Changes:*");
+    parts.push(t("notification.changes"));
     for (const change of data.gitChanges) {
       const emoji = gitChangeEmoji(change.status);
       parts.push(`${emoji} \`${escapeMarkdownV2(change.file)}\``);
@@ -56,13 +58,13 @@ function formatDuration(ms: number): string {
   return `${minutes}m${seconds}s`;
 }
 
-function gitChangeEmoji(status: string): string {
+function gitChangeEmoji(status: GitChangeStatus): string {
   switch (status) {
-    case "added":
+    case GitChangeStatus.Added:
       return "➕";
-    case "deleted":
+    case GitChangeStatus.Deleted:
       return "❌";
-    case "renamed":
+    case GitChangeStatus.Renamed:
       return "📝";
     default:
       return "✏️";

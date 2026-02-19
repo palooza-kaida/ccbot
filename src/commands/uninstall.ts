@@ -4,24 +4,26 @@ import { join } from "node:path";
 import { homedir } from "node:os";
 import { HookInstaller } from "../hook/hook-installer.js";
 import { detectInstallMethod } from "../utils/install-detection.js";
+import { InstallMethod } from "../utils/constants.js";
+import { t } from "../i18n/index.js";
 
 export function runUninstall(): void {
-  p.intro("🗑️  Uninstalling ccbot");
+  p.intro(t("uninstall.intro"));
 
   removeHook();
   removeConfigDirectory();
 
   printPostUninstallHint();
 
-  p.outro("ccbot uninstalled");
+  p.outro(t("uninstall.done"));
 }
 
 function removeHook(): void {
   try {
     HookInstaller.uninstall();
-    p.log.success("Hook removed from ~/.claude/settings.json");
+    p.log.success(t("uninstall.hookRemoved"));
   } catch {
-    p.log.warn("No hook found (already removed)");
+    p.log.warn(t("uninstall.hookNotFound"));
   }
 }
 
@@ -29,18 +31,18 @@ function removeConfigDirectory(): void {
   const ccbotDir = join(homedir(), ".ccbot");
   try {
     rmSync(ccbotDir, { recursive: true, force: true });
-    p.log.success("Removed ~/.ccbot/ (config, state, hooks)");
+    p.log.success(t("uninstall.configRemoved"));
   } catch {
-    p.log.warn("~/.ccbot/ not found (already removed)");
+    p.log.warn(t("uninstall.configNotFound"));
   }
 }
 
 function printPostUninstallHint(): void {
   const method = detectInstallMethod();
 
-  if (method === "global") {
-    p.log.info("To also remove the package:\n  pnpm remove -g ccbot");
-  } else if (method === "git-clone") {
-    p.log.info("To also remove the source:\n  rm -rf <ccbot-directory>");
+  if (method === InstallMethod.Global) {
+    p.log.info(t("uninstall.removeGlobal"));
+  } else if (method === InstallMethod.GitClone) {
+    p.log.info(t("uninstall.removeGitClone"));
   }
 }

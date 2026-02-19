@@ -1,0 +1,117 @@
+import type { TranslationKeys } from "../types.js";
+
+export const zh: TranslationKeys = {
+  bot: {
+    started: "ccbot: 已启动 (hook端口: {port})",
+    shuttingDown: "ccbot: 正在关闭...",
+    telegramStarted: "ccbot: telegram bot 已启动",
+    commandsRegistered: "ccbot: 命令已注册",
+    commandsRegisterFailed: "ccbot: 注册命令失败: {error}",
+    menuButtonRegistered: "ccbot: 小程序菜单按钮已注册",
+    menuButtonFailed: "ccbot: 注册菜单按钮失败: {error}",
+    noChatId: "ccbot: 尚无聊天ID — 运行 'ccbot setup' 或向机器人发送 /start",
+    notificationFailed: "ccbot: 发送通知失败: {error}",
+    registeredChatId: "ccbot: 已注册聊天ID {chatId}",
+    unauthorizedUser: "ccbot: 未授权用户 {userId} ({username})",
+    ready: "✅ *ccbot* 已就绪\\.\n\n当Claude Code完成响应时，您将收到通知\\.",
+    running: "🟢 ccbot 正在运行",
+    commands: {
+      start: "将机器人连接到此聊天",
+      ping: "检查机器人是否在线",
+      status: "Claude Code 会话状态",
+    },
+  },
+
+  setup: {
+    intro: "🤖 ccbot 设置",
+    tokenMessage: "Telegram Bot Token",
+    tokenPlaceholder: "从 @BotFather → /newbot 获取",
+    tokenRequired: "Bot token 为必填项",
+    tokenInvalidFormat: "格式无效 (需要: 123456:ABC-xxx)",
+    userIdMessage: "您的 Telegram 用户 ID",
+    userIdPlaceholder: "向 @userinfobot 发送 /start",
+    userIdRequired: "用户 ID 为必填项",
+    userIdMustBeNumber: "必须是数字",
+    cancelled: "设置已取消。",
+    configSaved: "配置已保存",
+    hookInstalled: "Hook 已安装 → ~/.claude/settings.json",
+    hookAlreadyInstalled: "Hook 已安装",
+    hookFailed: "Hook 安装失败: {error}",
+    chatIdRegistered: "聊天 ID 已注册",
+    complete: "🎉 设置完成！\n\n  下一步:\n  1. 启动机器人:  {command}\n  2. 正常使用 Claude Code → 通知将自动发送",
+    languageMessage: "语言",
+  },
+
+  uninstall: {
+    intro: "🗑️  卸载 ccbot",
+    hookRemoved: "已从 ~/.claude/settings.json 移除 Hook",
+    hookNotFound: "未找到 Hook（已移除）",
+    configRemoved: "已删除 ~/.ccbot/（配置、状态、钩子）",
+    configNotFound: "未找到 ~/.ccbot/（已删除）",
+    removeGlobal: "要同时删除包:\n  pnpm remove -g ccbot",
+    removeGitClone: "要同时删除源代码:\n  rm -rf <ccbot-directory>",
+    done: "ccbot 已卸载",
+  },
+
+  update: {
+    intro: "📦 ccbot 更新",
+    npxAlreadyLatest: "通过 npx 安装 — 始终使用最新版本，无需更新。",
+    npxDone: "已是最新版本",
+    updating: "正在通过 {pm} 更新...",
+    updateSuccess: "更新成功",
+    updateComplete: "更新完成",
+    updateFailed: "更新失败",
+    updateManualGlobal: "请手动尝试: {cmd}",
+    pulling: "正在拉取最新代码...",
+    pulled: "已拉取最新代码",
+    installingDeps: "正在安装依赖...",
+    depsInstalled: "依赖已安装",
+    building: "正在构建...",
+    buildComplete: "构建完成",
+    updateManualGit: "请手动尝试: git pull && npm install && npm run build",
+    gitRepoNotFound: "找不到 git 仓库根目录。",
+  },
+
+  help: {
+    intro: "🤖 ccbot — Claude Code ↔ Telegram 通知机器人",
+    usage: "用法: {prefix} [命令]",
+    commands: "命令:",
+    cmdNone: "  (无)        启动机器人",
+    cmdSetup: "  setup       交互式设置（配置 + 钩子）",
+    cmdUpdate: "  update      更新 ccbot 到最新版本",
+    cmdUninstall: "  uninstall   删除所有 ccbot 数据和钩子",
+    cmdHelp: "  help        显示此帮助信息",
+    docs: "文档 → https://github.com/palooza-kaida/ccbot",
+  },
+
+  hook: {
+    serverListening: "ccbot: hook 服务器正在监听 localhost:{port}",
+    invalidPayload: "ccbot: 无效的 stop event 负载 — 缺少必要字段",
+    stopEventReceived: "ccbot: 收到 session {sessionId} 的 stop event，位于 {cwd}",
+    transcriptFailed: "ccbot: 解析 transcript 失败: {error}",
+    notificationFailed: "ccbot: 发送通知失败: {error}",
+  },
+
+  config: {
+    notFound: "未找到配置 — 请先运行 'ccbot setup'",
+    readError: "读取配置: {error}",
+    mustBeObject: "配置必须是 JSON 对象",
+    invalidToken: "telegram_bot_token 必须是包含 ':' 的字符串 — 运行 'ccbot setup'",
+    invalidUserId: "user_id 必须是整数 — 运行 'ccbot setup'",
+    invalidPort: "hook_port 必须是 1 到 65535 之间的整数",
+    invalidSecret: "hook_secret 只能包含十六进制字符 (a-f, 0-9)",
+    invalidHookPort: "无效的 hook 端口: {port}（必须为 1-65535）",
+    hookAlreadyInstalled: "ccbot hook 已安装",
+    readSettingsError: "读取设置: {error}",
+  },
+
+  notification: {
+    title: "🤖 *Claude Code 响应*",
+    changes: "📂 *变更:*",
+  },
+
+  common: {
+    unknownCommand: "未知命令: {command}",
+    setupFailed: "ccbot: 设置失败: {error}",
+  },
+};

@@ -1,0 +1,117 @@
+import type { TranslationKeys } from "../types.js";
+
+export const en: TranslationKeys = {
+  bot: {
+    started: "ccbot: started (hook port: {port})",
+    shuttingDown: "ccbot: shutting down...",
+    telegramStarted: "ccbot: telegram bot started",
+    commandsRegistered: "ccbot: commands registered",
+    commandsRegisterFailed: "ccbot: failed to register commands: {error}",
+    menuButtonRegistered: "ccbot: mini app menu button registered",
+    menuButtonFailed: "ccbot: failed to register menu button: {error}",
+    noChatId: "ccbot: no chat ID yet — run 'ccbot setup' or send /start to the bot",
+    notificationFailed: "ccbot: failed to send notification: {error}",
+    registeredChatId: "ccbot: registered chat ID {chatId}",
+    unauthorizedUser: "ccbot: unauthorized user {userId} ({username})",
+    ready: "✅ *ccbot* is ready\\.\n\nYou will receive notifications when Claude Code completes a response\\.",
+    running: "🟢 ccbot is running",
+    commands: {
+      start: "Connect bot to this chat",
+      ping: "Check if bot is alive",
+      status: "Claude Code session status",
+    },
+  },
+
+  setup: {
+    intro: "🤖 ccbot setup",
+    tokenMessage: "Telegram Bot Token",
+    tokenPlaceholder: "Get from @BotFather → /newbot",
+    tokenRequired: "Bot token is required",
+    tokenInvalidFormat: "Invalid format (expected: 123456:ABC-xxx)",
+    userIdMessage: "Your Telegram User ID",
+    userIdPlaceholder: "Send /start to @userinfobot",
+    userIdRequired: "User ID is required",
+    userIdMustBeNumber: "Must be a number",
+    cancelled: "Setup cancelled.",
+    configSaved: "Config saved",
+    hookInstalled: "Hook installed → ~/.claude/settings.json",
+    hookAlreadyInstalled: "Hook already installed",
+    hookFailed: "Hook installation failed: {error}",
+    chatIdRegistered: "Chat ID registered",
+    complete: "🎉 Setup complete!\n\n  Next steps:\n  1. Start bot:  {command}\n  2. Use Claude Code normally → notifications will arrive",
+    languageMessage: "Language",
+  },
+
+  uninstall: {
+    intro: "🗑️  Uninstalling ccbot",
+    hookRemoved: "Hook removed from ~/.claude/settings.json",
+    hookNotFound: "No hook found (already removed)",
+    configRemoved: "Removed ~/.ccbot/ (config, state, hooks)",
+    configNotFound: "~/.ccbot/ not found (already removed)",
+    removeGlobal: "To also remove the package:\n  pnpm remove -g ccbot",
+    removeGitClone: "To also remove the source:\n  rm -rf <ccbot-directory>",
+    done: "ccbot uninstalled",
+  },
+
+  update: {
+    intro: "📦 ccbot update",
+    npxAlreadyLatest: "Installed via npx — always uses latest version, no update needed.",
+    npxDone: "Already up to date",
+    updating: "Updating via {pm}...",
+    updateSuccess: "Updated successfully",
+    updateComplete: "Update complete",
+    updateFailed: "Update failed",
+    updateManualGlobal: "Try manually: {cmd}",
+    pulling: "Pulling latest changes...",
+    pulled: "Pulled latest changes",
+    installingDeps: "Installing dependencies...",
+    depsInstalled: "Dependencies installed",
+    building: "Building...",
+    buildComplete: "Build complete",
+    updateManualGit: "Try manually: git pull && npm install && npm run build",
+    gitRepoNotFound: "Could not find git repo root.",
+  },
+
+  help: {
+    intro: "🤖 ccbot — Claude Code ↔ Telegram Notification Bot",
+    usage: "Usage: {prefix} [command]",
+    commands: "Commands:",
+    cmdNone: "  (none)      Start the bot",
+    cmdSetup: "  setup       Interactive setup (config + hooks)",
+    cmdUpdate: "  update      Update ccbot to latest version",
+    cmdUninstall: "  uninstall   Remove all ccbot data and hooks",
+    cmdHelp: "  help        Show this help message",
+    docs: "docs → https://github.com/palooza-kaida/ccbot",
+  },
+
+  hook: {
+    serverListening: "ccbot: hook server listening on localhost:{port}",
+    invalidPayload: "ccbot: invalid stop event payload — missing required fields",
+    stopEventReceived: "ccbot: stop event received for session {sessionId} at {cwd}",
+    transcriptFailed: "ccbot: failed to parse transcript: {error}",
+    notificationFailed: "ccbot: failed to send notification: {error}",
+  },
+
+  config: {
+    notFound: "config not found — run 'ccbot setup' first",
+    readError: "read config: {error}",
+    mustBeObject: "config must be a JSON object",
+    invalidToken: "telegram_bot_token must be a string containing ':' — run 'ccbot setup'",
+    invalidUserId: "user_id must be an integer — run 'ccbot setup'",
+    invalidPort: "hook_port must be an integer between 1 and 65535",
+    invalidSecret: "hook_secret must contain only hex characters (a-f, 0-9)",
+    invalidHookPort: "invalid hook port: {port} (must be 1-65535)",
+    hookAlreadyInstalled: "ccbot hook already installed",
+    readSettingsError: "read settings: {error}",
+  },
+
+  notification: {
+    title: "🤖 *Claude Code Response*",
+    changes: "📂 *Changes:*",
+  },
+
+  common: {
+    unknownCommand: "unknown command: {command}",
+    setupFailed: "ccbot: setup failed: {error}",
+  },
+};

@@ -1,0 +1,117 @@
+import type { TranslationKeys } from "../types.js";
+
+export const vi: TranslationKeys = {
+  bot: {
+    started: "ccbot: đã khởi động (hook port: {port})",
+    shuttingDown: "ccbot: đang tắt...",
+    telegramStarted: "ccbot: telegram bot đã khởi động",
+    commandsRegistered: "ccbot: đã đăng ký commands",
+    commandsRegisterFailed: "ccbot: đăng ký commands thất bại: {error}",
+    menuButtonRegistered: "ccbot: đã đăng ký mini app menu button",
+    menuButtonFailed: "ccbot: đăng ký menu button thất bại: {error}",
+    noChatId: "ccbot: chưa có chat ID — chạy 'ccbot setup' hoặc gửi /start cho bot",
+    notificationFailed: "ccbot: gửi notification thất bại: {error}",
+    registeredChatId: "ccbot: đã đăng ký chat ID {chatId}",
+    unauthorizedUser: "ccbot: user không có quyền {userId} ({username})",
+    ready: "✅ *ccbot* đã sẵn sàng\\.\n\nBạn sẽ nhận notification khi Claude Code hoàn thành response\\.",
+    running: "🟢 ccbot đang chạy",
+    commands: {
+      start: "Kết nối bot với chat này",
+      ping: "Kiểm tra bot còn sống không",
+      status: "Trạng thái Claude Code session",
+    },
+  },
+
+  setup: {
+    intro: "🤖 ccbot setup",
+    tokenMessage: "Telegram Bot Token",
+    tokenPlaceholder: "Lấy từ @BotFather → /newbot",
+    tokenRequired: "Bot token là bắt buộc",
+    tokenInvalidFormat: "Sai định dạng (cần: 123456:ABC-xxx)",
+    userIdMessage: "Telegram User ID của bạn",
+    userIdPlaceholder: "Gửi /start cho @userinfobot",
+    userIdRequired: "User ID là bắt buộc",
+    userIdMustBeNumber: "Phải là số",
+    cancelled: "Đã hủy setup.",
+    configSaved: "Đã lưu config",
+    hookInstalled: "Đã cài hook → ~/.claude/settings.json",
+    hookAlreadyInstalled: "Hook đã được cài rồi",
+    hookFailed: "Cài hook thất bại: {error}",
+    chatIdRegistered: "Đã đăng ký Chat ID",
+    complete: "🎉 Setup hoàn tất!\n\n  Bước tiếp:\n  1. Chạy bot:  {command}\n  2. Dùng Claude Code bình thường → notification sẽ đến",
+    languageMessage: "Ngôn ngữ",
+  },
+
+  uninstall: {
+    intro: "🗑️  Gỡ cài đặt ccbot",
+    hookRemoved: "Đã xóa hook khỏi ~/.claude/settings.json",
+    hookNotFound: "Không tìm thấy hook (đã xóa rồi)",
+    configRemoved: "Đã xóa ~/.ccbot/ (config, state, hooks)",
+    configNotFound: "Không tìm thấy ~/.ccbot/ (đã xóa rồi)",
+    removeGlobal: "Để gỡ package:\n  pnpm remove -g ccbot",
+    removeGitClone: "Để xóa source:\n  rm -rf <ccbot-directory>",
+    done: "Đã gỡ ccbot",
+  },
+
+  update: {
+    intro: "📦 ccbot cập nhật",
+    npxAlreadyLatest: "Cài qua npx — luôn dùng bản mới nhất, không cần cập nhật.",
+    npxDone: "Đã là phiên bản mới nhất",
+    updating: "Đang cập nhật qua {pm}...",
+    updateSuccess: "Cập nhật thành công",
+    updateComplete: "Hoàn tất cập nhật",
+    updateFailed: "Cập nhật thất bại",
+    updateManualGlobal: "Thử thủ công: {cmd}",
+    pulling: "Đang pull code mới nhất...",
+    pulled: "Đã pull code mới nhất",
+    installingDeps: "Đang cài dependencies...",
+    depsInstalled: "Đã cài dependencies",
+    building: "Đang build...",
+    buildComplete: "Build xong",
+    updateManualGit: "Thử thủ công: git pull && npm install && npm run build",
+    gitRepoNotFound: "Không tìm thấy thư mục gốc git repo.",
+  },
+
+  help: {
+    intro: "🤖 ccbot — Claude Code ↔ Telegram Notification Bot",
+    usage: "Usage: {prefix} [command]",
+    commands: "Commands:",
+    cmdNone: "  (none)      Chạy bot",
+    cmdSetup: "  setup       Setup tương tác (config + hooks)",
+    cmdUpdate: "  update      Cập nhật ccbot lên bản mới nhất",
+    cmdUninstall: "  uninstall   Xóa toàn bộ dữ liệu và hooks ccbot",
+    cmdHelp: "  help        Hiện hướng dẫn này",
+    docs: "docs → https://github.com/palooza-kaida/ccbot",
+  },
+
+  hook: {
+    serverListening: "ccbot: hook server đang lắng nghe tại localhost:{port}",
+    invalidPayload: "ccbot: payload stop event không hợp lệ — thiếu trường bắt buộc",
+    stopEventReceived: "ccbot: nhận stop event cho session {sessionId} tại {cwd}",
+    transcriptFailed: "ccbot: parse transcript thất bại: {error}",
+    notificationFailed: "ccbot: gửi notification thất bại: {error}",
+  },
+
+  config: {
+    notFound: "không tìm thấy config — chạy 'ccbot setup' trước",
+    readError: "đọc config: {error}",
+    mustBeObject: "config phải là một JSON object",
+    invalidToken: "telegram_bot_token phải là string chứa ':' — chạy 'ccbot setup'",
+    invalidUserId: "user_id phải là số nguyên — chạy 'ccbot setup'",
+    invalidPort: "hook_port phải là số nguyên từ 1 đến 65535",
+    invalidSecret: "hook_secret chỉ được chứa ký tự hex (a-f, 0-9)",
+    invalidHookPort: "hook port không hợp lệ: {port} (phải từ 1-65535)",
+    hookAlreadyInstalled: "ccbot hook đã được cài rồi",
+    readSettingsError: "đọc settings: {error}",
+  },
+
+  notification: {
+    title: "🤖 *Claude Code Response*",
+    changes: "📂 *Thay đổi:*",
+  },
+
+  common: {
+    unknownCommand: "lệnh không xác định: {command}",
+    setupFailed: "ccbot: setup thất bại: {error}",
+  },
+};

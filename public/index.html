@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ccbot — Code mọi nơi với AI Agents</title>
-  <meta name="description" content="Tương tác 2 chiều với Claude Code từ Telegram, Discord, Zalo. Code mọi lúc mọi nơi.">
+  <title>ccbot — Code anywhere with AI Agents</title>
+  <meta name="description" content="Two-way interaction with Claude Code from Telegram, Discord, Zalo. Code anytime, anywhere.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -65,8 +65,11 @@
     .flow-line::after {
       content: '';
       position: absolute;
-      right: -3px;
-      top: -3px;
+      width: 0;
+      height: 0;
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
       border: 4px solid transparent;
       border-left-color: var(--color-accent);
     }
@@ -74,8 +77,11 @@
     .flow-line.reverse::before {
       content: '';
       position: absolute;
-      left: -3px;
-      top: -3px;
+      width: 0;
+      height: 0;
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%);
       border: 4px solid transparent;
       border-right-color: var(--color-accent);
     }
@@ -111,29 +117,88 @@
     .step-term { white-space: pre; }
 
     @media (max-width: 700px) {
+      body { font-size: 0.9rem; }
+      main { padding-left: 1rem !important; padding-right: 1rem !important; }
+      nav > div { padding-left: 1rem; padding-right: 1rem; }
+
       .flow-grid { grid-template-columns: 1fr }
-      .flow-center-wrap { flex-direction: row; justify-content: center; padding: 1rem 0 }
-      .flow-line { width: 2px; height: 1.5rem }
+      .flow-center-wrap { flex-direction: row; justify-content: center; align-items: center; padding: 0.75rem 0; gap: 0.25rem; }
+      .flow-line { width: 2px; height: 2rem; }
       .flow-line::after {
-        right: auto; left: -3px; top: auto; bottom: -3px;
-        border: 4px solid transparent;
+        right: auto;
+        top: auto;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 3px solid transparent;
         border-top-color: var(--color-accent);
+        border-left-color: transparent;
       }
+      .flow-line.reverse::after { display: block; }
       .flow-line.reverse::before {
-        left: auto; right: -3px; top: -3px;
-        border: 4px solid transparent;
+        left: 50%;
+        top: -5px;
+        right: auto;
+        transform: translateX(-50%);
+        border: 3px solid transparent;
         border-bottom-color: var(--color-accent);
+        border-right-color: transparent;
+      }
+      .flow-line.reverse::after {
+        right: auto;
+        top: auto;
+        bottom: auto;
+        left: auto;
+        border: none;
+        display: none;
       }
       .nav-hide-mobile { display: none }
       .hero-section { padding: 3rem 0 2rem }
+      .hero-section p { font-size: 0.92rem; }
       .sect-section { padding: 3.5rem 0 }
-      .t-right-wrap { display: none }
-      .t-body-wrap { flex-direction: column; gap: 0.75rem; align-items: flex-start }
+      .sect-section > div:first-child h2 { font-size: 1.35rem; }
+      .sect-section > div:first-child p { font-size: 0.85rem; }
+      .t-right-wrap .pm-tab { padding: 4px 6px; font-size: 0.65rem; }
+      #cplbl { display: none }
+      #cpbtn { padding: 4px 8px; }
+      .step-term { white-space: pre-wrap; word-break: break-all; font-size: 0.7rem; line-height: 1.7; padding: 0.875rem 1rem; }
+      .flow-grid > div { padding: 1.25rem; }
+      .flow-grid > div h3 { font-size: 0.88rem; }
+      .flow-grid > div p { font-size: 0.82rem; }
+      .timeline { padding-left: 2rem; }
+      .timeline h3 { font-size: 1rem; }
+      .timeline p { font-size: 0.78rem; }
+      .tl-item { padding-bottom: 2rem; }
+
+      #features .grid { grid-template-columns: 40px 1fr; gap: 0.875rem; padding-top: 1.25rem; padding-bottom: 1.25rem; }
+      #features .grid h3 { font-size: 0.9rem; }
+      #features .grid p { font-size: 0.82rem; }
+      #features .grid > div:first-child { width: 40px; height: 40px; }
+
+      #setup .grid { gap: 0.75rem; }
+      #setup .grid h3 { font-size: 0.9rem; }
+      #setup .grid p { font-size: 0.82rem; }
+
+      .hero-section img { width: 56px; height: 56px; }
+      .sect-section > div:first-child { margin-bottom: 2rem; }
     }
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto }
     }
+
+    .lang-dropdown { position: relative }
+    .lang-trigger { display: flex; align-items: center; gap: 4px; padding: 5px 8px; border: none; background: transparent; font-family: var(--font-sans); font-size: 0.72rem; font-weight: 600; color: var(--color-txt-3); cursor: pointer; border-radius: 6px; transition: all 0.15s }
+    .lang-trigger:hover { background: #ECECEE; color: var(--color-txt) }
+    .lang-trigger svg { width: 10px; height: 10px; opacity: 0.4; transition: transform 0.2s }
+    .lang-dropdown.open .lang-trigger { background: var(--color-bg-warm); color: var(--color-txt-2) }
+    .lang-dropdown.open .lang-trigger svg { transform: rotate(180deg) }
+    .lang-menu { position: absolute; top: calc(100% + 6px); right: 0; min-width: 100px; background: white; border: none; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04); padding: 4px; opacity: 0; visibility: hidden; transform: translateY(-4px); transition: all 0.15s ease }
+    .lang-dropdown.open .lang-menu { opacity: 1; visibility: visible; transform: translateY(0) }
+    .lang-option { display: flex; align-items: center; gap: 8px; width: 100%; padding: 7px 12px; border: none; background: transparent; font-family: var(--font-sans); font-size: 0.78rem; font-weight: 500; color: var(--color-txt-2); cursor: pointer; border-radius: 7px; transition: all 0.12s }
+    .lang-option:hover { background: var(--color-bg-warm); color: var(--color-txt) }
+    .lang-option.active { color: var(--color-accent); font-weight: 600 }
+    .lang-option.active::after { content: '✓'; margin-left: auto; font-size: 0.7rem }
   </style>
 </head>
 <body>
@@ -145,15 +210,27 @@
         <span class="font-bold text-base tracking-tight">ccbot</span>
       </a>
       <ul class="flex items-center gap-7 list-none">
-        <li class="nav-hide-mobile"><a href="#how-it-works" class="text-sm font-medium text-txt-2 hover:text-txt">Cách hoạt động</a></li>
-        <li class="nav-hide-mobile"><a href="#features" class="text-sm font-medium text-txt-2 hover:text-txt">Tính năng</a></li>
-        <li class="nav-hide-mobile"><a href="#setup" class="text-sm font-medium text-txt-2 hover:text-txt">Cài đặt</a></li>
-        <li class="nav-hide-mobile"><a href="#roadmap" class="text-sm font-medium text-txt-2 hover:text-txt">Roadmap</a></li>
+        <li class="nav-hide-mobile"><a href="#how-it-works" class="text-sm font-medium text-txt-2 hover:text-txt hover:bg-[#ECECEE] px-2.5 py-1.5 rounded-md transition-all duration-150" data-i18n="navHow">How it works</a></li>
+        <li class="nav-hide-mobile"><a href="#features" class="text-sm font-medium text-txt-2 hover:text-txt hover:bg-[#ECECEE] px-2.5 py-1.5 rounded-md transition-all duration-150" data-i18n="navFeat">Features</a></li>
+        <li class="nav-hide-mobile"><a href="#setup" class="text-sm font-medium text-txt-2 hover:text-txt hover:bg-[#ECECEE] px-2.5 py-1.5 rounded-md transition-all duration-150" data-i18n="navSetup">Setup</a></li>
+        <li class="nav-hide-mobile"><a href="#roadmap" class="text-sm font-medium text-txt-2 hover:text-txt hover:bg-[#ECECEE] px-2.5 py-1.5 rounded-md transition-all duration-150" data-i18n="navRoad">Roadmap</a></li>
+        <li>
+          <div class="lang-dropdown" id="langDropdown">
+            <button class="lang-trigger" id="langTrigger" onclick="toggleLangDropdown()">
+              <span id="langCurrent">EN</span>
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+            </button>
+            <div class="lang-menu">
+              <button class="lang-option" data-lang="en" onclick="selectLang('en')">EN</button>
+              <button class="lang-option" data-lang="vi" onclick="selectLang('vi')">VI</button>
+              <button class="lang-option" data-lang="zh" onclick="selectLang('zh')">中文</button>
+            </div>
+          </div>
+        </li>
         <li>
           <a href="https://github.com/palooza-kaida/ccbot" target="_blank" rel="noopener"
-             class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-txt text-white !text-white text-[0.82rem] font-semibold transition-opacity hover:opacity-85 hover:no-underline cursor-pointer">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-            GitHub
+             class="inline-flex items-center justify-center w-9 h-9 rounded-lg text-txt-2 transition-all duration-150 hover:text-txt hover:no-underline cursor-pointer" aria-label="GitHub">
+            <svg class="w-[18px] h-[18px]" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           </a>
         </li>
       </ul>
@@ -167,13 +244,13 @@
         <img src="logo.svg" alt="ccbot hero logo" class="mx-auto w-[72px] h-[72px]">
       </div>
       <h1 class="text-[clamp(2.2rem,5.5vw,3.4rem)] font-extrabold tracking-tighter leading-[1.12] mb-3">
-        Code mọi nơi, <span class="text-accent">mọi lúc</span>
+        <span data-i18n="heroTitle">Code anywhere, </span><span class="text-accent" data-i18n="heroAccent">anytime</span>
       </h1>
-      <p class="text-[1.05rem] text-txt-2 max-w-[540px] mx-auto mb-8 leading-[1.7]">
-        Tương tác 2 chiều với Claude Code qua Telegram, Discord, Zalo. Cầm điện thoại mà vẫn code.
+      <p class="text-[1.05rem] text-txt-2 max-w-[540px] mx-auto mb-8 leading-[1.7]" data-i18n="heroSub">
+        Two-way interaction with Claude Code via Telegram, Discord, Zalo. Code on the go with your phone.
       </p>
 
-      <div class="bg-bg-code rounded-xl overflow-hidden max-w-[600px] mx-auto" id="tw">
+      <div class="bg-bg-code rounded-xl overflow-hidden max-w-[600px] mx-auto w-full" id="tw">
         <div class="flex items-center justify-between px-4 py-2.5 bg-bg-code-2">
           <div class="flex gap-[7px]">
             <i class="w-2.5 h-2.5 rounded-full block bg-[#FF5F57]"></i>
@@ -184,17 +261,17 @@
             <button class="pm-tab px-3 py-1 font-sans text-xs font-semibold text-term-muted bg-transparent border-none rounded-md cursor-pointer transition-all duration-150 hover:text-term-dim-hover" data-pm="npm">npm</button>
             <button class="pm-tab px-3 py-1 font-sans text-xs font-semibold text-term-muted bg-transparent border-none rounded-md cursor-pointer transition-all duration-150 hover:text-term-dim-hover" data-pm="yarn">yarn</button>
             <button class="pm-tab active px-3 py-1 font-sans text-xs font-semibold text-white bg-white/[0.1] border-none rounded-md cursor-pointer transition-all duration-150" data-pm="pnpm">pnpm</button>
-            <button class="pm-tab px-3 py-1 font-sans text-xs font-semibold text-term-muted bg-transparent border-none rounded-md cursor-pointer transition-all duration-150 hover:text-term-dim-hover" data-pm="bun">bun</button>
+
           </div>
         </div>
         <div class="t-body-wrap flex items-center justify-between gap-4 px-5 py-4">
-          <div class="font-mono text-[0.88rem] text-term-text">
+          <div class="font-mono text-[0.88rem] text-term-text min-w-0">
             <span class="text-accent select-none mr-2.5">$</span><span id="cmdtxt">pnpm add -g ccbot</span>
           </div>
           <button id="cpbtn"
                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[7px] bg-white/[0.06] border border-white/10 text-term-dim font-sans text-[0.78rem] font-semibold cursor-pointer transition-all duration-150 shrink-0 hover:bg-white/10 hover:text-term-dim-hover">
             <svg class="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            <span id="cplbl">Copy</span>
+            <span id="cplbl" data-i18n="copyBtn">Copy</span>
           </button>
         </div>
       </div>
@@ -203,33 +280,33 @@
     <!-- HOW IT WORKS -->
     <section class="sect-section py-20" id="how-it-works">
       <div class="mb-12">
-        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Cách hoạt động</p>
-        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">Bridge 2 chiều giữa terminal và điện thoại</h2>
-        <p class="text-[0.95rem] text-txt-2 max-w-[460px]">Gửi prompt, nhận kết quả, approve quyền — tất cả từ nền tảng chat bạn đang dùng.</p>
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2" data-i18n="howLabel">How it works</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2" data-i18n="howTitle">Two-way bridge between terminal and phone</h2>
+        <p class="text-[0.95rem] text-txt-2 max-w-[460px]" data-i18n="howSub">Send prompts, receive results, approve permissions — all from your favorite chat platform.</p>
       </div>
 
       <div class="flow-grid grid grid-cols-[1fr_80px_1fr]">
         <div class="p-8 bg-bg-warm rounded-2xl h-full">
           <h3 class="text-[0.95rem] font-bold mb-2 flex items-center gap-2.5 text-txt">
             <svg class="text-accent shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-            Terminal
+            <span data-i18n="termTitle">Terminal</span>
           </h3>
-          <p class="text-sm text-txt-2 leading-relaxed">Claude Code chạy trên máy. ccbot lắng nghe hook event và JSONL transcript.</p>
+          <p class="text-sm text-txt-2 leading-relaxed" data-i18n="termDesc">Claude Code runs on your machine. ccbot listens to hook events and JSONL transcripts.</p>
         </div>
 
         <div class="flow-center-wrap flex flex-col items-center gap-1 relative self-center">
-          <span class="text-[0.6rem] font-bold uppercase tracking-wider text-accent bg-accent-light px-2 py-0.5 rounded">ccbot</span>
+          <span class="text-[0.6rem] font-bold uppercase tracking-wider text-accent bg-accent-light px-2 py-0.5 rounded mb-1.5">ccbot</span>
           <div class="flow-line"></div>
           <div class="flow-line reverse"></div>
-          <span class="text-[0.6rem] font-bold uppercase tracking-wider text-accent bg-accent-light px-2 py-0.5 rounded">real-time</span>
+          <span class="text-[0.6rem] font-bold uppercase tracking-wider text-accent bg-accent-light px-2 py-0.5 rounded mt-1.5">real-time</span>
         </div>
 
         <div class="p-8 bg-bg-warm rounded-2xl h-full">
           <h3 class="text-[0.95rem] font-bold mb-2 flex items-center gap-2.5 text-txt">
             <svg class="text-accent shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            Bạn
+            <span data-i18n="youTitle">You</span>
           </h3>
-          <p class="text-sm text-txt-2 leading-relaxed">Chat, review, approve từ bất kỳ đâu.</p>
+          <p class="text-sm text-txt-2 leading-relaxed" data-i18n="youDesc">Chat, review, approve from anywhere.</p>
           <div class="flex flex-wrap gap-1.5 mt-3.5">
             <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-[#E3F2FD] text-[#1976D2]">Telegram</span>
             <span class="px-2.5 py-1 rounded-md text-xs font-semibold bg-[#EDE7F6] text-[#5E35B1]">Discord</span>
@@ -243,8 +320,8 @@
     <!-- FEATURES -->
     <section class="sect-section py-20" id="features">
       <div class="mb-12">
-        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Tính năng</p>
-        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">Không chỉ notification</h2>
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2" data-i18n="featLabel">Features</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2" data-i18n="featTitle">More than notifications</h2>
       </div>
 
       <div class="flex flex-col">
@@ -254,10 +331,10 @@
           </div>
           <div>
             <h3 class="text-base font-bold mb-1 flex items-center gap-2">
-              Push notification
+              <span data-i18n="featPushT">Push notification</span>
               <span class="text-[0.6rem] font-bold px-[7px] py-0.5 rounded uppercase tracking-wider bg-accent-light text-accent">Hook-based</span>
             </h3>
-            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Claude Code xong &rarr; notification đẩy ngay. Không polling, không delay.</p>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed" data-i18n="featPushD">Claude Code done → notification pushed instantly. No polling, no delay.</p>
           </div>
         </div>
 
@@ -267,10 +344,10 @@
           </div>
           <div>
             <h3 class="text-base font-bold mb-1 flex items-center gap-2">
-              Tương tác 2 chiều
+              <span data-i18n="feat2wayT">Two-way interaction</span>
               <span class="text-[0.6rem] font-bold px-[7px] py-0.5 rounded uppercase tracking-wider bg-plum-light text-plum">Tier 2</span>
             </h3>
-            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Gửi prompt từ điện thoại, Claude Code nhận và xử lý, response gửi ngược lại. Approve/deny quyền ngay trên chat.</p>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed" data-i18n="feat2wayD">Send prompts from your phone, Claude Code receives and processes, response sent back. Approve/deny permissions right in chat.</p>
           </div>
         </div>
 
@@ -279,8 +356,8 @@
             <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           </div>
           <div>
-            <h3 class="text-base font-bold mb-1">Git diff tự động</h3>
-            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Mỗi notification kèm danh sách file: added, modified, deleted. Biết Claude Code thay đổi gì mà không cần mở máy.</p>
+            <h3 class="text-base font-bold mb-1" data-i18n="featGitT">Auto git diff</h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed" data-i18n="featGitD">Each notification includes file list: added, modified, deleted. Know what Claude Code changed without opening your laptop.</p>
           </div>
         </div>
 
@@ -289,8 +366,8 @@
             <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
           </div>
           <div>
-            <h3 class="text-base font-bold mb-1">Tóm tắt response + chi phí</h3>
-            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Trích xuất nội dung response từ transcript JSONL, kèm thời gian xử lý.</p>
+            <h3 class="text-base font-bold mb-1" data-i18n="featSumT">Response summary + cost</h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed" data-i18n="featSumD">Extract response content from JSONL transcript, with processing time.</p>
           </div>
         </div>
 
@@ -299,8 +376,8 @@
             <svg class="w-[22px] h-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
           </div>
           <div>
-            <h3 class="text-base font-bold mb-1">Self-hosted, code không rời máy</h3>
-            <p class="text-[0.88rem] text-txt-2 leading-relaxed">Whitelist User ID, unauthorized bị ignore im lặng. Mọi thứ chạy trên máy bạn.</p>
+            <h3 class="text-base font-bold mb-1" data-i18n="featSecT">Self-hosted, code stays on your machine</h3>
+            <p class="text-[0.88rem] text-txt-2 leading-relaxed" data-i18n="featSecD">Whitelist User ID, unauthorized gets silently ignored. Everything runs on your machine.</p>
           </div>
         </div>
       </div>
@@ -309,16 +386,16 @@
     <!-- SETUP -->
     <section class="sect-section py-20" id="setup">
       <div class="mb-12">
-        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Cài đặt</p>
-        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">3 bước, 2 phút</h2>
-        <p class="text-[0.95rem] text-txt-2 max-w-[460px]">Cần Node.js &ge; 18 và một Telegram Bot Token.</p>
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2" data-i18n="setupLabel">Setup</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2" data-i18n="setupTitle">3 steps, 2 minutes</h2>
+        <p class="text-[0.95rem] text-txt-2 max-w-[460px]" data-i18n="setupSub">Requires Node.js ≥ 18 and a Telegram Bot Token.</p>
       </div>
 
       <div class="flex flex-col gap-8">
         <div class="grid grid-cols-[32px_1fr] gap-4">
           <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">1</div>
-          <div>
-            <h3 class="text-base font-bold mb-1.5">Tạo Bot Token</h3>
+          <div class="min-w-0">
+            <h3 class="text-base font-bold mb-1.5" data-i18n="s1T">Create Bot Token</h3>
             <p class="text-[0.88rem] text-txt-2 leading-relaxed">
               Mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> trên Telegram &rarr;
               <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; lưu token.<br>
@@ -329,9 +406,9 @@
 
         <div class="grid grid-cols-[32px_1fr] gap-4">
           <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">2</div>
-          <div>
-            <h3 class="text-base font-bold mb-1.5">Cài đặt &amp; chạy setup</h3>
-            <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto"><span class="d">$ </span>pnpm add -g ccbot
+          <div class="min-w-0">
+            <h3 class="text-base font-bold mb-1.5" data-i18n="s2T">Install & run setup</h3>
+            <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto max-w-full"><span class="d">$ </span>pnpm add -g ccbot
 <span class="d">$ </span>ccbot setup
 
 <span class="c">┌  🤖 ccbot setup</span>
@@ -343,7 +420,8 @@
 <span class="c">│  123456789</span>
 <span class="c">│</span>
 <span class="c">◆  Config saved</span>
-<span class="c">◆  Hook installed → ~/.claude/settings.json</span>
+<span class="c">◆  Hook installed →</span>
+<span class="c">   ~/.claude/settings.json</span>
 <span class="c">◆  Chat ID registered</span>
 <span class="c">│</span>
 <span class="c">└  🎉 Setup complete!</span></div>
@@ -352,15 +430,15 @@
 
         <div class="grid grid-cols-[32px_1fr] gap-4">
           <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">3</div>
-          <div>
-            <h3 class="text-base font-bold mb-1.5">Chạy bot</h3>
-            <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto"><span class="d">$ </span>ccbot
+          <div class="min-w-0">
+            <h3 class="text-base font-bold mb-1.5" data-i18n="s3T">Start bot</h3>
+            <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto max-w-full"><span class="d">$ </span>ccbot
 
 <span class="c">ccbot: hook server listening on localhost:9377</span>
 <span class="c">ccbot: telegram bot started</span>
 <span class="c">ccbot: registered chat ID 123456789</span></div>
-            <p class="mt-2.5 text-[0.88rem] text-txt-2 leading-relaxed">
-              Mở Telegram &rarr; gửi <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> &rarr; xong. Dùng Claude Code bình thường.
+            <p class="mt-2.5 text-[0.88rem] text-txt-2 leading-relaxed" data-i18n="s3D">
+              Open Telegram → send <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> → done. Use Claude Code normally.
             </p>
           </div>
         </div>
@@ -370,19 +448,19 @@
     <!-- ROADMAP -->
     <section class="sect-section py-20" id="roadmap">
       <div class="mb-12">
-        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">Roadmap</p>
-        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">Lộ trình dài hơi</h2>
-        <p class="text-[0.95rem] text-txt-2 max-w-[520px]">Telegram-first — hoàn thiện trải nghiệm trên Telegram trước, sau đó mở rộng ra các nền tảng khác.</p>
+        <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2" data-i18n="roadLabel">Roadmap</p>
+        <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2" data-i18n="roadTitle">Long-term roadmap</h2>
+        <p class="text-[0.95rem] text-txt-2 max-w-[520px]" data-i18n="roadSub">Telegram-first — perfect the experience on Telegram first, then expand to other platforms.</p>
       </div>
 
       <div class="timeline relative pl-10 max-w-[680px]">
 
         <div class="tl-item done relative pb-11">
           <div class="tl-dot done"></div>
-          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-emerald">Phase 1 · Hoàn thành</p>
-          <h3 class="text-lg font-bold mb-1.5">Notification cơ bản</h3>
-          <p class="text-[0.82rem] text-txt-3 mb-3">Push thông báo từ Claude Code hook đến Telegram.</p>
-          <div class="flex flex-wrap gap-2">
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-emerald" data-i18n="p1L">Phase 1 · Complete</p>
+          <h3 class="text-lg font-bold mb-1.5" data-i18n="p1T">Basic notification</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3" data-i18n="p1D">Push notifications from Claude Code hook to Telegram.</p>
+          <div class="flex flex-wrap gap-2" data-i18n-tags="p1Tags" data-tag-class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Stop hook</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Git diff</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-emerald-light text-emerald transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Markdown format</span>
@@ -393,11 +471,11 @@
 
         <div class="tl-item wip relative pb-11">
           <div class="tl-dot wip"></div>
-          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-accent">Phase 2 · Đang phát triển</p>
-          <h3 class="text-lg font-bold mb-1.5">Chat 2 chiều</h3>
-          <p class="text-[0.82rem] text-txt-3 mb-3">Gửi prompt và nhận response trực tiếp từ Telegram.</p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Gửi prompt</span>
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-accent" data-i18n="p2L">Phase 2 · In development</p>
+          <h3 class="text-lg font-bold mb-1.5" data-i18n="p2T">Two-way chat</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3" data-i18n="p2D">Send prompts and receive responses directly from Telegram.</p>
+          <div class="flex flex-wrap gap-2" data-i18n-tags="p2Tags" data-tag-class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">
+            <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Send prompt</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Approve / Deny</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Response streaming</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-accent-light text-accent transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Session management</span>
@@ -406,10 +484,10 @@
 
         <div class="tl-item relative pb-11">
           <div class="tl-dot soon"></div>
-          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 3</p>
-          <h3 class="text-lg font-bold mb-1.5">Terminal control</h3>
-          <p class="text-[0.82rem] text-txt-3 mb-3">Điều khiển terminal từ xa qua Telegram.</p>
-          <div class="flex flex-wrap gap-2">
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3" data-i18n="p3L">Phase 3</p>
+          <h3 class="text-lg font-bold mb-1.5" data-i18n="p3T">Terminal control</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3" data-i18n="p3D">Control terminal remotely via Telegram.</p>
+          <div class="flex flex-wrap gap-2" data-i18n-tags="p3Tags" data-tag-class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">tmux bridge</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Screenshot capture</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Live output</span>
@@ -419,10 +497,10 @@
 
         <div class="tl-item relative pb-11">
           <div class="tl-dot soon"></div>
-          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 4</p>
-          <h3 class="text-lg font-bold mb-1.5">Developer experience</h3>
-          <p class="text-[0.82rem] text-txt-3 mb-3">Nâng cao trải nghiệm lập trình viên.</p>
-          <div class="flex flex-wrap gap-2">
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3" data-i18n="p4L">Phase 4</p>
+          <h3 class="text-lg font-bold mb-1.5" data-i18n="p4T">Developer experience</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3" data-i18n="p4D">Enhance developer experience.</p>
+          <div class="flex flex-wrap gap-2" data-i18n-tags="p4Tags" data-tag-class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Multi-project</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Config profiles</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Webhook API</span>
@@ -432,10 +510,10 @@
 
         <div class="tl-item relative pb-11">
           <div class="tl-dot soon"></div>
-          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 5</p>
-          <h3 class="text-lg font-bold mb-1.5">Multi-platform</h3>
-          <p class="text-[0.82rem] text-txt-3 mb-3">Mở rộng sang các nền tảng chat khác sau khi Telegram ổn định.</p>
-          <div class="flex flex-wrap gap-2">
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3" data-i18n="p5L">Phase 5</p>
+          <h3 class="text-lg font-bold mb-1.5" data-i18n="p5T">Multi-platform</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3" data-i18n="p5D">Expand to other chat platforms after Telegram is stable.</p>
+          <div class="flex flex-wrap gap-2" data-i18n-tags="p5Tags" data-tag-class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Discord</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Zalo</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Slack</span>
@@ -445,10 +523,10 @@
 
         <div class="tl-item relative pb-0">
           <div class="tl-dot soon"></div>
-          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3">Phase 6</p>
-          <h3 class="text-lg font-bold mb-1.5">Ecosystem</h3>
-          <p class="text-[0.82rem] text-txt-3 mb-3">Hệ sinh thái mở rộng cho team và cộng đồng.</p>
-          <div class="flex flex-wrap gap-2">
+          <p class="text-[0.68rem] font-bold uppercase tracking-[0.08em] mb-1.5 text-txt-3" data-i18n="p6L">Phase 6</p>
+          <h3 class="text-lg font-bold mb-1.5" data-i18n="p6T">Ecosystem</h3>
+          <p class="text-[0.82rem] text-txt-3 mb-3" data-i18n="p6D">Open ecosystem for teams and community.</p>
+          <div class="flex flex-wrap gap-2" data-i18n-tags="p6Tags" data-tag-class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Plugin system</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Team collaboration</span>
             <span class="px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium bg-bg-warm text-txt-2 transition-transform duration-150 hover:-translate-y-px hover:shadow-md">Web dashboard</span>
@@ -472,7 +550,7 @@
       npm:  'npm i -g ccbot',
       yarn: 'yarn global add ccbot',
       pnpm: 'pnpm add -g ccbot',
-      bun:  'bun add -g ccbot',
+
     };
     let pm = 'pnpm';
     const ct = document.getElementById('cmdtxt');
@@ -494,16 +572,32 @@
       });
     });
 
+    function toggleLangDropdown() {
+      document.getElementById('langDropdown').classList.toggle('open');
+    }
+
+    function selectLang(lang) {
+      if (I18N_LOCALES[lang]) applyTranslations(lang);
+      document.getElementById('langDropdown').classList.remove('open');
+    }
+
+    document.addEventListener('click', e => {
+      const dd = document.getElementById('langDropdown');
+      if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+    });
+
     cb.addEventListener('click', () => {
       navigator.clipboard.writeText(cmds[pm]);
       cb.classList.add('bg-[rgba(46,139,87,0.2)]', 'text-emerald', 'border-[rgba(46,139,87,0.3)]');
-      cl.textContent = 'Copied!';
+      const lang = localStorage.getItem('ccbot-locale') || 'en';
+      cl.textContent = I18N_LOCALES[lang]?.copiedBtn || 'Copied!';
       setTimeout(() => {
         cb.classList.remove('bg-[rgba(46,139,87,0.2)]', 'text-emerald', 'border-[rgba(46,139,87,0.3)]');
-        cl.textContent = 'Copy';
+        cl.textContent = I18N_LOCALES[lang]?.copyBtn || 'Copy';
       }, 1500);
     });
   </script>
+  <script src="i18n.js"></script>
 
 </body>
 </html>

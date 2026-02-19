@@ -6,6 +6,8 @@ import {
   type GitChange,
 } from "../telegram/message-formatter.js";
 import { formatError } from "../utils/error-utils.js";
+import { GitChangeStatus } from "../utils/constants.js";
+import { t } from "../i18n/index.js";
 
 const GIT_TIMEOUT_MS = 10_000;
 
@@ -37,17 +39,17 @@ export class HookHandler {
 
   handleStopEvent(event: unknown): void {
     if (!isValidStopEvent(event)) {
-      console.log("ccbot: invalid stop event payload — missing required fields");
+      console.log(t("hook.invalidPayload"));
       return;
     }
 
-    console.log(`ccbot: stop event received for session ${event.session_id} at ${event.cwd}`);
+    console.log(t("hook.stopEventReceived", { sessionId: event.session_id, cwd: event.cwd }));
 
     let summary = { lastAssistantMessage: "", durationMs: 0, totalCostUSD: 0 };
     try {
       summary = parseTranscript(event.transcript_path);
     } catch (err: unknown) {
-      console.log(`ccbot: failed to parse transcript: ${formatError(err)}`);
+      console.log(t("hook.transcriptFailed", { error: formatError(err) }));
     }
 
     const gitChanges = this.collectGitChanges(event.cwd);
@@ -65,7 +67,7 @@ export class HookHandler {
     });
 
     this.notify(notification).catch((err: unknown) => {
-      console.log(`ccbot: failed to send notification: ${formatError(err)}`);
+      console.log(t("hook.notificationFailed", { error: formatError(err) }));
     });
   }
 
@@ -85,7 +87,7 @@ export class HookHandler {
           timeout: GIT_TIMEOUT_MS,
         });
         for (const file of untrackedOutput.trim().split("\n")) {
-          if (file) changes.push({ file, status: "added" });
+          if (file) changes.push({ file, status: GitChangeStatus.Added });
         }
       } catch {}
 
@@ -113,10 +115,10 @@ export class HookHandler {
       const parts = line.split("\t");
       if (parts.length < 2) continue;
 
-      let status: GitChange["status"] = "modified";
-      if (parts[0].startsWith("A")) status = "added";
-      else if (parts[0].startsWith("D")) status = "deleted";
-      else if (parts[0].startsWith("R")) status = "renamed";
+      let status: GitChange["status"] = GitChangeStatus.Modified;
+      if (parts[0].startsWith("A")) status = GitChangeStatus.Added;
+      else if (parts[0].startsWith("D")) status = GitChangeStatus.Deleted;
+      else if (parts[0].startsWith("R")) status = GitChangeStatus.Renamed;
 
       changes.push({ file: parts[1], status });
     }
@@ -133,17 +135,17 @@ export class HookHandler {
       const statusCode = line.slice(0, 2).trim();
       const file = line.slice(3).trim();
 
-      let status: GitChange["status"] = "modified";
+      let status: GitChange["status"] = GitChangeStatus.Modified;
       switch (statusCode) {
         case "??":
         case "A":
-          status = "added";
+          status = GitChangeStatus.Added;
           break;
         case "D":
-          status = "deleted";
+          status = GitChangeStatus.Deleted;
           break;
         case "R":
-          status = "renamed";
+          status = GitChangeStatus.Renamed;
           break;
       }
 

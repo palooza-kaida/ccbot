@@ -1,15 +1,31 @@
 import { readFileSync, writeFileSync, mkdirSync, unlinkSync, rmdirSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
+import { t } from "../i18n/index.js";
 
 export class HookInstaller {
   private static readonly HOOKS_DIR = join(homedir(), ".ccbot", "hooks");
   private static readonly SCRIPT_PATH = join(HookInstaller.HOOKS_DIR, "stop-notify.sh");
   private static readonly SETTINGS_PATH = join(homedir(), ".claude", "settings.json");
 
+  static isInstalled(): boolean {
+    try {
+      const settings = HookInstaller.readSettings();
+      const hooks = (settings.hooks ?? {}) as Record<string, unknown>;
+      const existingStop = (hooks.Stop ?? []) as Array<Record<string, unknown>>;
+
+      return existingStop.some((entry) => {
+        const entryHooks = entry.hooks as Array<Record<string, unknown>> | undefined;
+        return entryHooks?.some((h) => typeof h.command === "string" && (h.command as string).includes("ccbot"));
+      });
+    } catch {
+      return false;
+    }
+  }
+
   static install(hookPort: number, hookSecret: string): void {
     if (!Number.isInteger(hookPort) || hookPort < 1 || hookPort > 65535) {
-      throw new Error(`invalid hook port: ${hookPort} (must be 1-65535)`);
+      throw new Error(t("config.invalidHookPort", { port: hookPort }));
     }
 
     const settings = HookInstaller.readSettings();
@@ -17,13 +33,8 @@ export class HookInstaller {
     const hooks: Record<string, unknown> = (settings.hooks ?? {}) as Record<string, unknown>;
     const existingStop = (hooks.Stop ?? []) as Array<Record<string, unknown>>;
 
-    const alreadyInstalled = existingStop.some((entry) => {
-      const entryHooks = entry.hooks as Array<Record<string, unknown>> | undefined;
-      return entryHooks?.some((h) => typeof h.command === "string" && (h.command as string).includes("ccbot"));
-    });
-
-    if (alreadyInstalled) {
-      throw new Error("ccbot hook already installed");
+    if (HookInstaller.isInstalled()) {
+      throw new Error(t("config.hookAlreadyInstalled"));
     }
 
     existingStop.push({
@@ -108,7 +119,7 @@ curl -s -X POST http://localhost:${hookPort}/hook/stop \\
       if (err instanceof Error && "code" in err && (err as NodeJS.ErrnoException).code === "ENOENT") {
         return {};
       }
-      throw new Error(`read settings: ${err instanceof Error ? err.message : String(err)}`);
+      throw new Error(t("config.readSettingsError", { error: err instanceof Error ? err.message : String(err) }));
     }
   }
 }

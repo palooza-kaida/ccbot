@@ -6,17 +6,21 @@ import { ConfigManager, type Config } from "../config-manager.js";
 import { HookInstaller } from "../hook/hook-installer.js";
 import { detectCliPrefix } from "../utils/install-detection.js";
 import { formatError } from "../utils/error-utils.js";
+import { t, setLocale, type Locale, SUPPORTED_LOCALES, LOCALE_LABELS } from "../i18n/index.js";
 
 export async function runSetup(): Promise<void> {
-  p.intro("🤖 ccbot setup");
+  p.intro(t("setup.intro"));
 
   let existing: Config | null = null;
   try {
     existing = ConfigManager.load();
   } catch {}
 
+  const locale = await promptLanguage(existing);
+  setLocale(locale);
+
   const credentials = await promptCredentials(existing);
-  const config = buildConfig(credentials, existing);
+  const config = buildConfig(credentials, existing, locale);
 
   saveConfig(config);
   installHook(config);
@@ -24,7 +28,25 @@ export async function runSetup(): Promise<void> {
 
   const startCommand = detectCliPrefix();
 
-  p.outro(`🎉 Setup complete!\n\n  Next steps:\n  1. Start bot:  ${startCommand}\n  2. Use Claude Code normally → notifications will arrive`);
+  p.outro(t("setup.complete", { command: startCommand }));
+}
+
+async function promptLanguage(existing: Config | null): Promise<Locale> {
+  const result = await p.select({
+    message: t("setup.languageMessage"),
+    initialValue: existing?.locale ?? "en",
+    options: SUPPORTED_LOCALES.map((loc) => ({
+      value: loc,
+      label: LOCALE_LABELS[loc],
+    })),
+  });
+
+  if (p.isCancel(result)) {
+    p.cancel(t("setup.cancelled"));
+    process.exit(0);
+  }
+
+  return result;
 }
 
 interface Credentials {
@@ -37,28 +59,28 @@ async function promptCredentials(existing: Config | null): Promise<Credentials> 
     {
       token: () =>
         p.text({
-          message: "Telegram Bot Token",
-          placeholder: "Get from @BotFather → /newbot",
+          message: t("setup.tokenMessage"),
+          placeholder: t("setup.tokenPlaceholder"),
           initialValue: existing?.telegram_bot_token ?? "",
           validate(value) {
-            if (!value || !value.trim()) return "Bot token is required";
-            if (!value.includes(":")) return "Invalid format (expected: 123456:ABC-xxx)";
+            if (!value || !value.trim()) return t("setup.tokenRequired");
+            if (!value.includes(":")) return t("setup.tokenInvalidFormat");
           },
         }),
       userId: () =>
         p.text({
-          message: "Your Telegram User ID",
-          placeholder: "Send /start to @userinfobot",
+          message: t("setup.userIdMessage"),
+          placeholder: t("setup.userIdPlaceholder"),
           initialValue: existing?.user_id?.toString() ?? "",
           validate(value) {
-            if (!value || !value.trim()) return "User ID is required";
-            if (isNaN(parseInt(value, 10))) return "Must be a number";
+            if (!value || !value.trim()) return t("setup.userIdRequired");
+            if (isNaN(parseInt(value, 10))) return t("setup.userIdMustBeNumber");
           },
         }),
     },
     {
       onCancel: () => {
-        p.cancel("Setup cancelled.");
+        p.cancel(t("setup.cancelled"));
         process.exit(0);
       },
     },
@@ -70,32 +92,34 @@ async function promptCredentials(existing: Config | null): Promise<Credentials> 
   };
 }
 
-function buildConfig(credentials: Credentials, existing: Config | null): Config {
+function buildConfig(credentials: Credentials, existing: Config | null, locale: Locale): Config {
   return {
     telegram_bot_token: credentials.token,
     user_id: credentials.userId,
     hook_port: existing?.hook_port || 9377,
     hook_secret: existing?.hook_secret || ConfigManager.generateSecret(),
+    locale,
   };
 }
 
 function saveConfig(config: Config): void {
   ConfigManager.save(config);
-  p.log.success("Config saved");
+  p.log.success(t("setup.configSaved"));
 }
 
 function installHook(config: Config): void {
+  if (HookInstaller.isInstalled()) {
+    p.log.step(t("setup.hookAlreadyInstalled"));
+    return;
+  }
+
   try {
     HookInstaller.install(config.hook_port, config.hook_secret);
-    p.log.success("Hook installed → ~/.claude/settings.json");
+    p.log.success(t("setup.hookInstalled"));
   } catch (err: unknown) {
     const msg = formatError(err);
-    if (msg.includes("already installed")) {
-      p.log.step("Hook already installed");
-    } else {
-      p.log.error(`Hook installation failed: ${msg}`);
-      throw new Error(`install hook: ${msg}`);
-    }
+    p.log.error(t("setup.hookFailed", { error: msg }));
+    throw new Error(`install hook: ${msg}`);
   }
 }
 
@@ -120,5 +144,5 @@ function registerChatId(userId: number): void {
   state.chat_id = userId;
   mkdirSync(stateDir, { recursive: true });
   writeFileSync(stateFile, JSON.stringify(state, null, 2), { mode: 0o600 });
-  p.log.success("Chat ID registered");
+  p.log.success(t("setup.chatIdRegistered"));
 }

@@ -5,6 +5,7 @@ import { homedir } from "node:os";
 import { type Config, ConfigManager } from "../config-manager.js";
 import { sendMessage } from "./message-sender.js";
 import { formatError } from "../utils/error-utils.js";
+import { t, getTranslations } from "../i18n/index.js";
 
 interface BotState {
   chat_id: number | null;
@@ -17,6 +18,7 @@ export class Bot {
 
   private static readonly STATE_DIR = join(homedir(), ".ccbot");
   private static readonly STATE_FILE = join(Bot.STATE_DIR, "state.json");
+  private static readonly MINI_APP_URL = "https://palooza-kaida.github.io/ccbot/";
 
   constructor(cfg: Config) {
     this.cfg = cfg;
@@ -25,9 +27,11 @@ export class Bot {
     this.registerHandlers();
   }
 
-  start(): void {
+  async start(): Promise<void> {
     this.bot.startPolling();
-    console.log("ccbot: telegram bot started");
+    await this.registerCommands();
+    await this.registerMenuButton();
+    console.log(t("bot.telegramStarted"));
   }
 
   stop(): Promise<void> {
@@ -39,21 +43,55 @@ export class Bot {
 
   async sendNotification(text: string): Promise<void> {
     if (!this.chatId) {
-      console.log("ccbot: no chat ID yet — run 'ccbot setup' or send /start to the bot");
+      console.log(t("bot.noChatId"));
       return;
     }
 
     try {
       await sendMessage(this.bot, this.chatId, text);
     } catch (err: unknown) {
-      console.log(`ccbot: failed to send notification: ${formatError(err)}`);
+      console.log(t("bot.notificationFailed", { error: formatError(err) }));
+    }
+  }
+
+  private async registerCommands(): Promise<void> {
+    const translations = getTranslations();
+    const commands: TelegramBot.BotCommand[] = [
+      { command: "start", description: translations.bot.commands.start },
+      { command: "ping", description: translations.bot.commands.ping },
+      { command: "status", description: translations.bot.commands.status },
+    ];
+
+    try {
+      await this.bot.setMyCommands(commands);
+      console.log(t("bot.commandsRegistered"));
+    } catch (err: unknown) {
+      console.log(t("bot.commandsRegisterFailed", { error: formatError(err) }));
+    }
+  }
+
+  private async registerMenuButton(): Promise<void> {
+    try {
+      await this.bot.setChatMenuButton({
+        menu_button: {
+          type: "web_app",
+          text: "📱 Dashboard",
+          web_app: { url: Bot.MINI_APP_URL },
+        },
+      });
+      console.log(t("bot.menuButtonRegistered"));
+    } catch (err: unknown) {
+      console.log(t("bot.menuButtonFailed", { error: formatError(err) }));
     }
   }
 
   private registerHandlers(): void {
     this.bot.on("message", (msg) => {
       if (!ConfigManager.isOwner(this.cfg, msg.from?.id ?? 0)) {
-        console.log(`ccbot: unauthorized user ${msg.from?.id} (${msg.from?.username})`);
+        console.log(t("bot.unauthorizedUser", {
+          userId: msg.from?.id ?? 0,
+          username: msg.from?.username ?? "",
+        }));
         return;
       }
 
@@ -62,10 +100,10 @@ export class Bot {
       if (text === "/start") {
         this.chatId = msg.chat.id;
         this.saveState();
-        console.log(`ccbot: registered chat ID ${msg.chat.id}`);
+        console.log(t("bot.registeredChatId", { chatId: msg.chat.id }));
         this.bot.sendMessage(
           msg.chat.id,
-          "✅ *ccbot* đã sẵn sàng\\.\\n\\nBạn sẽ nhận notification khi Claude Code hoàn thành response\\.",
+          t("bot.ready"),
           { parse_mode: "MarkdownV2" },
         );
         return;
@@ -77,7 +115,7 @@ export class Bot {
       }
 
       if (text === "/status") {
-        this.bot.sendMessage(msg.chat.id, "🟢 ccbot đang chạy");
+        this.bot.sendMessage(msg.chat.id, t("bot.running"));
         return;
       }
     });

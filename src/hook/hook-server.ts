@@ -1,6 +1,7 @@
 import express, { type Express } from "express";
 import type { Server } from "node:http";
 import { HookHandler } from "./hook-handler.js";
+import { t } from "../i18n/index.js";
 
 export class HookServer {
   private app: Express;
@@ -18,7 +19,7 @@ export class HookServer {
 
   start(): void {
     this.server = this.app.listen(this.port, "127.0.0.1", () => {
-      console.log(`ccbot: hook server listening on localhost:${this.port}`);
+      console.log(t("hook.serverListening", { port: this.port }));
     });
   }
 
