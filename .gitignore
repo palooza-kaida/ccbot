@@ -1,0 +1,6 @@
+.env
+.ccbot/
+dist/
+node_modules/
+docs
+.claude
