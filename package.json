@@ -50,7 +50,7 @@
     "uninstall": "tsx src/index.ts uninstall",
     "help": "tsx src/index.ts help",
     "build:web": "cd web && npx astro build",
-    "deploy:web": "npm run build:web && gh-pages -d web/dist",
+    "deploy:web": "npm run build:web && gh-pages -d web/dist --dotfiles",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "format": "prettier --write 'src/**/*.ts'",
