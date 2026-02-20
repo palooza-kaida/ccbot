@@ -49,9 +49,14 @@ export function localePath(locale: Locale, path: string = "/"): string {
   return `/${locale}${cleanPath}`;
 }
 
-export function alternateLocales(currentLocale: Locale, currentPath: string) {
-  return SUPPORTED_LOCALES.map((locale) => ({
-    locale,
-    href: localePath(locale, currentPath),
-  }));
+export function alternateLocales(
+  currentLocale: Locale,
+  currentPath: string,
+  base: string = "/",
+) {
+  return SUPPORTED_LOCALES.map((locale) => {
+    const relative = localePath(locale, currentPath);
+    const withBase = base.endsWith("/") ? base.slice(0, -1) : base;
+    return { locale, href: `${withBase}${relative}` };
+  });
 }

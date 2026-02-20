@@ -16,7 +16,7 @@ const { locale, currentPath = "/", showSectionNav = false } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const title = Astro.props.title ?? ts(locale, "title");
 const description = Astro.props.description ?? ts(locale, "metaDesc");
-const alternates = alternateLocales(locale, currentPath);
+const alternates = alternateLocales(locale, currentPath, base);
 ---
 
 <!DOCTYPE html>
