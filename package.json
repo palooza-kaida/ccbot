@@ -49,7 +49,18 @@
     "setup": "tsx src/index.ts setup",
     "uninstall": "tsx src/index.ts uninstall",
     "help": "tsx src/index.ts help",
-    "deploy:web": "gh-pages -d public"
+    "deploy:web": "gh-pages -d public",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts'",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@clack/prompts": "^1.0.1",
@@ -58,11 +69,19 @@
     "node-telegram-bot-api": "^0.66.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.4",
     "@types/node-telegram-bot-api": "^0.64.8",
+    "eslint": "^10.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
     "gh-pages": "^6.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.8.1",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.56.0"
   }
 }
