@@ -2,7 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import type { ViewState } from "./types";
 import { tClient } from "../../i18n";
 import { fetchResponse, parseQueryParams } from "./api";
-import { ErrorState, GitChangesPanel, LoadingState, MetaBar, ResponseHeader } from "./ResponseParts";
+import { ErrorState, GitChangesPanel, LoadingState, ResponseMeta } from "./ResponseParts";
 import { MarkdownBody } from "./MarkdownBody";
 
 declare const Telegram: { WebApp: { ready: () => void; expand: () => void } } | undefined;
@@ -18,7 +18,6 @@ export default function ResponseViewer() {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
     }
-
     loadResponse();
   }, []);
 
@@ -49,14 +48,11 @@ export default function ResponseViewer() {
   }
 
   return (
-    <>
-      <MetaBar project={project} durationMs={durationMs} />
-
-      <main class="max-w-[780px] mx-auto px-6 py-7 pb-16">
+    <div class="rv">
+      <main class="rv__body">
+        <ResponseMeta project={project} durationMs={durationMs} timestamp={timestamp} />
         {viewState.kind === "loading" && <LoadingState />}
-
         {viewState.kind === "error" && <ErrorState message={viewState.message} />}
-
         {viewState.kind === "success" && (
           <>
             {viewState.data.responseSummary && (
@@ -66,8 +62,6 @@ export default function ResponseViewer() {
           </>
         )}
       </main>
-
-      {timestamp && <ResponseHeader timestamp={timestamp} />}
-    </>
+    </div>
   );
 }

@@ -89,5 +89,5 @@ export const zh: Record<string, string | string[]> = {
   responseLoading: "正在加载响应...",
   responseNotFound: "未找到响应",
   responseExpired: "响应数据已过期。基本信息显示在上方。",
-  responseChanges: "📂 变更",
+  responseChanges: "变更",
 };

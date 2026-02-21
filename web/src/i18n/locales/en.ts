@@ -89,5 +89,5 @@ export const en: Record<string, string | string[]> = {
   responseLoading: "Loading response...",
   responseNotFound: "Response not found",
   responseExpired: "Response data has expired. Basic info is shown above.",
-  responseChanges: "📂 Changes",
+  responseChanges: "Changes",
 };

@@ -89,5 +89,5 @@ export const vi: Record<string, string | string[]> = {
   responseLoading: "Đang tải response...",
   responseNotFound: "Không tìm thấy response",
   responseExpired: "Dữ liệu response đã hết hạn. Thông tin cơ bản hiển thị ở trên.",
-  responseChanges: "📂 Thay đổi",
+  responseChanges: "Thay đổi",
 };

@@ -1,0 +1,10 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ResponsePreview from "../components/response/ResponsePreview";
+
+const locale = "en";
+---
+
+<BaseLayout locale={locale} title="ccpoke — Preview" description="Response UI preview" currentPath="/preview">
+  <ResponsePreview client:only="preact" />
+</BaseLayout>
