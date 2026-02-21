@@ -156,15 +156,30 @@ a:hover { color: var(--color-accent-hover) }
 }
 
 .rv-header__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.75rem;
   font-weight: 400;
   color: var(--color-txt-3);
+}
+
+.rv-header__model {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-plum);
+  background: var(--color-plum-light);
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: -0.01em;
 }
 
 .rv__body {
   max-width: var(--max-width-content);
   margin: 0 auto;
   padding: 2rem 1.5rem 4rem;
+  overflow-x: hidden;
 }
 
 /* ---- Changes ---- */
@@ -321,6 +336,35 @@ a:hover { color: var(--color-accent-hover) }
 
 /* ---- Markdown ---- */
 
+.md-body {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.md-table-wrap {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0 0 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.md-body .md-table-wrap table {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.md-table-wrap th:first-child,
+.md-table-wrap td:first-child { border-left: none; }
+.md-table-wrap th:last-child,
+.md-table-wrap td:last-child { border-right: none; }
+.md-table-wrap tr:first-child th { border-top: none; }
+.md-table-wrap tr:last-child td { border-bottom: none; }
+
 .md-body h1 {
   font-size: 1.4rem;
   font-weight: 800;
@@ -417,12 +461,14 @@ a:hover { color: var(--color-accent-hover) }
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--color-border);
   color: var(--color-txt);
+  white-space: nowrap;
 }
 
 .md-body td {
   padding: 0.4rem 0.75rem;
   border: 1px solid var(--color-border);
   color: var(--color-txt-2);
+  max-width: 280px;
 }
 
 .md-body hr { margin: 1.5rem 0; border: none; height: 0; }

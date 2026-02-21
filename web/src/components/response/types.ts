@@ -4,6 +4,7 @@ export interface ResponseData {
   responseSummary?: string;
   gitChanges?: GitChange[];
   timestamp?: string;
+  model?: string;
 }
 
 export interface GitChange {

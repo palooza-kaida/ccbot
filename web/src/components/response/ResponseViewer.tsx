@@ -12,6 +12,7 @@ export default function ResponseViewer() {
   const [project, setProject] = useState("");
   const [durationMs, setDurationMs] = useState(0);
   const [timestamp, setTimestamp] = useState<string | undefined>();
+  const [model, setModel] = useState("");
 
   useEffect(() => {
     if (typeof Telegram !== "undefined" && Telegram?.WebApp) {
@@ -41,6 +42,7 @@ export default function ResponseViewer() {
       if (result.data.projectName) setProject(result.data.projectName);
       if (result.data.durationMs) setDurationMs(result.data.durationMs);
       if (result.data.timestamp) setTimestamp(result.data.timestamp);
+      if (result.data.model) setModel(result.data.model);
       setViewState(result);
     } catch {
       setViewState({ kind: "error", message: tClient("responseExpired") });
@@ -50,7 +52,7 @@ export default function ResponseViewer() {
   return (
     <div class="rv">
       <main class="rv__body">
-        <ResponseMeta project={project} durationMs={durationMs} timestamp={timestamp} />
+        <ResponseMeta project={project} durationMs={durationMs} timestamp={timestamp} model={model} />
         {viewState.kind === "loading" && <LoadingState />}
         {viewState.kind === "error" && <ErrorState message={viewState.message} />}
         {viewState.kind === "success" && (

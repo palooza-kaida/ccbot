@@ -47,6 +47,16 @@ hljs.registerLanguage("sql", sql);
 
 marked.setOptions({ breaks: true, gfm: true });
 
+function wrapTablesInScrollContainer(container: HTMLElement) {
+  container.querySelectorAll("table").forEach((table) => {
+    if (table.parentElement?.classList.contains("md-table-wrap")) return;
+    const wrapper = document.createElement("div");
+    wrapper.className = "md-table-wrap";
+    table.parentNode!.insertBefore(wrapper, table);
+    wrapper.appendChild(table);
+  });
+}
+
 export function useMarkdownRenderer() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -56,6 +66,7 @@ export function useMarkdownRenderer() {
     containerRef.current
       .querySelectorAll("pre code")
       .forEach((block) => hljs.highlightElement(block as HTMLElement));
+    wrapTablesInScrollContainer(containerRef.current);
   }, []);
 
   return { containerRef, render };

@@ -1,7 +1,7 @@
 
 import { useState } from "preact/hooks";
 import { tClient } from "../../i18n";
-import { formatDuration } from "../../lib/format";
+import { formatDuration, formatModelName } from "../../lib/format";
 import { GIT_STATUS_STYLES } from "../../lib/constants";
 import type { GitChange } from "./types";
 
@@ -9,12 +9,14 @@ export function ResponseMeta({
   project,
   durationMs,
   timestamp,
+  model,
 }: {
   project: string;
   durationMs: number;
   timestamp?: string;
+  model?: string;
 }) {
-  const hasAnyMeta = project || durationMs > 0 || timestamp;
+  const hasAnyMeta = project || durationMs > 0 || timestamp || model;
   if (!hasAnyMeta) return null;
 
   const leftParts: string[] = [];
@@ -29,10 +31,20 @@ export function ResponseMeta({
     dateStr = `${date} ${time}`;
   }
 
+  const rightParts: preact.JSX.Element[] = [];
+  if (model) {
+    rightParts.push(<span class="rv-header__model" key="model">{formatModelName(model)}</span>);
+  }
+  if (dateStr) {
+    rightParts.push(<span key="date">{dateStr}</span>);
+  }
+
   return (
     <div class="rv-header">
       <span class="rv-header__left">{leftParts.join(" · ")}</span>
-      {dateStr && <span class="rv-header__right">{dateStr}</span>}
+      {rightParts.length > 0 && (
+        <span class="rv-header__right">{rightParts}</span>
+      )}
     </div>
   );
 }

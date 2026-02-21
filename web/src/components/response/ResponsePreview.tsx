@@ -2,62 +2,36 @@ import { ErrorState, GitChangesPanel, LoadingState, ResponseMeta } from "./Respo
 import { MarkdownBody } from "./MarkdownBody";
 import type { GitChange } from "./types";
 
-const MOCK_MARKDOWN = `# Refactored Authentication Module
+const MOCK_MARKDOWN = `Các bot dễ tạo tương tự Telegram:
 
-## Summary
+## Dễ nhất (tương tự Telegram)
 
-Refactored the authentication module to use **JWT tokens** with refresh token rotation. Replaced the legacy session-based auth with a stateless approach.
+1. **Discord** - API rất đơn giản, documentation tốt
+2. **Slack** - Có Bolt framework, dễ setup
+3. **Line** - API khá friendly, phổ biến ở Châu Á
 
-### Key Changes
+## Trung bình
 
-1. Replaced \`express-session\` with \`jsonwebtoken\` for token-based authentication
-2. Added refresh token rotation for enhanced security
-3. Updated all protected routes to use the new \`authMiddleware\`
-4. Added rate limiting on auth endpoints
+4. **Zalo** - Official bot API, phổ biến VN
+5. **Viber** - Có API bot rõ ràng
+6. **WhatsApp Business** - Phức tạp hơn nhưng còn quản lý
 
-### New Dependencies
+## Khó hơn
 
-- \`jsonwebtoken\` — JWT signing and verification
-- \`bcryptjs\` — Password hashing (replaced \`bcrypt\` native module)
-
-## Implementation Details
-
-The new auth flow works as follows:
-
-\`\`\`typescript
-const token = jwt.sign({ userId, role }, SECRET, { expiresIn: "15m" });
-const refreshToken = crypto.randomUUID();
-await redis.set(\`refresh:\${refreshToken}\`, userId, "EX", 604800);
-\`\`\`
-
-> **Note:** Access tokens expire in 15 minutes. Refresh tokens are valid for 7 days and are rotated on each use.
-
-### API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| \`/auth/login\` | POST | Login with credentials |
-| \`/auth/refresh\` | POST | Refresh access token |
-| \`/auth/logout\` | POST | Invalidate refresh token |
-| \`/auth/me\` | GET | Get current user |
-
-### Middleware Usage
-
-All protected routes now use the unified middleware:
-
-\`\`\`typescript
-app.get("/api/profile", authMiddleware("user"), getProfile);
-app.delete("/api/users/:id", authMiddleware("admin"), deleteUser);
-\`\`\`
+7. **Instagram/Facebook** - Webhooks complex, rate limit nhiều
+8. **Twitter/X** - API thay đổi thường xuyên
 
 ---
 
-## Testing
+**Top 3 dễ nhất để mở rộng từ Telegram:**
 
-- Added 12 unit tests for token generation and validation
-- Added 5 integration tests for the full auth flow
-- All existing tests pass with the new auth system
-`;
+| Platform | Độ khó | Tại sao |
+|----------|--------|--------|
+| **Discord** | ⭐ Dễ | Webhook + event-driven, library Discord.py/discord.js rất tốt |
+| **Slack** | ⭐ Dễ | Bolt framework, event streaming rõ ràng |
+| **Line** | ⭐⭐ Dễ | Similar to Telegram API structure |
+
+Bạn muốn thêm bot cho platform nào? Mình có thể tạo plan để extend codebase Telegram hiện tại.`;
 
 const MOCK_CHANGES: GitChange[] = [
   { status: "modified", file: "src/auth/middleware.ts" },
@@ -82,8 +56,9 @@ export default function ResponsePreview() {
       <main class="rv__body">
         <ResponseMeta
           project="claudecode-tele"
-          durationMs={435971}
-          timestamp="2026-02-21T11:15:30Z"
+          durationMs={6118809}
+          timestamp="2026-02-21T12:44:19.009Z"
+          model="claude-sonnet-4-10"
         />
         {mode === "loading" && <LoadingState />}
         {mode === "error" && <ErrorState message="Dữ liệu response đã hết hạn. Thông tin cơ bản hiển thị ở trên." />}
