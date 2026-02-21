@@ -35,7 +35,6 @@ Claude Code xong response
 
 - **Node.js** ≥ 18
 - **Telegram Bot Token** — tạo từ [@BotFather](https://t.me/BotFather)
-- **Telegram User ID** — lấy từ [@userinfobot](https://t.me/userinfobot)
 
 ## Bắt đầu
 
@@ -68,11 +67,27 @@ Setup wizard sẽ hướng dẫn từng bước:
 ```
 ┌  🤖 ccpoke setup
 │
+◇  Language
+│  English
+│
 ◇  Telegram Bot Token
 │  your-bot-token
 │
-◇  Your Telegram User ID
-│  your-user-id
+◇  ✓ Bot: @your_bot
+│
+◇  Scan QR or open link to connect:
+│  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+│  █ ▄▄▄▄▄ █▄▄████▀ ▄██▄▄█ ▄▄▄▄▄ █
+│  █ █   █ █ ▀█ ▄▄▄▄▀▀▄▀ █ █   █ █
+│  █ █▄▄▄█ █▄ ▄▄▀▄▀██▄  ▄█ █▄▄▄█ █
+│  █▄▄▄▄▄▄▄█▄▀▄▀▄▀ █▄▀▄█▄█▄▄▄▄▄▄▄█
+│  ...
+│  █▄▄▄▄▄▄▄█▄███▄█▄███▄▄▄▄███▄█▄██
+│  https://t.me/your_bot?start=setup
+│
+◇  Waiting for you to send /start to the bot...
+│
+◆  ✓ Connected! User ID: 123456789
 │
 ◆  Config saved
 ◆  Hook installed → ~/.claude/settings.json

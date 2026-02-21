@@ -31,10 +31,13 @@ export interface TranslationKeys {
     tokenPlaceholder: string;
     tokenRequired: string;
     tokenInvalidFormat: string;
-    userIdMessage: string;
-    userIdPlaceholder: string;
-    userIdRequired: string;
-    userIdMustBeNumber: string;
+    verifyingToken: string;
+    botVerified: string;
+    scanOrClick: string;
+    waitingForStart: string;
+    userDetected: string;
+    tokenVerifyFailed: string;
+    waitingTimeout: string;
     cancelled: string;
     configSaved: string;
     hookInstalled: string;

@@ -109,7 +109,7 @@ export class TelegramChannel implements NotificationChannel {
   }
 
   private registerHandlers(): void {
-    this.bot.on("message", (msg) => {
+    this.bot.onText(/\/start(?:\s|$)/, (msg) => {
       if (!ConfigManager.isOwner(this.cfg, msg.from?.id ?? 0)) {
         log(
           t("bot.unauthorizedUser", {
@@ -120,19 +120,15 @@ export class TelegramChannel implements NotificationChannel {
         return;
       }
 
-      const text = msg.text ?? "";
-
-      if (text === "/start") {
-        if (this.chatId === msg.chat.id) {
-          this.bot.sendMessage(msg.chat.id, t("bot.alreadyConnected"));
-          return;
-        }
-        this.chatId = msg.chat.id;
-        ConfigManager.saveChatState({ chat_id: this.chatId });
-        log(t("bot.registeredChatId", { chatId: msg.chat.id }));
-        this.bot.sendMessage(msg.chat.id, t("bot.ready"), { parse_mode: "MarkdownV2" });
+      if (this.chatId === msg.chat.id) {
+        this.bot.sendMessage(msg.chat.id, t("bot.alreadyConnected"));
         return;
       }
+
+      this.chatId = msg.chat.id;
+      ConfigManager.saveChatState({ chat_id: this.chatId });
+      log(t("bot.registeredChatId", { chatId: msg.chat.id }));
+      this.bot.sendMessage(msg.chat.id, t("bot.ready"), { parse_mode: "MarkdownV2" });
     });
   }
 

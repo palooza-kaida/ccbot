@@ -43,6 +43,7 @@ export const ApiRoute = {
 
 export const DEFAULT_HOOK_PORT = 9377;
 export const TUNNEL_TIMEOUT_MS = 30_000;
+export const SETUP_WAIT_TIMEOUT_MS = 120_000;
 export const TRANSCRIPT_SETTLE_DELAY_MS = 500;
 export const MAX_STORED_RESPONSES = 100;
 export const RESPONSE_EXPIRE_MS = 24 * 60 * 60 * 1000;

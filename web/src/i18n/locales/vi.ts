@@ -38,14 +38,14 @@ export const vi: Record<string, string | string[]> = {
   featureSecurityDesc: "Whitelist User ID, unauthorized bị ignore im lặng. Mọi thứ chạy trên máy bạn.",
 
   setupLabel: "Cài đặt",
-  setupTitle: "3 bước, 2 phút",
+  setupTitle: "2 bước, 30 giây",
   setupSub: "Cần Node.js ≥ 18 và một Telegram Bot Token.",
   setupStep1Title: "Tạo Bot Token",
-  setupStep1Desc: 'Mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> trên Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; lưu token.<br>Lấy User ID từ <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a>.',
+  setupStep1Desc: 'Mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> trên Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; lưu token.',
   setupStep2Title: "Chạy một lệnh duy nhất",
   setupStep2Desc: '💡 Dùng hàng ngày thì cài global: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code> để khởi động nhanh hơn.',
   setupStep3Title: "Xong!",
-  setupStep3Desc: 'Mở Telegram → gửi <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> cho bot. Dùng Claude Code bình thường → notification sẽ đến.',
+  setupStep3Desc: 'Quét mã QR hoặc click link hiện trong terminal để kết nối Telegram. Setup tự động — không cần nhập User ID thủ công.',
 
   roadmapLabel: "Roadmap",
   roadmapTitle: "Lộ trình dài hơi",
@@ -54,7 +54,7 @@ export const vi: Record<string, string | string[]> = {
   phase1Label: "Phase 1 · Hoàn thành",
   phase1Title: "Notification + Response viewer",
   phase1Desc: "Push thông báo khi Claude Code hoàn thành, kèm git diff, thống kê token/chi phí, và xem response đầy đủ qua Telegram Mini App.",
-  phase1Tags: ["Stop hook","Git diff","Token stats","Mini App viewer","Cloudflare tunnel","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","User auth","Auto-split message"],
+  phase1Tags: ["Stop hook","Git diff","Token stats","Mini App viewer","Cloudflare tunnel","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","User auth","Auto-split message","QR code setup"],
 
   phase2Label: "Phase 2 · Đang phát triển",
   phase2Title: "Chat 2 chiều",

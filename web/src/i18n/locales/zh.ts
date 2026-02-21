@@ -38,14 +38,14 @@ export const zh: Record<string, string | string[]> = {
   featureSecurityDesc: "白名单用户 ID，未授权请求被静默忽略。一切在您的机器上运行。",
 
   setupLabel: "安装",
-  setupTitle: "3 步，2 分钟",
+  setupTitle: "2 步，30 秒",
   setupSub: "需要 Node.js ≥ 18 和一个 Telegram Bot Token。",
   setupStep1Title: "创建 Bot Token",
-  setupStep1Desc: '在 Telegram 上打开 <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; 保存 Token。<br>从 <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a> 获取您的 User ID。',
+  setupStep1Desc: '在 Telegram 上打开 <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; 保存 Token。',
   setupStep2Title: "运行一个命令",
   setupStep2Desc: '💡 日常使用建议全局安装: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code> 启动更快。',
   setupStep3Title: "完成！",
-  setupStep3Desc: '打开 Telegram → 向机器人发送 <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code>。正常使用 Claude Code → 通知将自动到达。',
+  setupStep3Desc: '扫描终端中显示的二维码或点击链接连接 Telegram。自动完成设置 — 无需手动输入用户 ID。',
 
   roadmapLabel: "路线图",
   roadmapTitle: "长期路线图",
@@ -54,7 +54,7 @@ export const zh: Record<string, string | string[]> = {
   phase1Label: "阶段 1 · 已完成",
   phase1Title: "通知 + 响应查看器",
   phase1Desc: "Claude Code 完成时推送通知，附带 git diff、token/费用统计，通过 Telegram Mini App 查看完整响应。",
-  phase1Tags: ["停止钩子","Git 差异","Token 统计","Mini App 查看器","Cloudflare 隧道","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","用户认证","消息自动拆分"],
+  phase1Tags: ["停止钩子","Git 差异","Token 统计","Mini App 查看器","Cloudflare 隧道","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","用户认证","消息自动拆分","二维码设置"],
 
   phase2Label: "阶段 2 · 开发中",
   phase2Title: "双向聊天",

@@ -38,14 +38,14 @@ export const en: Record<string, string | string[]> = {
   featureSecurityDesc: "Whitelist User ID, unauthorized gets silently ignored. Everything runs on your machine.",
 
   setupLabel: "Setup",
-  setupTitle: "3 steps, 2 minutes",
+  setupTitle: "2 steps, 30 seconds",
   setupSub: "Requires Node.js ≥ 18 and a Telegram Bot Token.",
   setupStep1Title: "Create Bot Token",
-  setupStep1Desc: 'Open <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> on Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; save token.<br>Get your User ID from <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a>.',
+  setupStep1Desc: 'Open <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> on Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; save the token.',
   setupStep2Title: "Run one command",
   setupStep2Desc: '💡 For daily use, install globally: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code> for faster startup.',
   setupStep3Title: "Done!",
-  setupStep3Desc: 'Open Telegram → send <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> to the bot. Use Claude Code normally → notifications arrive.',
+  setupStep3Desc: 'Scan the QR code or click the link shown in terminal to connect your Telegram. Setup is automatic — no manual User ID needed.',
 
   roadmapLabel: "Roadmap",
   roadmapTitle: "Long-term roadmap",
@@ -54,7 +54,7 @@ export const en: Record<string, string | string[]> = {
   phase1Label: "Phase 1 · Complete",
   phase1Title: "Notification + Response viewer",
   phase1Desc: "Push notification when Claude Code completes, with git diff, token/cost stats, and full response viewer via Telegram Mini App.",
-  phase1Tags: ["Stop hook","Git diff","Token stats","Mini App viewer","Cloudflare tunnel","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","User auth","Auto-split message"],
+  phase1Tags: ["Stop hook","Git diff","Token stats","Mini App viewer","Cloudflare tunnel","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","User auth","Auto-split message","QR code setup"],
 
   phase2Label: "Phase 2 · In development",
   phase2Title: "Two-way chat",

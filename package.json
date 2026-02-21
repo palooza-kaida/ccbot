@@ -67,13 +67,15 @@
     "@clack/prompts": "^1.0.1",
     "cloudflared": "^0.7.1",
     "express": "^5.0.1",
-    "node-telegram-bot-api": "^0.66.0"
+    "node-telegram-bot-api": "^0.66.0",
+    "qrcode-terminal": "^0.12.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.4",
     "@types/node-telegram-bot-api": "^0.64.8",
+    "@types/qrcode-terminal": "^0.12.2",
     "eslint": "^10.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",

@@ -1,9 +1,11 @@
 import * as p from "@clack/prompts";
+import TelegramBot from "node-telegram-bot-api";
+import qrcode from "qrcode-terminal";
 import { ConfigManager, type Config } from "../config-manager.js";
 import { HookInstaller } from "../hook/hook-installer.js";
 import { detectCliPrefix } from "../utils/install-detection.js";
 import { t, setLocale, type Locale, SUPPORTED_LOCALES, LOCALE_LABELS } from "../i18n/index.js";
-import { DEFAULT_HOOK_PORT } from "../utils/constants.js";
+import { DEFAULT_HOOK_PORT, SETUP_WAIT_TIMEOUT_MS } from "../utils/constants.js";
 
 export async function runSetup(): Promise<Config> {
   p.intro(t("setup.intro"));
@@ -12,21 +14,23 @@ export async function runSetup(): Promise<Config> {
   try {
     existing = ConfigManager.load();
   } catch {
-    // first-time setup, no existing config
+    // first-time setup
   }
 
   const locale = await promptLanguage(existing);
   setLocale(locale);
 
-  const credentials = await promptCredentials(existing);
-  const config = buildConfig(credentials, existing, locale);
+  const token = await promptToken(existing);
+  const botUsername = await verifyToken(token);
+  const userId = await waitForUserStart(token, botUsername);
+
+  const config = buildConfig(token, userId, existing, locale);
 
   saveConfig(config);
   installHook(config);
-  registerChatId(config.user_id);
+  registerChatId(userId);
 
   const startCommand = detectCliPrefix();
-
   p.outro(t("setup.complete", { command: startCommand }));
 
   return config;
@@ -50,53 +54,105 @@ async function promptLanguage(existing: Config | null): Promise<Locale> {
   return result;
 }
 
-interface Credentials {
-  token: string;
-  userId: number;
-}
-
-async function promptCredentials(existing: Config | null): Promise<Credentials> {
-  const result = await p.group(
-    {
-      token: () =>
-        p.text({
-          message: t("setup.tokenMessage"),
-          placeholder: t("setup.tokenPlaceholder"),
-          initialValue: existing?.telegram_bot_token ?? "",
-          validate(value) {
-            if (!value || !value.trim()) return t("setup.tokenRequired");
-            if (!value.includes(":")) return t("setup.tokenInvalidFormat");
-          },
-        }),
-      userId: () =>
-        p.text({
-          message: t("setup.userIdMessage"),
-          placeholder: t("setup.userIdPlaceholder"),
-          initialValue: existing?.user_id?.toString() ?? "",
-          validate(value) {
-            if (!value || !value.trim()) return t("setup.userIdRequired");
-            if (isNaN(parseInt(value, 10))) return t("setup.userIdMustBeNumber");
-          },
-        }),
+async function promptToken(existing: Config | null): Promise<string> {
+  const result = await p.text({
+    message: t("setup.tokenMessage"),
+    placeholder: t("setup.tokenPlaceholder"),
+    initialValue: existing?.telegram_bot_token ?? "",
+    validate(value) {
+      if (!value || !value.trim()) return t("setup.tokenRequired");
+      if (!value.includes(":")) return t("setup.tokenInvalidFormat");
     },
-    {
-      onCancel: () => {
-        p.cancel(t("setup.cancelled"));
-        process.exit(0);
-      },
-    }
-  );
+  });
 
-  return {
-    token: result.token.trim(),
-    userId: parseInt(result.userId.trim(), 10),
-  };
+  if (p.isCancel(result)) {
+    p.cancel(t("setup.cancelled"));
+    process.exit(0);
+  }
+
+  return result.trim();
 }
 
-function buildConfig(credentials: Credentials, existing: Config | null, locale: Locale): Config {
+async function verifyToken(token: string): Promise<string> {
+  const spinner = p.spinner();
+  spinner.start(t("setup.verifyingToken"));
+
+  try {
+    const bot = new TelegramBot(token);
+    const me = await bot.getMe();
+
+    spinner.stop(t("setup.botVerified", { username: me.username ?? "unknown" }));
+    return me.username ?? "unknown";
+  } catch {
+    spinner.stop(t("setup.tokenVerifyFailed"));
+    throw new Error(t("setup.tokenVerifyFailed"));
+  }
+}
+
+async function waitForUserStart(token: string, botUsername: string): Promise<number> {
+  const deepLink = `https://t.me/${botUsername}?start=setup`;
+
+  p.log.step(t("setup.scanOrClick"));
+
+  const qrString = await new Promise<string>((resolve) => {
+    qrcode.generate(deepLink, { small: true }, (code: string) => {
+      resolve(code);
+    });
+  });
+
+  const indentedQr = qrString
+    .split("\n")
+    .filter((line) => line.trim())
+    .map((line) => `│    ${line}`)
+    .join("\n");
+
+  // eslint-disable-next-line no-console
+  console.log(indentedQr);
+  // eslint-disable-next-line no-console
+  console.log(`│`);
+  // eslint-disable-next-line no-console
+  console.log(`│    ${deepLink}`);
+
+  p.log.step(t("setup.waitingForStart"));
+
+  const bot = new TelegramBot(token, { polling: true });
+
+  try {
+    const userId = await new Promise<number>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        bot.stopPolling();
+        reject(new Error(t("setup.waitingTimeout", { seconds: SETUP_WAIT_TIMEOUT_MS / 1000 })));
+      }, SETUP_WAIT_TIMEOUT_MS);
+
+      bot.onText(/\/start(?:\s|$)/, (msg) => {
+        clearTimeout(timeout);
+
+        bot
+          .sendMessage(msg.chat.id, t("setup.userDetected", { userId: msg.from!.id }))
+          .finally(() => {
+            bot.stopPolling();
+            resolve(msg.from!.id);
+          });
+      });
+    });
+
+    p.log.success(t("setup.userDetected", { userId }));
+    return userId;
+  } catch (err) {
+    bot.stopPolling();
+    throw err;
+  }
+}
+
+function buildConfig(
+  token: string,
+  userId: number,
+  existing: Config | null,
+  locale: Locale
+): Config {
   return {
-    telegram_bot_token: credentials.token,
-    user_id: credentials.userId,
+    telegram_bot_token: token,
+    user_id: userId,
     hook_port: existing?.hook_port || DEFAULT_HOOK_PORT,
     hook_secret: existing?.hook_secret || ConfigManager.generateSecret(),
     locale,
