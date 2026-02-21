@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { ConfigManager } from "./config-manager.js";
+import { ConfigManager, type Config } from "./config-manager.js";
 import { TelegramChannel } from "./channel/telegram/telegram-channel.js";
 import { HookServer } from "./hook/hook-server.js";
 import { HookHandler } from "./hook/hook-handler.js";
@@ -8,10 +8,11 @@ import { runSetup } from "./commands/setup.js";
 import { runUpdate } from "./commands/update.js";
 import { runUninstall } from "./commands/uninstall.js";
 import { runHelp } from "./commands/help.js";
-import { CliCommand } from "./utils/constants.js";
+import { CliCommand, InstallMethod } from "./utils/constants.js";
 import { t } from "./i18n/index.js";
 import { TunnelManager } from "./utils/tunnel.js";
 import { log, logError } from "./utils/log.js";
+import { detectInstallMethod } from "./utils/install-detection.js";
 
 const args = process.argv.slice(2);
 
@@ -21,14 +22,22 @@ if (args.length > 0) {
   startBot();
 }
 
-async function startBot(): Promise<void> {
-  let cfg;
+async function loadOrSetupConfig(): Promise<Config> {
   try {
-    cfg = ConfigManager.load();
+    return ConfigManager.load();
   } catch {
-    logError(t("config.notFound"));
-    process.exit(1);
+    log(t("bot.firstTimeSetup"));
+    try {
+      return await runSetup();
+    } catch (err: unknown) {
+      logError(t("common.setupFailed"), err);
+      process.exit(1);
+    }
   }
+}
+
+async function startBot(): Promise<void> {
+  const cfg = await loadOrSetupConfig();
 
   const hookServer = new HookServer(cfg.hook_port, cfg.hook_secret);
   hookServer.start();
@@ -48,6 +57,10 @@ async function startBot(): Promise<void> {
   hookServer.setHandler(handler);
 
   await channel.initialize();
+
+  if (detectInstallMethod() === InstallMethod.Npx) {
+    log(t("bot.globalInstallTip"));
+  }
 
   const shutdown = async () => {
     log(t("bot.shuttingDown"));

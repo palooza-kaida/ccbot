@@ -22,6 +22,8 @@ export interface TranslationKeys {
     open: string;
     sendFailed: string;
     sendFallbackFailed: string;
+    firstTimeSetup: string;
+    globalInstallTip: string;
   };
   setup: {
     intro: string;

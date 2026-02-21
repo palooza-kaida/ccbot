@@ -25,6 +25,8 @@ export const vi: TranslationKeys = {
     open: "Mở",
     sendFailed: "gửi thất bại, dùng fallback",
     sendFallbackFailed: "fallback cũng thất bại",
+    firstTimeSetup: "chưa có config — bắt đầu setup...",
+    globalInstallTip: "💡 Tip: chạy 'npm i -g ccpoke' để khởi động nhanh hơn",
   },
 
   setup: {

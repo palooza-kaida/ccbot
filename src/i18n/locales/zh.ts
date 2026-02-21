@@ -24,6 +24,8 @@ export const zh: TranslationKeys = {
     open: "打开",
     sendFailed: "发送失败，使用备用方式",
     sendFallbackFailed: "备用方式也失败",
+    firstTimeSetup: "未找到配置 — 正在启动设置向导...",
+    globalInstallTip: "💡 提示: 运行 'npm i -g ccpoke' 可加快启动速度",
   },
 
   setup: {

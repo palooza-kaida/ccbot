@@ -5,7 +5,7 @@ import { detectCliPrefix } from "../utils/install-detection.js";
 import { t, setLocale, type Locale, SUPPORTED_LOCALES, LOCALE_LABELS } from "../i18n/index.js";
 import { DEFAULT_HOOK_PORT } from "../utils/constants.js";
 
-export async function runSetup(): Promise<void> {
+export async function runSetup(): Promise<Config> {
   p.intro(t("setup.intro"));
 
   let existing: Config | null = null;
@@ -28,6 +28,8 @@ export async function runSetup(): Promise<void> {
   const startCommand = detectCliPrefix();
 
   p.outro(t("setup.complete", { command: startCommand }));
+
+  return config;
 }
 
 async function promptLanguage(existing: Config | null): Promise<Locale> {

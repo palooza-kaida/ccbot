@@ -25,6 +25,8 @@ export const en: TranslationKeys = {
     open: "Open",
     sendFailed: "send failed, falling back",
     sendFallbackFailed: "fallback also failed",
+    firstTimeSetup: "no config found — starting setup wizard...",
+    globalInstallTip: "💡 Tip: run 'npm i -g ccpoke' for faster startup",
   },
 
   setup: {
