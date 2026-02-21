@@ -1,6 +1,6 @@
 {
   "name": "ccpoke",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Your AI agent pokes you when it's done — zero-config, one command: npx ccpoke",
   "type": "module",
   "license": "MIT",
