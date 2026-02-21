@@ -42,9 +42,10 @@ export const vi: Record<string, string | string[]> = {
   setupSub: "Cần Node.js ≥ 18 và một Telegram Bot Token.",
   setupStep1Title: "Tạo Bot Token",
   setupStep1Desc: 'Mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> trên Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; lưu token.<br>Lấy User ID từ <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a>.',
-  setupStep2Title: "Cài đặt & chạy setup",
-  setupStep3Title: "Chạy bot",
-  setupStep3Desc: 'Mở Telegram → gửi <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> → xong. Dùng Claude Code bình thường.',
+  setupStep2Title: "Chạy một lệnh duy nhất",
+  setupStep2Desc: '💡 Dùng hàng ngày thì cài global: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code> để khởi động nhanh hơn.',
+  setupStep3Title: "Xong!",
+  setupStep3Desc: 'Mở Telegram → gửi <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> cho bot. Dùng Claude Code bình thường → notification sẽ đến.',
 
   roadmapLabel: "Roadmap",
   roadmapTitle: "Lộ trình dài hơi",

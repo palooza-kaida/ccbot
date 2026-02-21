@@ -34,23 +34,24 @@ Claude Code xong response
 ## Yêu cầu
 
 - **Node.js** ≥ 18
-- **pnpm** (hoặc npm/yarn)
 - **Telegram Bot Token** — tạo từ [@BotFather](https://t.me/BotFather)
 - **Telegram User ID** — lấy từ [@userinfobot](https://t.me/userinfobot)
 
 ## Bắt đầu
 
-### Cách 1: Global install (khuyến nghị)
+### Cách 1: npx (khuyến nghị — zero install)
 
 ```bash
-pnpm add -g ccpoke
-ccpoke setup
+npx ccpoke
 ```
 
-### Cách 2: npx (không cần cài)
+Lần đầu chạy → tự động setup → start bot. Một lệnh duy nhất.
+
+### Cách 2: Global install (dùng hàng ngày, khởi động nhanh hơn)
 
 ```bash
-npx ccpoke setup
+npm i -g ccpoke
+ccpoke
 ```
 
 ### Cách 3: Clone repo (cho development)
@@ -59,7 +60,7 @@ npx ccpoke setup
 git clone https://github.com/palooza-kaida/ccpoke.git
 cd ccpoke
 pnpm install
-pnpm setup
+pnpm dev
 ```
 
 Setup wizard sẽ hướng dẫn từng bước:
@@ -102,11 +103,11 @@ Sau đó chạy `ccpoke setup` để cài hook và đăng ký chat ID.
 ### Khởi động bot
 
 ```bash
-# Global install
-ccpoke
-
-# Hoặc npx
+# npx (zero install)
 npx ccpoke
+
+# Hoặc global install
+ccpoke
 
 # Hoặc local dev
 pnpm dev

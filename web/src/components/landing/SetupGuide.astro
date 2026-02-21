@@ -28,23 +28,26 @@ const { locale } = Astro.props;
       <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">2</div>
       <div class="min-w-0">
         <h3 class="text-base font-bold mb-1.5">{ts(locale, "setupStep2Title")}</h3>
-        <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto max-w-full"><span class="d">$ </span>pnpm add -g ccpoke
-<span class="d">$ </span>ccpoke setup
+        <pre class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto max-w-full m-0"><span class="d">$ </span>npx ccpoke
+<span class="c">
+no config found — starting setup wizard...
+┌  🤖 ccpoke setup
+│
+◇  Telegram Bot Token
+│  ****:ABC-xxx
+│
+◇  Your Telegram User ID
+│  123456789
+│
+◆  Config saved
+◆  Hook installed → ~/.claude/settings.json
+◆  Chat ID registered
+│
+└  🎉 Setup complete!
 
-<span class="c">┌  🤖 ccpoke setup</span>
-<span class="c">│</span>
-<span class="c">◇  Telegram Bot Token</span>
-<span class="c">│  ****:ABC-xxx</span>
-<span class="c">│</span>
-<span class="c">◇  Your Telegram User ID</span>
-<span class="c">│  123456789</span>
-<span class="c">│</span>
-<span class="c">◆  Config saved</span>
-<span class="c">◆  Hook installed →</span>
-<span class="c">   ~/.claude/settings.json</span>
-<span class="c">◆  Chat ID registered</span>
-<span class="c">│</span>
-<span class="c">└  🎉 Setup complete!</span></div>
+ccpoke: hook server listening on localhost:9377
+ccpoke: telegram bot started</span></pre>
+        <p class="mt-2.5 text-[0.88rem] text-txt-2 leading-relaxed" set:html={ts(locale, "setupStep2Desc")} />
       </div>
     </div>
 
@@ -52,12 +55,7 @@ const { locale } = Astro.props;
       <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">3</div>
       <div class="min-w-0">
         <h3 class="text-base font-bold mb-1.5">{ts(locale, "setupStep3Title")}</h3>
-        <div class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto max-w-full"><span class="d">$ </span>ccpoke
-
-<span class="c">ccpoke: hook server listening on localhost:9377</span>
-<span class="c">ccpoke: telegram bot started</span>
-<span class="c">ccpoke: registered chat ID 123456789</span></div>
-        <p class="mt-2.5 text-[0.88rem] text-txt-2 leading-relaxed" set:html={ts(locale, "setupStep3Desc")} />
+        <p class="text-[0.88rem] text-txt-2 leading-relaxed" set:html={ts(locale, "setupStep3Desc")} />
       </div>
     </div>
   </div>

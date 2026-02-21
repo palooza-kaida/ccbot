@@ -42,9 +42,10 @@ export const zh: Record<string, string | string[]> = {
   setupSub: "需要 Node.js ≥ 18 和一个 Telegram Bot Token。",
   setupStep1Title: "创建 Bot Token",
   setupStep1Desc: '在 Telegram 上打开 <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; 保存 Token。<br>从 <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a> 获取您的 User ID。',
-  setupStep2Title: "安装并运行设置",
-  setupStep3Title: "启动机器人",
-  setupStep3Desc: '打开 Telegram → 发送 <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> → 完成。正常使用 Claude Code。',
+  setupStep2Title: "运行一个命令",
+  setupStep2Desc: '💡 日常使用建议全局安装: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code> 启动更快。',
+  setupStep3Title: "完成！",
+  setupStep3Desc: '打开 Telegram → 向机器人发送 <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code>。正常使用 Claude Code → 通知将自动到达。',
 
   roadmapLabel: "路线图",
   roadmapTitle: "长期路线图",

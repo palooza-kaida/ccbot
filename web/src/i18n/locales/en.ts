@@ -42,9 +42,10 @@ export const en: Record<string, string | string[]> = {
   setupSub: "Requires Node.js ≥ 18 and a Telegram Bot Token.",
   setupStep1Title: "Create Bot Token",
   setupStep1Desc: 'Open <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> on Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; save token.<br>Get your User ID from <a href="https://t.me/userinfobot" target="_blank" rel="noopener">@userinfobot</a>.',
-  setupStep2Title: "Install & run setup",
-  setupStep3Title: "Start bot",
-  setupStep3Desc: 'Open Telegram → send <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> → done. Use Claude Code normally.',
+  setupStep2Title: "Run one command",
+  setupStep2Desc: '💡 For daily use, install globally: <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">npm i -g ccpoke</code> for faster startup.',
+  setupStep3Title: "Done!",
+  setupStep3Desc: 'Open Telegram → send <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/start</code> to the bot. Use Claude Code normally → notifications arrive.',
 
   roadmapLabel: "Roadmap",
   roadmapTitle: "Long-term roadmap",

@@ -34,23 +34,24 @@ Claude Code completes response
 ## Requirements
 
 - **Node.js** ≥ 18
-- **pnpm** (or npm/yarn)
 - **Telegram Bot Token** — create from [@BotFather](https://t.me/BotFather)
 - **Telegram User ID** — get from [@userinfobot](https://t.me/userinfobot)
 
 ## Getting Started
 
-### Option 1: Global install (recommended)
+### Option 1: npx (recommended — zero install)
 
 ```bash
-pnpm add -g ccpoke
-ccpoke setup
+npx ccpoke
 ```
 
-### Option 2: npx (no install needed)
+First run → auto setup → start bot. One command, that's it.
+
+### Option 2: Global install (daily use, faster startup)
 
 ```bash
-npx ccpoke setup
+npm i -g ccpoke
+ccpoke
 ```
 
 ### Option 3: Clone repo (for development)
@@ -59,7 +60,7 @@ npx ccpoke setup
 git clone https://github.com/palooza-kaida/ccpoke.git
 cd ccpoke
 pnpm install
-pnpm setup
+pnpm dev
 ```
 
 The setup wizard will guide you step by step:
@@ -102,11 +103,11 @@ Then run `ccpoke setup` to install the hook and register your chat ID.
 ### Start the bot
 
 ```bash
-# Global install
-ccpoke
-
-# Or npx
+# npx (zero install)
 npx ccpoke
+
+# Or global install
+ccpoke
 
 # Or local dev
 pnpm dev

@@ -1,7 +1,7 @@
 {
   "name": "ccpoke",
   "version": "1.3.1",
-  "description": "Claude Code Telegram Notification Bot — get notified when Claude Code completes a response",
+  "description": "Your AI agent pokes you when it's done — zero-config, one command: npx ccpoke",
   "type": "module",
   "license": "MIT",
   "author": {

@@ -1,12 +1,6 @@
 import { useState, useCallback } from "preact/hooks";
 
-const PM_COMMANDS: Record<string, string> = {
-  npm: "npm i -g ccpoke",
-  yarn: "yarn global add ccpoke",
-  pnpm: "pnpm add -g ccpoke",
-};
-
-const PACKAGE_MANAGERS = Object.keys(PM_COMMANDS);
+const COMMAND = "npx ccpoke";
 
 interface Props {
   copyLabel: string;
@@ -14,14 +8,13 @@ interface Props {
 }
 
 export default function TerminalWidget({ copyLabel, copiedLabel }: Props) {
-  const [activePm, setActivePm] = useState("pnpm");
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(PM_COMMANDS[activePm]!);
+    navigator.clipboard.writeText(COMMAND);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
-  }, [activePm]);
+  }, []);
 
   return (
     <div class="bg-bg-code rounded-xl overflow-hidden max-w-[600px] mx-auto w-full">
@@ -31,26 +24,11 @@ export default function TerminalWidget({ copyLabel, copiedLabel }: Props) {
           <i class="w-2.5 h-2.5 rounded-full block bg-[#FEBC2E]" />
           <i class="w-2.5 h-2.5 rounded-full block bg-[#28C840]" />
         </div>
-        <div class="flex items-center gap-0.5 bg-white/[0.05] rounded-lg p-0.5">
-          {PACKAGE_MANAGERS.map((pm) => (
-            <button
-              key={pm}
-              class={`px-3 py-1 font-sans text-xs font-semibold bg-transparent border-none rounded-md cursor-pointer transition-all duration-150 ${
-                pm === activePm
-                  ? "text-white bg-white/[0.1]"
-                  : "text-term-muted hover:text-term-dim-hover"
-              }`}
-              onClick={() => setActivePm(pm)}
-            >
-              {pm}
-            </button>
-          ))}
-        </div>
       </div>
       <div class="flex items-center justify-between gap-4 px-5 py-4">
         <div class="font-mono text-[0.88rem] text-term-text min-w-0">
           <span class="text-accent select-none mr-2.5">$</span>
-          <span>{PM_COMMANDS[activePm]}</span>
+          <span>{COMMAND}</span>
         </div>
         <button
           onClick={handleCopy}
