@@ -1,9 +1,9 @@
 import { useState, useCallback } from "preact/hooks";
 
 const PM_COMMANDS: Record<string, string> = {
-  npm: "npm i -g ccbot",
-  yarn: "yarn global add ccbot",
-  pnpm: "pnpm add -g ccbot",
+  npm: "npm i -g ccpoke",
+  yarn: "yarn global add ccpoke",
+  pnpm: "pnpm add -g ccpoke",
 };
 
 const PACKAGE_MANAGERS = Object.keys(PM_COMMANDS);
