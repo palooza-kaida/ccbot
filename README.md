@@ -1,19 +1,19 @@
-# 🤖 ccpoke — Claude Code ↔ Telegram Notification Bot
+# 🤖 ccpoke — AI Agent ↔ Telegram Notification Bot
 
 [English](./README.en.md)
 
-> Nhận thông báo Telegram khi Claude Code hoàn thành response — kèm git diff, thời gian xử lý, và tóm tắt kết quả.
+> Nhận thông báo Telegram khi AI agent (Claude Code, Cursor, ...) hoàn thành response — kèm git diff, thời gian xử lý, và tóm tắt kết quả.
 
 ---
 
 ## Vấn đề giải quyết
 
-Bạn đang dùng Claude Code trên máy tính. Ra ngoài cầm điện thoại nhưng không biết Claude Code đã xong chưa, thay đổi file nào.
+Bạn đang dùng Claude Code hoặc Cursor trên máy tính. Ra ngoài cầm điện thoại nhưng không biết AI agent đã xong chưa, thay đổi file nào.
 
-**ccpoke** là cầu nối nhẹ giữa Claude Code và Telegram — khi Claude Code xong việc, bạn nhận notification ngay trên điện thoại.
+**ccpoke** là cầu nối nhẹ giữa AI agents và Telegram — khi agent xong việc, bạn nhận notification ngay trên điện thoại.
 
 ```
-Claude Code xong response
+AI agent xong response
         ↓
   Stop Hook trigger
         ↓
@@ -22,12 +22,22 @@ Claude Code xong response
   Telegram notification 📱
 ```
 
+## Supported Agents
+
+| Agent | Trạng thái |
+|-------|-----------|
+| Claude Code | ✅ Hỗ trợ |
+| Cursor | ✅ Hỗ trợ |
+
+Thêm agent mới qua kiến trúc plugin — contributions welcome!
+
 ## Tính năng
 
-- 🔔 **Notification tự động** — Claude Code xong → Telegram nhận tin ngay
+- 🤖 **Multi-agent** — hỗ trợ Claude Code, Cursor và mở rộng thêm
+- 🔔 **Notification tự động** — AI agent xong → Telegram nhận tin ngay
 - 📂 **Git diff kèm theo** — biết file nào thay đổi mà không cần mở máy tính
-- ⏱ **Thời gian xử lý** — biết Claude Code chạy bao lâu
-- 📝 **Tóm tắt response** — xem nhanh Claude Code trả lời gì
+- ⏱ **Thời gian xử lý** — biết agent chạy bao lâu
+- 📝 **Tóm tắt response** — xem nhanh agent trả lời gì
 - 🔐 **Whitelist user** — chỉ user được phép mới dùng được bot
 - 📄 **Auto-split message** — response dài tự động chia page `[1/N]`
 
@@ -89,8 +99,12 @@ Setup wizard sẽ hướng dẫn từng bước:
 │
 ◆  ✓ Connected! User ID: 123456789
 │
+◇  Chọn AI agents (ấn cách để chọn)
+│  Claude Code, Cursor
+│
 ◆  Config saved
-◆  Hook installed → ~/.claude/settings.json
+◆  Hook installed for Claude Code
+◆  Hook installed for Cursor
 ◆  Chat ID registered
 │
 └  🎉 Setup complete!
@@ -128,7 +142,7 @@ ccpoke
 pnpm dev
 ```
 
-Bot chạy xong → dùng Claude Code bình thường → notification tự đến Telegram.
+Bot chạy xong → dùng Claude Code / Cursor bình thường → notification tự đến Telegram.
 
 ### Telegram Commands
 
@@ -163,7 +177,8 @@ ccpoke uninstall
 ```
 ┌  🗑️  Uninstalling ccpoke
 │
-◆  Hook removed from ~/.claude/settings.json
+◆  Hook removed from Claude Code
+◆  Hook removed from Cursor
 ◆  Removed ~/.ccpoke/ (config, state, hooks)
 │
 └  ccpoke uninstalled

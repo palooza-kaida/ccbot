@@ -1,0 +1,13 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BrandPage from "../components/BrandPage.astro";
+import { ts, type Locale } from "../i18n";
+
+const locale: Locale = "en";
+---
+
+<BaseLayout locale={locale} title={ts(locale, "brandTitle")} description={ts(locale, "brandMetaDesc")} currentPath="/brand">
+  <main>
+    <BrandPage locale={locale} />
+  </main>
+</BaseLayout>

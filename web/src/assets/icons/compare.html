@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Logo Compare</title>
+  <style>
+    body { background: #f5f5f5; font-family: sans-serif; padding: 40px; }
+    h2 { margin-bottom: 20px; }
+    .row { display: flex; gap: 30px; flex-wrap: wrap; margin-bottom: 40px; }
+    .card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .card h3 { margin: 0 0 12px; font-size: 13px; color: #666; text-align: center; }
+    .layer-box { position: relative; }
+    .layer-box > * { position: absolute; top: 0; left: 0; }
+  </style>
+</head>
+<body>
+
+  <h2>Logo overlay — stroke-width 2 (standard)</h2>
+  <div class="row">
+
+    <div class="card">
+      <h3>Filled</h3>
+      <img src="logo-filled.svg" width="300" height="300">
+    </div>
+
+    <div class="card">
+      <h3>Outline</h3>
+      <img src="logo-outline.svg" width="300" height="300">
+    </div>
+
+    <div class="card">
+      <h3>Overlay (filled 40% + outline)</h3>
+      <div class="layer-box" style="width:300px;height:300px;">
+        <img src="logo-filled.svg" width="300" height="300" style="opacity: 0.4;">
+        <img src="logo-outline.svg" width="300" height="300">
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Outline + Rocket</h3>
+      <img src="logo-outline-rocket.svg" width="300" height="300">
+    </div>
+
+    <div class="card">
+      <h3>Overlay (filled 40% + outline rocket)</h3>
+      <div class="layer-box" style="width:300px;height:300px;">
+        <img src="logo-filled.svg" width="300" height="300" style="opacity: 0.4;">
+        <img src="logo-outline-rocket.svg" width="300" height="300">
+      </div>
+    </div>
+
+  </div>
+
+  <h2>Zoom overlay (inline SVG)</h2>
+  <div class="row">
+
+    <div class="card">
+      <h3>Zoom tai trái (8x)</h3>
+      <div style="position:relative;width:500px;height:350px;overflow:hidden;">
+        <svg style="position:absolute;top:0;left:0;" width="500" height="350" viewBox="4 0 8 5.5">
+          <circle cx="9" cy="4.5" r="3" fill="#D97757" opacity="0.4"/>
+          <path d="M5.5 19 L5.5 12.5 C5.5 6.5 10.5 2.5 18 2.5 C25.5 2.5 30.5 6.5 30.5 12.5 L30.5 19 C30.5 21.5 28.5 23.5 26 23.5 L10 23.5 C7.5 23.5 5.5 21.5 5.5 19Z" fill="#D97757" opacity="0.4"/>
+        </svg>
+        <svg style="position:absolute;top:0;left:0;" width="500" height="350" viewBox="4 0 8 5.5" fill="none" stroke="blue" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7.2779 6.9565 C6.2079 6.2064 5.7465 4.8499 6.1373 3.6029 C6.528 2.3559 7.681 1.5054 8.9878 1.5 C10.2945 1.4947 11.4544 2.3358 11.8553 3.5796"/>
+          <path d="M5.5 19 L5.5 12.5 C5.5 6.5 10.5 2.5 18 2.5 C25.5 2.5 30.5 6.5 30.5 12.5 L30.5 19 C30.5 21.5 28.5 23.5 26 23.5 L10 23.5 C7.5 23.5 5.5 21.5 5.5 19Z"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Zoom tai phải (8x)</h3>
+      <div style="position:relative;width:500px;height:350px;overflow:hidden;">
+        <svg style="position:absolute;top:0;left:0;" width="500" height="350" viewBox="24 0 8 5.5">
+          <circle cx="27" cy="4.5" r="3" fill="#D97757" opacity="0.4"/>
+          <path d="M5.5 19 L5.5 12.5 C5.5 6.5 10.5 2.5 18 2.5 C25.5 2.5 30.5 6.5 30.5 12.5 L30.5 19 C30.5 21.5 28.5 23.5 26 23.5 L10 23.5 C7.5 23.5 5.5 21.5 5.5 19Z" fill="#D97757" opacity="0.4"/>
+        </svg>
+        <svg style="position:absolute;top:0;left:0;" width="500" height="350" viewBox="24 0 8 5.5" fill="none" stroke="blue" stroke-width="0.15" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M24.1447 3.5796 C24.5456 2.3358 25.7055 1.4947 27.0122 1.5 C28.319 1.5054 29.472 2.3559 29.8627 3.6029 C30.2535 4.8499 29.7921 6.2064 28.7221 6.9565"/>
+          <path d="M5.5 19 L5.5 12.5 C5.5 6.5 10.5 2.5 18 2.5 C25.5 2.5 30.5 6.5 30.5 12.5 L30.5 19 C30.5 21.5 28.5 23.5 26 23.5 L10 23.5 C7.5 23.5 5.5 21.5 5.5 19Z"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,430 @@
+---
+import { ts, ta, type Locale } from "../i18n";
+import logoFilled from "../assets/icons/logo-filled.svg?raw";
+import logoOutline from "../assets/icons/logo-outline.svg?raw";
+import logoOutlineRocket from "../assets/icons/logo-outline-rocket.svg?raw";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const primaryColors = [
+  { name: "Accent", hex: "#D97757", desc: "Primary brand color" },
+  { name: "Accent Hover", hex: "#C4623F", desc: "Interactive states" },
+  { name: "Accent Light", hex: "#FFF0EB", desc: "Backgrounds, badges" },
+  { name: "Flame Top", hex: "#EDAA85", desc: "Rocket flame gradient" },
+];
+
+const neutralColors = [
+  { name: "Text", hex: "#1A1A2E" },
+  { name: "Text Secondary", hex: "#5A5A72" },
+  { name: "Text Tertiary", hex: "#8E8E9F" },
+  { name: "Background", hex: "#FFFFFF" },
+  { name: "Background Warm", hex: "#FAF9F7" },
+  { name: "Border", hex: "#EBEBEB" },
+];
+
+const semanticColors = [
+  { name: "Emerald", hex: "#2E8B57" },
+  { name: "Sky", hex: "#4A7FD4" },
+  { name: "Plum", hex: "#7C5CBF" },
+  { name: "Code BG", hex: "#1A1A2E" },
+];
+
+const doItems = ta(locale, "brandDoItems");
+const dontItems = ta(locale, "brandDontItems");
+---
+
+<section class="brand-hero">
+  <div class="brand-hero__inner">
+    <div class="brand-hero__logo" set:html={logoFilled} />
+    <h1>{ts(locale, "brandHeroTitle")}</h1>
+    <p>{ts(locale, "brandHeroSub")}</p>
+  </div>
+</section>
+
+<div class="brand-content">
+
+  <section class="brand-section" id="logo">
+    <div class="brand-section__header">
+      <span class="brand-section__number">01</span>
+      <h2>{ts(locale, "brandLogoTitle")}</h2>
+      <p>{ts(locale, "brandLogoDesc")}</p>
+    </div>
+
+    <div class="logo-grid">
+      <div class="logo-card">
+        <div class="logo-card__preview logo-card__preview--light">
+          <div class="logo-card__svg" set:html={logoFilled} />
+        </div>
+        <div class="logo-card__info">
+          <h3>{ts(locale, "brandLogoFilled")}</h3>
+          <span class="logo-card__tag">{ts(locale, "brandLogoFilledTag")}</span>
+          <p>{ts(locale, "brandLogoFilledDesc")}</p>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-card__preview logo-card__preview--light">
+          <div class="logo-card__svg logo-card__svg--accent" set:html={logoOutline} />
+        </div>
+        <div class="logo-card__info">
+          <h3>{ts(locale, "brandLogoOutline")}</h3>
+          <span class="logo-card__tag logo-card__tag--outline">{ts(locale, "brandLogoOutlineTag")}</span>
+          <p>{ts(locale, "brandLogoOutlineDesc")}</p>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-card__preview logo-card__preview--light">
+          <div class="logo-card__svg logo-card__svg--accent" set:html={logoOutlineRocket} />
+        </div>
+        <div class="logo-card__info">
+          <h3>{ts(locale, "brandLogoOutlineRocket")}</h3>
+          <span class="logo-card__tag logo-card__tag--rocket">{ts(locale, "brandLogoOutlineRocketTag")}</span>
+          <p>{ts(locale, "brandLogoOutlineRocketDesc")}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-subsection">
+      <h3>{ts(locale, "brandClearSpace")}</h3>
+      <p>{ts(locale, "brandClearSpaceDesc")}</p>
+      <div class="clearspace-demo">
+        <div class="clearspace-box">
+          <div class="clearspace-logo" set:html={logoFilled} />
+          <span class="clearspace-label">x</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-subsection">
+      <h3>{ts(locale, "brandLogoUsage")}</h3>
+      <div class="usage-grid">
+        <div class="usage-card usage-card--do">
+          <div class="usage-card__badge">✓ {ts(locale, "brandDo")}</div>
+          <ul>
+            {doItems.map(item => <li>{item}</li>)}
+          </ul>
+        </div>
+        <div class="usage-card usage-card--dont">
+          <div class="usage-card__badge">✗ {ts(locale, "brandDont")}</div>
+          <ul>
+            {dontItems.map(item => <li>{item}</li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="brand-section" id="colors">
+    <div class="brand-section__header">
+      <span class="brand-section__number">02</span>
+      <h2>{ts(locale, "brandColorTitle")}</h2>
+      <p>{ts(locale, "brandColorDesc")}</p>
+    </div>
+
+    <h3 class="color-group-title">{ts(locale, "brandColorPrimary")}</h3>
+    <div class="color-grid color-grid--primary">
+      {primaryColors.map(c => (
+        <div class="color-swatch">
+          <div class="color-swatch__preview" style={`background: ${c.hex}`}></div>
+          <div class="color-swatch__info">
+            <strong>{c.name}</strong>
+            <code>{c.hex}</code>
+            <span>{c.desc}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <h3 class="color-group-title">{ts(locale, "brandColorNeutral")}</h3>
+    <div class="color-grid">
+      {neutralColors.map(c => (
+        <div class="color-swatch color-swatch--small">
+          <div class="color-swatch__dot" style={`background: ${c.hex}; ${c.hex === '#FFFFFF' ? 'border: 1px solid #EBEBEB' : ''}`}></div>
+          <div class="color-swatch__meta">
+            <strong>{c.name}</strong>
+            <code>{c.hex}</code>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <h3 class="color-group-title">{ts(locale, "brandColorSemantic")}</h3>
+    <div class="color-grid">
+      {semanticColors.map(c => (
+        <div class="color-swatch color-swatch--small">
+          <div class="color-swatch__dot" style={`background: ${c.hex}`}></div>
+          <div class="color-swatch__meta">
+            <strong>{c.name}</strong>
+            <code>{c.hex}</code>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="brand-section" id="typography">
+    <div class="brand-section__header">
+      <span class="brand-section__number">03</span>
+      <h2>{ts(locale, "brandTypoTitle")}</h2>
+      <p>{ts(locale, "brandTypoDesc")}</p>
+    </div>
+
+    <div class="type-grid">
+      <div class="type-card">
+        <div class="type-card__sample" style="font-family: 'Inter', sans-serif;">
+          <span class="type-card__big">Aa</span>
+          <span class="type-card__name">Inter</span>
+        </div>
+        <div class="type-card__weights">
+          <span style="font-weight: 400;">Regular 400</span>
+          <span style="font-weight: 500;">Medium 500</span>
+          <span style="font-weight: 600;">Semibold 600</span>
+          <span style="font-weight: 700;">Bold 700</span>
+          <span style="font-weight: 800;">Extrabold 800</span>
+        </div>
+        <p class="type-card__usage">UI text, headings, body copy, buttons, navigation</p>
+      </div>
+
+      <div class="type-card">
+        <div class="type-card__sample" style="font-family: 'JetBrains Mono', monospace;">
+          <span class="type-card__big">Aa</span>
+          <span class="type-card__name">JetBrains Mono</span>
+        </div>
+        <div class="type-card__weights" style="font-family: 'JetBrains Mono', monospace;">
+          <span style="font-weight: 400;">Regular 400</span>
+          <span style="font-weight: 500;">Medium 500</span>
+        </div>
+        <p class="type-card__usage">Code blocks, terminal output, technical labels, model badges</p>
+      </div>
+    </div>
+
+    <div class="type-scale">
+      <h3>{ts(locale, "brandTypeScale")}</h3>
+      <div class="type-scale__list">
+        <div class="type-scale__row">
+          <span class="type-scale__label">H1</span>
+          <span class="type-scale__specimen" style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em;">Your AI agent pokes you</span>
+        </div>
+        <div class="type-scale__row">
+          <span class="type-scale__label">H2</span>
+          <span class="type-scale__specimen" style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em;">How It Works</span>
+        </div>
+        <div class="type-scale__row">
+          <span class="type-scale__label">H3</span>
+          <span class="type-scale__specimen" style="font-size: 1.125rem; font-weight: 700;">Feature Title</span>
+        </div>
+        <div class="type-scale__row">
+          <span class="type-scale__label">Body</span>
+          <span class="type-scale__specimen" style="font-size: 1rem; color: var(--color-txt-2);">Zero-config notifications for AI coding agents.</span>
+        </div>
+        <div class="type-scale__row">
+          <span class="type-scale__label">Small</span>
+          <span class="type-scale__specimen" style="font-size: 0.82rem; color: var(--color-txt-3);">MIT · TypeScript</span>
+        </div>
+        <div class="type-scale__row">
+          <span class="type-scale__label">Code</span>
+          <span class="type-scale__specimen" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--color-accent);">npx ccpoke</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="brand-section" id="mascot">
+    <div class="brand-section__header">
+      <span class="brand-section__number">04</span>
+      <h2>{ts(locale, "brandMascotTitle")}</h2>
+      <p>{ts(locale, "brandMascotDesc")}</p>
+    </div>
+
+    <div class="anatomy-demo">
+      <div class="anatomy-logo" set:html={logoFilled} />
+      <div class="anatomy-labels">
+        <div class="anatomy-item">
+          <span class="anatomy-dot" style="background: var(--color-accent)"></span>
+          <div>
+            <strong>{ts(locale, "brandMascotEars")}</strong>
+            <span>{ts(locale, "brandMascotEarsDesc")}</span>
+          </div>
+        </div>
+        <div class="anatomy-item">
+          <span class="anatomy-dot" style="background: var(--color-bg-code)"></span>
+          <div>
+            <strong>{ts(locale, "brandMascotEyes")}</strong>
+            <span>{ts(locale, "brandMascotEyesDesc")}</span>
+          </div>
+        </div>
+        <div class="anatomy-item">
+          <span class="anatomy-dot" style="background: var(--color-emerald)"></span>
+          <div>
+            <strong>{ts(locale, "brandMascotBody")}</strong>
+            <span>{ts(locale, "brandMascotBodyDesc")}</span>
+          </div>
+        </div>
+        <div class="anatomy-item">
+          <span class="anatomy-dot" style="background: #EDAA85"></span>
+          <div>
+            <strong>{ts(locale, "brandMascotRocket")}</strong>
+            <span>{ts(locale, "brandMascotRocketDesc")}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<style>
+  .brand-hero {
+    background: linear-gradient(135deg, #1A1A2E 0%, #2D2B55 50%, #3B2E4A 100%);
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .brand-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 80%, rgba(217,119,87,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .brand-hero__inner { position: relative; z-index: 1; }
+  .brand-hero__logo {
+    width: 80px; height: 80px;
+    margin: 0 auto 1.5rem;
+    filter: drop-shadow(0 4px 24px rgba(217,119,87,0.3));
+  }
+  .brand-hero__logo :global(svg) { width: 100%; height: 100%; }
+  .brand-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800; color: white;
+    letter-spacing: -0.03em; margin: 0 0 0.75rem;
+  }
+  .brand-hero p {
+    color: rgba(255,255,255,0.6); font-size: 1rem;
+    max-width: 480px; margin: 0 auto; line-height: 1.7;
+  }
+
+  .brand-content { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+  .brand-section { padding: 3.5rem 0 2rem; border-bottom: 1px solid var(--color-border); }
+  .brand-section:last-child { border-bottom: none; }
+
+  .brand-section__header { margin-bottom: 2rem; }
+  .brand-section__number {
+    font-family: var(--font-mono); font-size: 0.72rem; font-weight: 600;
+    color: var(--color-accent); background: var(--color-accent-light);
+    padding: 2px 10px; border-radius: 20px; display: inline-block; margin-bottom: 0.75rem;
+  }
+  .brand-section__header h2 { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
+  .brand-section__header p { color: var(--color-txt-2); font-size: 0.92rem; line-height: 1.7; max-width: 600px; margin: 0; }
+
+  .logo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .logo-card { border: 1px solid var(--color-border); border-radius: 16px; overflow: hidden; transition: box-shadow 0.2s; }
+  .logo-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+  .logo-card__preview {
+    display: flex; align-items: center; justify-content: center;
+    padding: 2.5rem 2rem; min-height: 160px;
+  }
+  .logo-card__preview--light { background: var(--color-bg-warm); }
+  .logo-card__svg { width: 72px; height: 72px; }
+  .logo-card__svg :global(svg) { width: 100%; height: 100%; }
+  .logo-card__svg--accent :global(svg) { color: var(--color-accent); }
+  .logo-card__info { padding: 1rem 1.25rem; }
+  .logo-card__info h3 { font-size: 0.92rem; font-weight: 700; margin: 0 0 0.375rem; }
+  .logo-card__tag {
+    display: inline-block; font-size: 0.65rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 4px;
+    background: var(--color-accent-light); color: var(--color-accent); margin-bottom: 0.5rem;
+  }
+  .logo-card__tag--outline { background: var(--color-plum-light); color: var(--color-plum); }
+  .logo-card__tag--rocket { background: var(--color-sky-light); color: var(--color-sky); }
+  .logo-card__info p { font-size: 0.78rem; color: var(--color-txt-2); margin: 0; line-height: 1.6; }
+
+  .brand-subsection { margin-top: 2.5rem; }
+  .brand-subsection h3 { font-size: 1.1rem; font-weight: 700; margin: 0 0 0.5rem; }
+  .brand-subsection > p { font-size: 0.85rem; color: var(--color-txt-2); line-height: 1.65; margin: 0 0 1.5rem; }
+
+  .clearspace-demo { display: flex; justify-content: center; padding: 2rem 0; }
+  .clearspace-box {
+    position: relative; width: 160px; height: 160px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px dashed var(--color-accent); border-radius: 12px; background: var(--color-accent-light);
+  }
+  .clearspace-logo { width: 80px; height: 80px; }
+  .clearspace-logo :global(svg) { width: 100%; height: 100%; }
+  .clearspace-label {
+    position: absolute; top: 8px; right: 12px;
+    font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--color-accent);
+  }
+
+  .usage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .usage-card { padding: 1.25rem 1.5rem; border-radius: 12px; border: 1px solid var(--color-border); }
+  .usage-card--do { border-color: var(--color-emerald); background: var(--color-emerald-light); }
+  .usage-card--dont { border-color: #C53030; background: #FFF5F5; }
+  .usage-card__badge { font-size: 0.78rem; font-weight: 800; margin-bottom: 0.75rem; }
+  .usage-card--do .usage-card__badge { color: var(--color-emerald); }
+  .usage-card--dont .usage-card__badge { color: #C53030; }
+  .usage-card ul { margin: 0; padding-left: 1.25rem; }
+  .usage-card li { font-size: 0.82rem; color: var(--color-txt-2); margin-bottom: 4px; line-height: 1.6; }
+
+  .color-group-title { font-size: 0.95rem; font-weight: 700; margin: 1.75rem 0 0.75rem; }
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+  .color-grid--primary { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+  .color-swatch { border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden; }
+  .color-swatch__preview { height: 80px; }
+  .color-swatch__info { padding: 0.75rem 1rem; }
+  .color-swatch__info strong { display: block; font-size: 0.82rem; margin-bottom: 2px; }
+  .color-swatch__info code { font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-txt-3); background: none; padding: 0; border: none; }
+  .color-swatch__info span { display: block; font-size: 0.72rem; color: var(--color-txt-3); margin-top: 4px; }
+  .color-swatch--small {
+    display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.75rem 1rem; border: 1px solid var(--color-border); border-radius: 10px;
+  }
+  .color-swatch__dot { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+  .color-swatch__meta strong { display: block; font-size: 0.78rem; }
+  .color-swatch__meta code { font-family: var(--font-mono); font-size: 0.68rem; color: var(--color-txt-3); background: none; padding: 0; border: none; }
+
+  .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .type-card { border: 1px solid var(--color-border); border-radius: 14px; overflow: hidden; }
+  .type-card__sample { background: var(--color-bg-warm); padding: 2rem; display: flex; align-items: baseline; gap: 1rem; }
+  .type-card__big { font-size: 3.5rem; font-weight: 700; color: var(--color-txt); }
+  .type-card__name { font-size: 1rem; font-weight: 600; color: var(--color-txt-2); }
+  .type-card__weights { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem 1.25rem 0.5rem; }
+  .type-card__weights span { font-size: 0.75rem; padding: 3px 10px; border-radius: 6px; background: var(--color-bg-warm); color: var(--color-txt-2); }
+  .type-card__usage { padding: 0 1.25rem 1rem; font-size: 0.78rem; color: var(--color-txt-3); margin: 0; }
+
+  .type-scale { margin-top: 2rem; }
+  .type-scale h3 { font-size: 1.1rem; font-weight: 700; margin: 0 0 1rem; }
+  .type-scale__row { display: flex; align-items: baseline; gap: 1.5rem; padding: 0.75rem 0; border-bottom: 1px solid var(--color-border); }
+  .type-scale__row:last-child { border-bottom: none; }
+  .type-scale__label { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 600; color: var(--color-accent); width: 48px; flex-shrink: 0; }
+  .type-scale__specimen { line-height: 1.3; }
+
+  .anatomy-demo { display: grid; grid-template-columns: auto 1fr; gap: 3rem; align-items: center; padding: 2rem 0; }
+  .anatomy-logo { width: 180px; height: 180px; }
+  .anatomy-logo :global(svg) { width: 100%; height: 100%; }
+  .anatomy-labels { display: flex; flex-direction: column; gap: 1rem; }
+  .anatomy-item { display: flex; align-items: flex-start; gap: 0.75rem; }
+  .anatomy-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .anatomy-item strong { display: block; font-size: 0.85rem; }
+  .anatomy-item span { font-size: 0.78rem; color: var(--color-txt-2); }
+
+  @media (max-width: 700px) {
+    .brand-hero { padding: 3.5rem 1.5rem 3rem; }
+    .brand-content { padding: 0 1rem 3rem; }
+    .logo-grid { grid-template-columns: 1fr; }
+    .usage-grid { grid-template-columns: 1fr; }
+    .type-grid { grid-template-columns: 1fr; }
+    .anatomy-demo { grid-template-columns: 1fr; justify-items: center; }
+    .anatomy-logo { width: 120px; height: 120px; }
+    .type-scale__row { flex-direction: column; gap: 0.25rem; }
+    .color-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>

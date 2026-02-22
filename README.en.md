@@ -1,19 +1,19 @@
-# 🤖 ccpoke — Claude Code ↔ Telegram Notification Bot
+# 🤖 ccpoke — AI Agent ↔ Telegram Notification Bot
 
 [Tiếng Việt](./README.md)
 
-> Get Telegram notifications when Claude Code completes a response — with git diff, processing time, and result summary.
+> Get Telegram notifications when your AI agent (Claude Code, Cursor, ...) completes a response — with git diff, processing time, and result summary.
 
 ---
 
 ## Problem
 
-You're using Claude Code on your computer. You step away with your phone but have no idea if Claude Code is done yet or what files it changed.
+You're using Claude Code or Cursor on your computer. You step away with your phone but have no idea if the AI agent is done yet or what files it changed.
 
-**ccpoke** is a lightweight bridge between Claude Code and Telegram — when Claude Code finishes, you get a notification right on your phone.
+**ccpoke** is a lightweight bridge between AI agents and Telegram — when any agent finishes, you get a notification right on your phone.
 
 ```
-Claude Code completes response
+AI agent completes response
         ↓
   Stop Hook triggers
         ↓
@@ -22,12 +22,22 @@ Claude Code completes response
   Telegram notification 📱
 ```
 
+## Supported Agents
+
+| Agent | Status |
+|-------|--------|
+| Claude Code | ✅ Supported |
+| Cursor | ✅ Supported |
+
+Adding new agents is easy via the plugin architecture — contributions welcome!
+
 ## Features
 
-- 🔔 **Auto notification** — Claude Code finishes → Telegram notifies you instantly
+- 🤖 **Multi-agent** — supports Claude Code, Cursor and more
+- 🔔 **Auto notification** — AI agent finishes → Telegram notifies you instantly
 - 📂 **Git diff included** — see changed files without opening your computer
-- ⏱ **Processing time** — know how long Claude Code took
-- 📝 **Response summary** — quick glance at what Claude Code replied
+- ⏱ **Processing time** — know how long the agent took
+- 📝 **Response summary** — quick glance at what the agent replied
 - 🔐 **User whitelist** — only authorized users can use the bot
 - 📄 **Auto-split messages** — long responses are automatically paginated `[1/N]`
 
@@ -89,8 +99,12 @@ The setup wizard will guide you step by step:
 │
 ◆  ✓ Connected! User ID: 123456789
 │
+◇  Select AI agents (space to toggle)
+│  Claude Code, Cursor
+│
 ◆  Config saved
-◆  Hook installed → ~/.claude/settings.json
+◆  Hook installed for Claude Code
+◆  Hook installed for Cursor
 ◆  Chat ID registered
 │
 └  🎉 Setup complete!
@@ -128,7 +142,7 @@ ccpoke
 pnpm dev
 ```
 
-Once running, use Claude Code as usual → notifications will arrive on Telegram.
+Once running, use Claude Code / Cursor as usual → notifications will arrive on Telegram.
 
 ### Telegram Commands
 
@@ -163,7 +177,8 @@ ccpoke uninstall
 ```
 ┌  🗑️  Uninstalling ccpoke
 │
-◆  Hook removed from ~/.claude/settings.json
+◆  Hook removed from Claude Code
+◆  Hook removed from Cursor
 ◆  Removed ~/.ccpoke/ (config, state, hooks)
 │
 └  ccpoke uninstalled

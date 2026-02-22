@@ -3,6 +3,8 @@ import { useState } from "preact/hooks";
 import { tClient } from "../../i18n";
 import { formatDuration, formatModelName } from "../../lib/format";
 import { GIT_STATUS_STYLES } from "../../lib/constants";
+import chevronDown16 from "../../assets/icons/chevron-down-16.svg?raw";
+import alertCircle from "../../assets/icons/alert-circle.svg?raw";
 import type { GitChange } from "./types";
 
 export function ResponseMeta({
@@ -78,12 +80,10 @@ export function GitChangesPanel({ changes }: { changes: GitChange[] }) {
           {counts.deleted > 0 && <span class="rv-stat rv-stat--del">-{counts.deleted}</span>}
           {counts.renamed > 0 && <span class="rv-stat rv-stat--ren">R{counts.renamed}</span>}
         </span>
-        <svg
+        <span
           class={`rv-changes__arrow ${expanded ? "rv-changes__arrow--open" : ""}`}
-          width="16" height="16" viewBox="0 0 16 16" fill="currentColor"
-        >
-          <path d="M12.78 6.22a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06 0L3.22 7.28a.75.75 0 011.06-1.06L8 9.94l3.72-3.72a.75.75 0 011.06 0z"/>
-        </svg>
+          dangerouslySetInnerHTML={{ __html: chevronDown16 }}
+        />
       </button>
 
       {expanded && (
@@ -131,11 +131,10 @@ export function LoadingState() {
 export function ErrorState({ message }: { message: string }) {
   return (
     <div class="rv-error">
-      <svg class="rv-error__icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <line x1="12" y1="8" x2="12" y2="12"/>
-        <line x1="12" y1="16" x2="12.01" y2="16"/>
-      </svg>
+      <span
+        class="rv-error__icon w-8 h-8"
+        dangerouslySetInnerHTML={{ __html: alertCircle }}
+      />
       <p class="rv-error__text">{message}</p>
     </div>
   );
