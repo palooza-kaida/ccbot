@@ -51,6 +51,12 @@ export const vi: TranslationKeys = {
     complete:
       "🎉 Setup hoàn tất!\n\n  Bước tiếp:\n  1. Chạy bot:  {command}\n  2. Dùng Claude Code bình thường → notification sẽ đến",
     languageMessage: "Ngôn ngữ",
+    tokenUnchanged: "Token không đổi — bỏ qua xác thực",
+    selectAgents: "Chọn AI agents (ấn cách để chọn)",
+    agentNotInstalled: "{agent} chưa được cài trên máy này",
+    agentHookInstalled: "Đã cài hook cho {agent}",
+    agentHookAlreadyInstalled: "Hook cho {agent} đã được cài rồi",
+    agentHookUninstalled: "Đã gỡ hook cho {agent}",
   },
 
   uninstall: {
@@ -62,6 +68,7 @@ export const vi: TranslationKeys = {
     removeGlobal: "Để gỡ package:\n  pnpm remove -g ccpoke",
     removeGitClone: "Để xóa source:\n  rm -rf <ccpoke-directory>",
     done: "Đã gỡ ccpoke",
+    agentHookRemoved: "Đã gỡ hook cho {agent}",
   },
 
   update: {
@@ -128,6 +135,10 @@ export const vi: TranslationKeys = {
     invalidSecret: "hook_secret chỉ được chứa ký tự hex (a-f, 0-9)",
     invalidHookPort: "hook port không hợp lệ: {port} (phải từ 1-65535)",
     hookAlreadyInstalled: "ccpoke hook đã được cài rồi",
+  },
+  agent: {
+    unknownAgent: "Agent không xác định: {agent}",
+    taskDone: "✅ Task done",
   },
 
   common: {

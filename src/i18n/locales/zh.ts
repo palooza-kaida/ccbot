@@ -50,6 +50,12 @@ export const zh: TranslationKeys = {
     complete:
       "🎉 设置完成！\n\n  下一步:\n  1. 启动机器人:  {command}\n  2. 正常使用 Claude Code → 通知将自动发送",
     languageMessage: "语言",
+    tokenUnchanged: "Token 未更改 — 跳过验证",
+    selectAgents: "选择 AI 代理 (空格键切换)",
+    agentNotInstalled: "{agent} 未安装在此设备上",
+    agentHookInstalled: "{agent} hook 已安装",
+    agentHookAlreadyInstalled: "{agent} hook 已安装",
+    agentHookUninstalled: "{agent} hook 已移除",
   },
 
   uninstall: {
@@ -61,6 +67,7 @@ export const zh: TranslationKeys = {
     removeGlobal: "要同时删除包:\n  pnpm remove -g ccpoke",
     removeGitClone: "要同时删除源代码:\n  rm -rf <ccpoke-directory>",
     done: "ccpoke 已卸载",
+    agentHookRemoved: "{agent} hook 已移除",
   },
 
   update: {
@@ -127,6 +134,10 @@ export const zh: TranslationKeys = {
     invalidSecret: "hook_secret 只能包含十六进制字符 (a-f, 0-9)",
     invalidHookPort: "无效的 hook 端口: {port}（必须为 1-65535）",
     hookAlreadyInstalled: "ccpoke hook 已安装",
+  },
+  agent: {
+    unknownAgent: "未知代理: {agent}",
+    taskDone: "✅ 任务完成",
   },
 
   common: {

@@ -51,6 +51,12 @@ export const en: TranslationKeys = {
     complete:
       "🎉 Setup complete!\n\n  Next steps:\n  1. Start bot:  {command}\n  2. Use Claude Code normally → notifications will arrive",
     languageMessage: "Language",
+    tokenUnchanged: "Bot token unchanged — skipping verification",
+    selectAgents: "Select AI agents (space to toggle)",
+    agentNotInstalled: "{agent} is not installed on this machine",
+    agentHookInstalled: "{agent} hook installed",
+    agentHookAlreadyInstalled: "{agent} hook already installed",
+    agentHookUninstalled: "{agent} hook removed",
   },
 
   uninstall: {
@@ -62,6 +68,7 @@ export const en: TranslationKeys = {
     removeGlobal: "To also remove the package:\n  pnpm remove -g ccpoke",
     removeGitClone: "To also remove the source:\n  rm -rf <ccpoke-directory>",
     done: "ccpoke uninstalled",
+    agentHookRemoved: "{agent} hook removed",
   },
 
   update: {
@@ -128,6 +135,10 @@ export const en: TranslationKeys = {
     invalidSecret: "hook_secret must contain only hex characters (a-f, 0-9)",
     invalidHookPort: "invalid hook port: {port} (must be 1-65535)",
     hookAlreadyInstalled: "ccpoke hook already installed",
+  },
+  agent: {
+    unknownAgent: "Unknown agent: {agent}",
+    taskDone: "✅ Task done",
   },
 
   common: {

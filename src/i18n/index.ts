@@ -3,19 +3,25 @@ import { en } from "./locales/en.js";
 import { vi } from "./locales/vi.js";
 import { zh } from "./locales/zh.js";
 
-export type Locale = "en" | "vi" | "zh";
+export const Locale = {
+  EN: "en",
+  VI: "vi",
+  ZH: "zh",
+} as const;
 
-export const SUPPORTED_LOCALES: readonly Locale[] = ["en", "vi", "zh"] as const;
+export type Locale = (typeof Locale)[keyof typeof Locale];
 
 export const LOCALE_LABELS: Record<Locale, string> = {
-  en: "English",
-  vi: "Tiếng Việt",
-  zh: "中文",
+  [Locale.EN]: "English",
+  [Locale.VI]: "Tiếng Việt",
+  [Locale.ZH]: "中文",
 };
+
+export const SUPPORTED_LOCALES = Object.values(Locale) as Locale[];
 
 const localeMap: Record<Locale, TranslationKeys> = { en, vi, zh };
 
-let currentLocale: Locale = "en";
+let currentLocale: Locale = Locale.EN;
 
 export function setLocale(locale: Locale): void {
   currentLocale = locale;

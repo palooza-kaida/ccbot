@@ -46,6 +46,12 @@ export interface TranslationKeys {
     chatIdRegistered: string;
     complete: string;
     languageMessage: string;
+    tokenUnchanged: string;
+    selectAgents: string;
+    agentNotInstalled: string;
+    agentHookInstalled: string;
+    agentHookAlreadyInstalled: string;
+    agentHookUninstalled: string;
   };
   uninstall: {
     intro: string;
@@ -56,6 +62,7 @@ export interface TranslationKeys {
     removeGlobal: string;
     removeGitClone: string;
     done: string;
+    agentHookRemoved: string;
   };
   update: {
     intro: string;
@@ -117,6 +124,10 @@ export interface TranslationKeys {
     invalidSecret: string;
     invalidHookPort: string;
     hookAlreadyInstalled: string;
+  };
+  agent: {
+    unknownAgent: string;
+    taskDone: string;
   };
   common: {
     unknownCommand: string;
