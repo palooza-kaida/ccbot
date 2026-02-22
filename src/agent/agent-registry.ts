@@ -1,5 +1,6 @@
 import type { AgentProvider } from "./types.js";
 import { ClaudeCodeProvider } from "./claude-code/claude-code-provider.js";
+import { CursorProvider } from "./cursor/cursor-provider.js";
 
 export class AgentRegistry {
   private providers = new Map<string, AgentProvider>();
@@ -24,5 +25,6 @@ export class AgentRegistry {
 export function createDefaultRegistry(): AgentRegistry {
   const registry = new AgentRegistry();
   registry.register(new ClaudeCodeProvider());
+  registry.register(new CursorProvider());
   return registry;
 }
