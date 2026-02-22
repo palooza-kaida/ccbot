@@ -4,6 +4,8 @@ import { ConfigManager } from "../../config-manager.js";
 import type { NotificationChannel, NotificationData } from "../types.js";
 import { sendTelegramMessage } from "./telegram-sender.js";
 import { MINI_APP_BASE_URL } from "../../utils/constants.js";
+import { formatModelName, formatDuration, formatTokenCount } from "../../utils/stats-format.js";
+import { extractProseSnippet } from "../../utils/markdown.js";
 import { t, getTranslations } from "../../i18n/index.js";
 import { log, logError } from "../../utils/log.js";
 
@@ -147,99 +149,4 @@ export class TelegramChannel implements NotificationChannel {
 
 function escapeMarkdownV2(text: string): string {
   return text.replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (m) => `\\${m}`);
-}
-
-function formatDuration(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  if (totalSeconds < 60) return `${totalSeconds}s`;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${minutes}m${seconds}s`;
-}
-
-function formatTokenCount(tokens: number): string {
-  if (tokens >= 1_000_000) return `${(tokens / 1_000_000).toFixed(1)}M`;
-  if (tokens >= 1_000) return `${(tokens / 1_000).toFixed(1)}k`;
-  return `${tokens}`;
-}
-
-const PROVIDERS: Record<string, string> = {
-  "claude-": "",
-  "gpt-": "GPT-",
-  "gemini-": "Gemini ",
-  "deepseek-": "DeepSeek ",
-  "mistral-": "Mistral ",
-  "codestral-": "Codestral ",
-  "grok-": "Grok ",
-  "moonshot-": "Moonshot ",
-  "qwen-": "Qwen ",
-};
-
-function formatModelName(model: string): string {
-  const dashIndex = model.indexOf("-");
-  if (dashIndex === -1) return prettify(model);
-
-  const prefix = model.slice(0, dashIndex + 1);
-  const display = PROVIDERS[prefix];
-  if (display === undefined) return prettify(model);
-
-  const rest = model.slice(dashIndex + 1);
-  return rest ? `${display}${prettify(rest)}` : model;
-}
-
-function prettify(s: string): string {
-  return s
-    .replace(/-/g, " ")
-    .replace(/(\d+)\s(\d+)/g, "$1.$2")
-    .replace(/(^| )[a-z]/g, (c) => c.toUpperCase());
-}
-
-function extractProseSnippet(text: string, maxLength: number): string {
-  const withoutCodeBlocks = text.replace(/```[\s\S]*?```/g, "").replace(/```[\s\S]*/g, "");
-  const paragraphs = withoutCodeBlocks.split(/\n\n+/);
-
-  const candidates = paragraphs
-    .map((p) => ({ raw: p.trim(), cleaned: stripInlineMarkdown(p.trim()) }))
-    .filter((c) => c.cleaned.length >= 20);
-
-  const prose = candidates.find((c) => !isStructuredBlock(c.raw));
-  if (prose) return truncateAtWordBoundary(prose.cleaned, maxLength);
-
-  const fallback = candidates[0];
-  if (fallback) return truncateAtWordBoundary(fallback.cleaned, maxLength);
-
-  return truncateAtWordBoundary(stripInlineMarkdown(text), maxLength);
-}
-
-function stripInlineMarkdown(text: string): string {
-  return text
-    .replace(/\*\*(.+?)\*\*/g, "$1")
-    .replace(/(?<!\w)\*(.+?)\*(?!\w)/g, "$1")
-    .replace(/__(.+?)__/g, "$1")
-    .replace(/(?<!\w)_(.+?)_(?!\w)/g, "$1")
-    .replace(/`([^`]+)`/g, "$1")
-    .replace(/~~(.+?)~~/g, "$1")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
-}
-
-function isStructuredBlock(line: string): boolean {
-  if (/^\|.*\|/.test(line)) return true;
-  if (/^#{1,6}\s/.test(line)) return true;
-  if (/^\*\*[^*]+\*\*:?\s*$/.test(line)) return true;
-
-  const lines = line.split("\n");
-  const listLines = lines.filter((l) => /^\s*[-*•]\s|^\s*\d+[.)]\s/.test(l));
-  if (listLines.length > lines.length * 0.5) return true;
-
-  return false;
-}
-
-function truncateAtWordBoundary(text: string, maxLength: number): string {
-  const normalized = text.replace(/\n+/g, " ").replace(/\s+/g, " ").trim();
-  if (normalized.length <= maxLength) return normalized;
-
-  const truncated = normalized.slice(0, maxLength);
-  const lastSpace = truncated.lastIndexOf(" ");
-  const cut = lastSpace > maxLength * 0.6 ? truncated.slice(0, lastSpace) : truncated;
-  return cut;
 }
