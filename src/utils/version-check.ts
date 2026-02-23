@@ -1,12 +1,7 @@
 import { getPackageVersion } from "./paths.js";
 import { logWarn } from "./log.js";
 import { t } from "../i18n/index.js";
-import {
-  NPM_REGISTRY_URL,
-  VERSION_CHECK_TIMEOUT_MS,
-  InstallMethod,
-  PackageManager,
-} from "./constants.js";
+import { NPM_REGISTRY_URL, VERSION_CHECK_TIMEOUT_MS, InstallMethod } from "./constants.js";
 import { detectInstallMethod } from "./install-detection.js";
 
 function isNewerVersion(current: string, latest: string): boolean {
@@ -23,14 +18,6 @@ function isNewerVersion(current: string, latest: string): boolean {
   return false;
 }
 
-function detectGlobalPackageManager(): PackageManager {
-  const scriptPath = process.argv[1] ?? "";
-  if (scriptPath.includes(PackageManager.Pnpm)) return PackageManager.Pnpm;
-  if (scriptPath.includes(PackageManager.Yarn)) return PackageManager.Yarn;
-  if (scriptPath.includes(PackageManager.Bun)) return PackageManager.Bun;
-  return PackageManager.Npm;
-}
-
 function getUpdateCommand(): string {
   const method = detectInstallMethod();
   switch (method) {
@@ -38,12 +25,8 @@ function getUpdateCommand(): string {
       return "npx ccpoke@latest";
     case InstallMethod.GitClone:
       return "git pull && npm run build";
-    case InstallMethod.Global: {
-      const pm = detectGlobalPackageManager();
-      return pm === PackageManager.Yarn
-        ? "yarn global add ccpoke"
-        : `${pm} install -g ccpoke@latest`;
-    }
+    case InstallMethod.Global:
+      return "ccpoke update";
   }
 }
 
