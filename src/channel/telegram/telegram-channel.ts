@@ -3,6 +3,9 @@ import type { Config } from "../../config-manager.js";
 import { ConfigManager } from "../../config-manager.js";
 import type { NotificationChannel, NotificationData } from "../types.js";
 import { sendTelegramMessage } from "./telegram-sender.js";
+import { PendingReplyStore } from "./pending-reply-store.js";
+import type { SessionMap } from "../../tmux/session-map.js";
+import type { SessionStateManager } from "../../tmux/session-state.js";
 import { MINI_APP_BASE_URL } from "../../utils/constants.js";
 import { formatModelName, formatDuration, formatTokenCount } from "../../utils/stats-format.js";
 import { extractProseSnippet } from "../../utils/markdown.js";
@@ -14,12 +17,18 @@ export class TelegramChannel implements NotificationChannel {
   private cfg: Config;
   private chatId: number | null = null;
   private isDisconnected = false;
+  private pendingReplyStore = new PendingReplyStore();
+  private sessionMap: SessionMap | null;
+  private stateManager: SessionStateManager | null;
 
-  constructor(cfg: Config) {
+  constructor(cfg: Config, sessionMap?: SessionMap, stateManager?: SessionStateManager) {
     this.cfg = cfg;
+    this.sessionMap = sessionMap ?? null;
+    this.stateManager = stateManager ?? null;
     this.bot = new TelegramBot(cfg.telegram_bot_token, { polling: false });
     this.chatId = ConfigManager.loadChatState().chat_id;
     this.registerHandlers();
+    this.registerChatHandlers();
     this.registerPollingErrorHandler();
   }
 
@@ -43,7 +52,7 @@ export class TelegramChannel implements NotificationChannel {
     const text = this.formatNotification(data);
 
     try {
-      await sendTelegramMessage(this.bot, this.chatId, text, responseUrl);
+      await sendTelegramMessage(this.bot, this.chatId, text, responseUrl, data.sessionId);
     } catch (err: unknown) {
       logError(t("bot.notificationFailed"), err);
     }
@@ -130,6 +139,82 @@ export class TelegramChannel implements NotificationChannel {
       ConfigManager.saveChatState({ chat_id: this.chatId });
       log(t("bot.registeredChatId", { chatId: msg.chat.id }));
       this.bot.sendMessage(msg.chat.id, t("bot.ready"), { parse_mode: "MarkdownV2" });
+    });
+  }
+
+  private registerChatHandlers(): void {
+    this.bot.on("callback_query", async (query) => {
+      if (!query.data?.startsWith("chat:")) return;
+      if (!ConfigManager.isOwner(this.cfg, query.from.id)) return;
+
+      const sessionId = query.data.slice(5);
+
+      if (!this.sessionMap) {
+        await this.bot.answerCallbackQuery(query.id, { text: t("chat.sessionExpired") });
+        return;
+      }
+
+      const session = this.sessionMap.getBySessionId(sessionId);
+      if (!session) {
+        await this.bot.answerCallbackQuery(query.id, { text: t("chat.sessionExpired") });
+        return;
+      }
+
+      if (!query.message) {
+        await this.bot.answerCallbackQuery(query.id);
+        return;
+      }
+
+      const sent = await this.bot.sendMessage(
+        query.message.chat.id,
+        `💬 *${escapeMarkdownV2(session.project)}*\n${escapeMarkdownV2(t("chat.replyHint"))}`,
+        {
+          parse_mode: "MarkdownV2",
+          reply_to_message_id: query.message.message_id,
+          reply_markup: {
+            force_reply: true,
+            input_field_placeholder: `${session.project} → Claude`,
+          },
+        }
+      );
+
+      this.pendingReplyStore.set(
+        query.message.chat.id,
+        sent.message_id,
+        sessionId,
+        session.project
+      );
+      await this.bot.answerCallbackQuery(query.id);
+    });
+
+    this.bot.on("message", async (msg) => {
+      if (!msg.reply_to_message) return;
+      if (!msg.text) return;
+      if (!ConfigManager.isOwner(this.cfg, msg.from?.id ?? 0)) return;
+
+      const pending = this.pendingReplyStore.get(msg.chat.id, msg.reply_to_message.message_id);
+      if (!pending) return;
+
+      this.pendingReplyStore.delete(msg.chat.id, msg.reply_to_message.message_id);
+
+      if (!this.stateManager) {
+        await this.bot.sendMessage(msg.chat.id, t("chat.sessionNotFound"));
+        return;
+      }
+
+      const result = this.stateManager.injectMessage(pending.sessionId, msg.text);
+
+      if ("sent" in result) {
+        await this.bot.sendMessage(msg.chat.id, t("chat.sent", { project: pending.project }));
+      } else if ("busy" in result) {
+        await this.bot.sendMessage(msg.chat.id, t("chat.busy"));
+      } else if ("desktopActive" in result) {
+        await this.bot.sendMessage(msg.chat.id, t("chat.desktopActive"));
+      } else if ("sessionNotFound" in result) {
+        await this.bot.sendMessage(msg.chat.id, t("chat.sessionNotFound"));
+      } else if ("tmuxDead" in result) {
+        await this.bot.sendMessage(msg.chat.id, t("chat.tmuxDead"));
+      }
     });
   }
 

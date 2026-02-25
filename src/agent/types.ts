@@ -23,6 +23,7 @@ export interface AgentProvider {
   installHook(port: number, secret: string): void;
   uninstallHook(): void;
   parseEvent(raw: unknown): AgentEventResult;
+  verifyIntegrity(): { complete: boolean; missing: string[] };
 }
 
 export interface AgentEventResult {
@@ -33,4 +34,7 @@ export interface AgentEventResult {
   inputTokens: number;
   outputTokens: number;
   model: string;
+  agentSessionId?: string;
+  cwd?: string;
+  tmuxTarget?: string;
 }

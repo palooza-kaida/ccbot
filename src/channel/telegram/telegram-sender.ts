@@ -10,7 +10,8 @@ export async function sendTelegramMessage(
   bot: TelegramBot,
   chatId: number,
   text: string,
-  responseUrl?: string
+  responseUrl?: string,
+  sessionId?: string
 ): Promise<void> {
   const pages = splitMessage(text, TELEGRAM_MAX_MESSAGE_LENGTH - PAGINATION_FOOTER_RESERVE);
 
@@ -24,7 +25,7 @@ export async function sendTelegramMessage(
     const opts: TelegramBot.SendMessageOptions = { parse_mode: "MarkdownV2" };
 
     if (isLastPage && responseUrl) {
-      opts.reply_markup = buildResponseReplyMarkup(responseUrl);
+      opts.reply_markup = buildResponseReplyMarkup(responseUrl, sessionId);
     }
 
     try {
@@ -33,7 +34,7 @@ export async function sendTelegramMessage(
       logError(t("bot.sendFailed"), err);
       const fallbackOpts: TelegramBot.SendMessageOptions = {};
       if (isLastPage && responseUrl) {
-        fallbackOpts.reply_markup = buildResponseReplyMarkup(responseUrl);
+        fallbackOpts.reply_markup = buildResponseReplyMarkup(responseUrl, sessionId);
       }
       try {
         await bot.sendMessage(chatId, pages[i]!, fallbackOpts);
@@ -77,10 +78,20 @@ function findSplitPoint(text: string, maxLen: number): number {
   return maxLen;
 }
 
-function buildResponseReplyMarkup(responseUrl: string): TelegramBot.InlineKeyboardMarkup {
-  const buttonText = t("bot.viewDetails");
-  const button = responseUrl.startsWith("https://")
-    ? { text: buttonText, web_app: { url: responseUrl } }
-    : { text: buttonText, url: responseUrl };
-  return { inline_keyboard: [[button]] };
+function buildResponseReplyMarkup(
+  responseUrl: string,
+  sessionId?: string
+): TelegramBot.InlineKeyboardMarkup {
+  const viewText = sessionId ? "📖" : t("bot.viewDetails");
+  const viewButton = responseUrl.startsWith("https://")
+    ? { text: viewText, web_app: { url: responseUrl } }
+    : { text: viewText, url: responseUrl };
+
+  const buttons: TelegramBot.InlineKeyboardButton[] = [viewButton];
+
+  if (sessionId) {
+    buttons.push({ text: "💬 Chat", callback_data: `chat:${sessionId}` });
+  }
+
+  return { inline_keyboard: [buttons] };
 }

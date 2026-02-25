@@ -16,6 +16,7 @@ export interface NotificationData {
   inputTokens: number;
   outputTokens: number;
   model: string;
+  sessionId?: string;
 }
 
 export interface GitChange {
