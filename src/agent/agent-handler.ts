@@ -1,4 +1,5 @@
 import type { AgentRegistry } from "./agent-registry.js";
+import type { ChatSessionResolver } from "./chat-session-resolver.js";
 import type { NotificationChannel, NotificationData } from "../channel/types.js";
 import type { TunnelManager } from "../utils/tunnel.js";
 import { MINI_APP_BASE_URL } from "../utils/constants.js";
@@ -11,7 +12,8 @@ export class AgentHandler {
     private registry: AgentRegistry,
     private channel: NotificationChannel,
     private hookPort: number,
-    private tunnelManager: TunnelManager
+    private tunnelManager: TunnelManager,
+    private chatResolver?: ChatSessionResolver
   ) {}
 
   async handleStopEvent(agentName: string, rawEvent: unknown): Promise<void> {
@@ -27,17 +29,38 @@ export class AgentHandler {
 
     const result = provider.parseEvent(rawEvent);
 
+    let chatSessionId: string | undefined;
+    if (this.chatResolver) {
+      chatSessionId = this.chatResolver.resolveSessionId(
+        result.agentSessionId ?? "",
+        result.projectName,
+        result.cwd,
+        result.tmuxTarget
+      );
+    }
+
     const data: NotificationData = {
       agent: provider.name,
       agentDisplayName: provider.displayName,
+      sessionId: chatSessionId,
       ...result,
     };
+
+    if (chatSessionId && this.chatResolver) {
+      this.chatResolver.onStopHook(chatSessionId);
+    }
 
     const responseUrl = this.buildResponseUrl(data);
     this.channel.sendNotification(data, responseUrl).catch((err: unknown) => {
       logError(t("hook.notificationFailed"), err);
     });
   }
+
+  async handleSessionStart(rawEvent: unknown): Promise<void> {
+    this.onSessionStart?.(rawEvent);
+  }
+
+  onSessionStart?: (rawEvent: unknown) => void;
 
   private buildResponseUrl(data: NotificationData): string {
     const id = responseStore.save(data);

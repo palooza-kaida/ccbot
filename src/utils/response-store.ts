@@ -67,7 +67,7 @@ class ResponseStore {
 
     if (this.responses.size >= MAX_STORED_RESPONSES) {
       const sorted = [...this.responses.entries()].sort((a, b) => b[1].timestamp - a[1].timestamp);
-      const toRemove = sorted.slice(MAX_STORED_RESPONSES - 1);
+      const toRemove = sorted.slice(MAX_STORED_RESPONSES);
       for (const [id] of toRemove) {
         this.responses.delete(id);
         this.removeFromDisk(id);

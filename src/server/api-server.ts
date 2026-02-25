@@ -77,7 +77,26 @@ export class ApiServer {
 
       const agentName = req.query.agent ? `${req.query.agent}` : AgentName.ClaudeCode;
 
-      setImmediate(() => this.handler?.handleStopEvent(agentName, req.body));
+      setImmediate(() => {
+        this.handler?.handleStopEvent(agentName, req.body).catch((err: unknown) => {
+          logError(t("hook.stopEventFailed"), err);
+        });
+      });
+      res.status(200).send("ok");
+    });
+
+    app.post(ApiRoute.HookSessionStart, (req, res) => {
+      const receivedSecret = req.headers["x-ccpoke-secret"];
+      if (receivedSecret !== this.secret) {
+        res.status(403).send("forbidden");
+        return;
+      }
+
+      setImmediate(() => {
+        this.handler?.handleSessionStart(req.body).catch((err: unknown) => {
+          logError(t("hook.sessionStartFailed"), err);
+        });
+      });
       res.status(200).send("ok");
     });
 

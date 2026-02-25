@@ -36,6 +36,10 @@ export class CursorProvider implements AgentProvider {
     CursorInstaller.uninstall();
   }
 
+  verifyIntegrity(): { complete: boolean; missing: string[] } {
+    return { complete: this.isHookInstalled(), missing: [] };
+  }
+
   parseEvent(raw: unknown): AgentEventResult {
     if (!isValidStopEvent(raw)) {
       return this.createFallbackResult(raw);

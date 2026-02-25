@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, renameSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import { Locale, isValidLocale, setLocale } from "./i18n/index.js";
 import { t } from "./i18n/index.js";
@@ -45,7 +45,9 @@ export class ConfigManager {
 
   static save(cfg: Config): void {
     mkdirSync(paths.ccpokeDir, { recursive: true });
-    writeFileSync(paths.configFile, JSON.stringify(cfg, null, 2), { mode: 0o600 });
+    const tmpPath = `${paths.configFile}.tmp`;
+    writeFileSync(tmpPath, JSON.stringify(cfg, null, 2), { mode: 0o600 });
+    renameSync(tmpPath, paths.configFile);
   }
 
   static isOwner(cfg: Config, userId: number): boolean {
@@ -67,7 +69,9 @@ export class ConfigManager {
 
   static saveChatState(state: ChatState): void {
     mkdirSync(paths.ccpokeDir, { recursive: true });
-    writeFileSync(paths.stateFile, JSON.stringify(state, null, 2), { mode: 0o600 });
+    const tmpPath = `${paths.stateFile}.tmp`;
+    writeFileSync(tmpPath, JSON.stringify(state, null, 2), { mode: 0o600 });
+    renameSync(tmpPath, paths.stateFile);
   }
 
   private static validate(data: Record<string, unknown>): Config {

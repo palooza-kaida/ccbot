@@ -30,6 +30,10 @@ export class ClaudeCodeProvider implements AgentProvider {
     ClaudeCodeInstaller.uninstall();
   }
 
+  verifyIntegrity(): { complete: boolean; missing: string[] } {
+    return ClaudeCodeInstaller.verifyIntegrity();
+  }
+
   parseEvent(raw: unknown): AgentEventResult {
     if (!isValidStopEvent(raw)) {
       return this.createFallbackResult(raw);
@@ -56,6 +60,9 @@ export class ClaudeCodeProvider implements AgentProvider {
       durationMs = DEFAULT_FALLBACK_DURATION_MS;
     }
 
+    const obj = raw as unknown as Record<string, unknown>;
+    const tmuxTarget = typeof obj.tmux_target === "string" ? obj.tmux_target : undefined;
+
     return {
       projectName: extractProjectName(raw.cwd, raw.transcript_path),
       responseSummary: summary.lastAssistantMessage,
@@ -64,6 +71,9 @@ export class ClaudeCodeProvider implements AgentProvider {
       inputTokens: summary.inputTokens,
       outputTokens: summary.outputTokens,
       model: summary.model,
+      agentSessionId: raw.session_id,
+      cwd: raw.cwd,
+      tmuxTarget,
     };
   }
 
@@ -71,6 +81,7 @@ export class ClaudeCodeProvider implements AgentProvider {
     const obj = (typeof raw === "object" && raw !== null ? raw : {}) as Record<string, unknown>;
     const cwd = typeof obj.cwd === "string" ? obj.cwd : process.cwd();
     const transcriptPath = typeof obj.transcript_path === "string" ? obj.transcript_path : "";
+    const tmuxTarget = typeof obj.tmux_target === "string" ? obj.tmux_target : undefined;
 
     return {
       projectName: extractProjectName(cwd, transcriptPath),
@@ -80,6 +91,9 @@ export class ClaudeCodeProvider implements AgentProvider {
       inputTokens: 0,
       outputTokens: 0,
       model: "",
+      agentSessionId: typeof obj.session_id === "string" ? obj.session_id : undefined,
+      cwd,
+      tmuxTarget,
     };
   }
 }
