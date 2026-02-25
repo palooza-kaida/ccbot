@@ -46,9 +46,9 @@ Implements the **Provider Pattern** for multi-agent support.
 
 | File | LOC | Responsibility |
 |------|-----|-----------------|
-| **types.ts** | 38 | Interface definitions: `AgentProvider`, `AgentEventResult` |
+| **types.ts** | 41 | Interface definitions: `AgentProvider`, `AgentEventResult`, `NotificationEvent` |
 | **agent-registry.ts** | 30 | Registry pattern for discovering/loading agents |
-| **agent-handler.ts** | 80 | Central hook event dispatcher for all agents |
+| **agent-handler.ts** | 136 | Central hook event dispatcher (stop, session_start, notification hooks) |
 | **chat-session-resolver.ts** | 5 | Bridges notifications to tmux session linking |
 
 #### Agent Adapters
@@ -76,6 +76,8 @@ Implements the **Adapter Pattern** for multi-channel support.
 | **telegram-channel.ts** | 239 | Bot lifecycle, Telegram handlers, notification formatting |
 | **telegram-sender.ts** | 97 | Message sending, pagination, Markdown escaping |
 | **pending-reply-store.ts** | 43 | In-memory store for tracking pending replies (10min TTL) |
+| **session-list.ts** | 60 | `/sessions` command formatting with state emojis and Chat buttons |
+| **prompt-handler.ts** | 163 | Forwards elicitation_dialog and idle_prompt events with force_reply |
 
 ### Terminal Session Management (`src/tmux/`)
 
@@ -87,7 +89,7 @@ Implements the **Bridge Pattern** for tmux operations.
 |------|-----|-----------------|
 | **tmux-bridge.ts** | 89 | Low-level tmux CLI wrapper (send-keys, capture-pane) |
 | **tmux-scanner.ts** | 108 | Pane detection, process tree search, session discovery |
-| **session-map.ts** | 160 | Session registry, persistence, periodic sync scan |
+| **session-map.ts** | 160 | Session registry, persistence, state tracking (idle/busy/blocked/unknown) |
 | **session-state.ts** | 114 | Message queue, keystroke injection, state machine |
 | **tmux-session-resolver.ts** | 67 | Links notification sessions to tmux targets |
 
@@ -97,7 +99,7 @@ Express-based HTTP server for receiving webhooks.
 
 | File | LOC | Responsibility |
 |------|-----|-----------------|
-| **api-server.ts** | 101 | Express setup, webhook routes, CORS, rate limiting |
+| **api-server.ts** | 101 | Express setup, webhook routes (/hook/stop, /hook/notification), CORS, rate limiting |
 
 ### Configuration (`src/config-manager.ts`)
 
@@ -246,7 +248,7 @@ idle → waiting_for_input → busy → idle
 3. curl POST http://127.0.0.1:9377/hook/stop
    - Include: transcript path, secret
    - Validate: hook secret
-4. AgentHandler parses event
+4. AgentHandler parses event (handleStopEvent)
    - Load transcript (NDJSON)
    - Extract last response
    - Collect git changes
@@ -258,17 +260,36 @@ idle → waiting_for_input → busy → idle
    - Add git diff summary
 ```
 
+### Elicitation Dialog Flow
+
+```
+1. Claude Code needs user input (confirmation prompt)
+2. Notification hook: POST /hook/notification
+   - notification_type: elicitation_dialog
+   - message: the prompt
+   - title: optional
+3. AgentHandler.handleNotification():
+   - Resolve session
+   - Update state → blocked
+4. PromptHandler forwards to Telegram
+   - force_reply markup
+   - User types response
+5. Message reply detection
+6. PromptHandler.injectElicitationResponse()
+   - Send response via tmux send-keys
+   - Update state → busy
+7. Claude Code continues with user input
+```
+
 ### Two-Way Chat Flow
 
 ```
 1. User sends message in Telegram
 2. TelegramChannel receives update
-3. Store pending reply (PendingReplyStore)
-4. Resolve target session (SessionResolver)
-5. Inject message via tmux send-keys
-6. Poll JSONL transcript for response
-7. Send response back to Telegram
-8. Clear pending reply flag
+3. Resolve target session (SessionResolver)
+4. Inject message via tmux send-keys
+5. Poll JSONL transcript for response
+6. Send response back to Telegram
 ```
 
 ### Session Lifecycle

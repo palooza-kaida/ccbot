@@ -158,10 +158,16 @@ interface TmuxSession {
   project: string;             // Project name (from path)
   cwd: string;                 // Working directory
   label: string;               // Display label
-  state: 'idle' | 'busy' | 'unknown';  // Current state
+  state: 'idle' | 'busy' | 'blocked' | 'unknown';  // Current state
   lastActivity: Date;          // Last activity timestamp
 }
 ```
+
+**Session States:**
+- **idle** — Session ready, no activity
+- **busy** — Agent processing response
+- **blocked** — Waiting for user input (elicitation_dialog hook)
+- **unknown** — Unable to determine state
 
 **Resource Limits:**
 - **MAX_SESSIONS = 200:** Prevents unbounded memory growth
@@ -336,6 +342,98 @@ Detects agents by matching process names:
 8. MESSAGE LIFECYCLE
    └─ PendingReplyStore expires (10min)
       └─ Auto-cleanup to free memory
+```
+
+---
+
+## Data Flow: Elicitation Dialog Forwarding
+
+**Scenario:** Claude Code sends elicitation_dialog hook → User sees prompt in Telegram → Response injected back
+
+```
+1. CLAUDE CODE ELICITATION HOOK
+   ├─ Agent requires user input (e.g., "Proceed with change?")
+   └─ Sends notification hook with event type: elicitation_dialog
+
+2. NOTIFICATION HOOK ENDPOINT (/hook/notification)
+   ├─ Validate secret header
+   ├─ Parse notification event:
+   │  ├─ session_id
+   │  ├─ notification_type (elicitation_dialog)
+   │  ├─ title (optional)
+   │  └─ message (the prompt)
+   └─ Delegate to AgentHandler.handleNotification()
+
+3. AGENT HANDLER
+   ├─ Resolve session ID (map to tmux target)
+   ├─ Call chatResolver.onNotificationBlock()
+   │  └─ Update session state → 'blocked'
+   └─ Emit onNotification event
+
+4. TELEGRAM CHANNEL
+   ├─ PromptHandler receives elicitation_dialog
+   ├─ Format message with title + prompt
+   ├─ Send to Telegram with force_reply markup
+   └─ Track pending prompt (10min TTL)
+
+5. USER ON PHONE
+   ├─ Sees prompt message with reply field
+   ├─ Types response
+   └─ Sends reply
+
+6. TELEGRAM MESSAGE HANDLER
+   ├─ Detect reply to prompt message
+   ├─ PromptHandler.injectElicitationResponse()
+   ├─ Validate session active and waiting
+   ├─ Send keys via tmux: text + Enter
+   └─ Update session state → 'busy'
+
+7. CLAUDE CODE RESUMES
+   ├─ Receives user response from stdin
+   ├─ Processes with injected input
+   ├─ Completes response
+   └─ Sends stop hook
+
+8. SESSION STATE RECOVERY
+   └─ Session transitions: blocked → busy → idle
+```
+
+---
+
+## Data Flow: Session List Command
+
+**Scenario:** User requests `/sessions` → Shows all active Claude Code sessions with state emojis and chat buttons
+
+```
+1. USER SENDS /sessions COMMAND
+   └─ TelegramChannel receives message
+
+2. MESSAGE HANDLER
+   ├─ Validate user (whitelist check)
+   ├─ Load all sessions from SessionMap
+   └─ Call formatSessionList()
+
+3. SESSION FORMATTER
+   ├─ Sort sessions by lastActivity (newest first)
+   ├─ For each session:
+   │  ├─ Get state emoji:
+   │  │  ├─ 🟢 (green) = idle
+   │  │  ├─ 🟡 (yellow) = busy
+   │  │  ├─ 🔴 (red) = blocked
+   │  │  └─ ⚪ (white) = unknown
+   │  ├─ Format label: "{emoji} {project} ({state})"
+   │  └─ Add "Chat" button (callback_data: chat:{sessionId})
+   └─ Return formatted message + inline keyboard
+
+4. TELEGRAM SEND
+   ├─ Send message with MarkdownV2 formatting
+   ├─ Include inline keyboard (50 buttons max)
+   └─ User taps "Chat" button
+
+5. CALLBACK HANDLER
+   ├─ Parse callback_data: chat:{sessionId}
+   ├─ Open chat input for that session
+   └─ Messages sent to session receive handler
 ```
 
 ---

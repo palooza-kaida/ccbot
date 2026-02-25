@@ -268,7 +268,7 @@ class SessionMap extends EventEmitter {
 **Purpose:** Enforce valid session state transitions.
 
 ```typescript
-type SessionStatus = 'idle' | 'waiting_input' | 'busy';
+type SessionStatus = 'idle' | 'busy' | 'blocked' | 'unknown';
 
 class SessionState {
   private status: SessionStatus = 'idle';
@@ -284,8 +284,15 @@ class SessionState {
 
 **Valid Transitions:**
 ```
-idle ──→ waiting_input ──→ busy ──→ idle
+idle ──→ blocked ──→ busy ──→ idle
+  └─────→ busy ────→ idle
 ```
+
+**State Meanings:**
+- **idle** — Session ready, no activity, can receive messages
+- **busy** — Agent processing, don't interrupt
+- **blocked** — Waiting for user input (elicitation hook), expecting reply
+- **unknown** — Unable to determine state
 
 ### 6. Store Pattern (Persistence)
 
