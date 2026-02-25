@@ -108,7 +108,7 @@ Emit to Notification Channel
 **Components:**
 - **TelegramChannel** — Bot lifecycle and message handling
 - **TelegramSender** — Message formatting and pagination
-- **PendingReplyStore** — Tracks pending user replies
+- **PendingReplyStore** — Tracks pending user replies (10min TTL, auto-cleanup on shutdown)
 
 **Key Operations:**
 ```
@@ -123,7 +123,16 @@ If > 4096 chars: Paginate [1/N]
 Send to Telegram API
     ↓
 Store Response ID (for edits/updates)
+    ↓
+PendingReplyStore tracks reply window (10min)
+    ↓
+Auto-cleanup on timeout or explicit destroy()
 ```
+
+**Resource Management:**
+- **PendingReplyStore** — In-memory store bounded by reply TTL (10 minutes)
+- **destroy()** — Explicitly clears all pending replies on shutdown (prevents memory leak)
+- **Auto-expiry** — Entries automatically expire after 10 minutes inactivity
 
 **Features:**
 - Auto-split long messages
@@ -136,8 +145,8 @@ Store Response ID (for edits/updates)
 **Responsibility:** Track and manage tmux sessions across bot restart.
 
 **Components:**
-- **SessionMap** — Registry of active sessions
-- **SessionState** — State machine for individual sessions
+- **SessionMap** — Registry of active sessions with LRU eviction
+- **SessionStateManager** — State machine for individual sessions
 - **TmuxScanner** — Detects live tmux panes
 - **SessionResolver** — Links notifications to sessions
 
@@ -148,11 +157,16 @@ interface TmuxSession {
   tmuxTarget: string;          // tmux target (session:window)
   project: string;             // Project name (from path)
   cwd: string;                 // Working directory
-  status: 'idle' | 'busy';     // Current status
-  lastActivity: number;        // Unix timestamp
-  createdAt: number;           // Session start time
+  label: string;               // Display label
+  state: 'idle' | 'busy' | 'unknown';  // Current state
+  lastActivity: Date;          // Last activity timestamp
 }
 ```
+
+**Resource Limits:**
+- **MAX_SESSIONS = 200:** Prevents unbounded memory growth
+- **LRU Eviction:** When limit reached, oldest inactive session (by `lastActivity`) is evicted
+- **Persistence:** Sessions saved to `~/.ccpoke/sessions.json` on disk for recovery
 
 **Lifecycle:**
 ```
@@ -385,6 +399,9 @@ CLEANUP PHASE
 RESTART RECOVERY
 ├─ Bot startup:
 │  ├─ Load ~/.ccpoke/sessions.json
+│  ├─ Validate required fields (sessionId, tmuxTarget, project)
+│  ├─ Validate date format (lastActivity timestamp)
+│  ├─ Skip invalid entries (corrupted or malformed)
 │  ├─ Populate SessionMap (memory)
 │  ├─ Reconcile with live tmux
 │  ├─ Mark lost sessions as 'stale'
@@ -576,14 +593,22 @@ try {
 
 **Breakdown:**
 - SessionMap (in-memory): ~1KB per session × 10 sessions = 10KB
+  - **Capped at 200 sessions** with LRU eviction
 - Response cache: ~10KB per response × 100 responses = 1MB
 - PendingReplyStore: ~1KB per pending reply × 10 = 10KB
+  - **Auto-expires** after 10 minutes
+  - **destroy()** called on shutdown for explicit cleanup
 - Bot instance: ~50MB (Telegram library + Node.js)
 
+**Resource Limits:**
+- **SessionMap.MAX_SESSIONS = 200** — Prevents unbounded growth, evicts oldest inactive session when exceeded
+- **PendingReplyStore TTL = 10 minutes** — Auto-cleanup, explicit destroy() on shutdown
+- **Response cache cleanup** — Daily batch purge of expired responses
+
 **Optimization:**
-- SessionMap persists to disk (can trim memory)
-- PendingReplyStore auto-expires (10min TTL)
-- ResponseStore cleanup (daily)
+- SessionMap persists to disk (state survives restart)
+- Atomic file writes prevent corruption on crash
+- In-memory collections bounded by limits or TTL
 
 ### Throughput
 

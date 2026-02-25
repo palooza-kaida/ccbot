@@ -71,7 +71,7 @@ export class CursorInstaller {
       ? `@echo off\ncurl -s -X POST http://localhost:${hookPort}${ApiRoute.HookStop}${agentParam} -H "Content-Type: application/json" -H "X-CCPoke-Secret: ${hookSecret}" --data-binary @- > nul 2>&1\n`
       : `#!/bin/bash\ncurl -s -X POST http://localhost:${hookPort}${ApiRoute.HookStop}${agentParam} \\\n  -H "Content-Type: application/json" \\\n  -H "X-CCPoke-Secret: ${hookSecret}" \\\n  --data-binary @- > /dev/null 2>&1 || true\n`;
 
-    writeFileSync(paths.cursorHookScript, script, { mode: isWindows ? 0o644 : 0o755 });
+    writeFileSync(paths.cursorHookScript, script, { mode: isWindows ? 0o644 : 0o700 });
   }
 
   private static removeScript(): void {

@@ -40,7 +40,11 @@ export async function sendTelegramMessage(
         await bot.sendMessage(chatId, pages[i]!, fallbackOpts);
       } catch (err2) {
         logError(t("bot.sendFallbackFailed"), err2);
-        await bot.sendMessage(chatId, pages[i]!);
+        try {
+          await bot.sendMessage(chatId, pages[i]!);
+        } catch {
+          // final fallback exhausted, message lost
+        }
       }
     }
   }

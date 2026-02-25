@@ -39,11 +39,19 @@ interface PersistedSession {
 
 const SESSIONS_FILE = "sessions.json";
 
+const MAX_SESSIONS = 200;
+
 export class SessionMap {
   private sessions = new Map<string, TmuxSession>();
   private scanInterval: ReturnType<typeof setInterval> | null = null;
 
   register(sessionId: string, tmuxTarget: string, project: string, cwd = "", label = ""): void {
+    if (this.sessions.size >= MAX_SESSIONS && !this.sessions.has(sessionId)) {
+      const oldest = [...this.sessions.entries()].sort(
+        (a, b) => a[1].lastActivity.getTime() - b[1].lastActivity.getTime()
+      )[0];
+      if (oldest) this.sessions.delete(oldest[0]);
+    }
     this.sessions.set(sessionId, {
       sessionId,
       tmuxTarget,
@@ -107,9 +115,12 @@ export class SessionMap {
       const raw = readFileSync(`${paths.ccpokeDir}/${SESSIONS_FILE}`, "utf-8");
       const parsed = JSON.parse(raw) as { sessions: PersistedSession[] };
       for (const s of parsed.sessions) {
+        if (!s.sessionId || !s.tmuxTarget || !s.project) continue;
+        const date = new Date(s.lastActivity);
+        if (isNaN(date.getTime())) continue;
         this.sessions.set(s.sessionId, {
           ...s,
-          lastActivity: new Date(s.lastActivity),
+          lastActivity: date,
         });
       }
     } catch {

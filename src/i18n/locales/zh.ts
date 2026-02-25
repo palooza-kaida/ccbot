@@ -138,6 +138,7 @@ export const zh: TranslationKeys = {
     invalidUserId: "user_id 必须是整数 — 运行 'ccpoke setup'",
     invalidPort: "hook_port 必须是 1 到 65535 之间的整数",
     invalidSecret: "hook_secret 只能包含十六进制字符 (a-f, 0-9)",
+    invalidJson: "config.json 已损坏 — 删除 ~/.ccpoke/config.json 然后运行 'ccpoke setup'",
     invalidHookPort: "无效的 hook 端口: {port}（必须为 1-65535）",
     hookAlreadyInstalled: "ccpoke hook 已安装",
   },

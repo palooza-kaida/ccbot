@@ -4,6 +4,7 @@ import { AgentHandler } from "../agent/agent-handler.js";
 import { AgentName } from "../agent/types.js";
 import { responseStore } from "../utils/response-store.js";
 import { MINI_APP_BASE_URL, ApiRoute } from "../utils/constants.js";
+import type { TunnelManager } from "../utils/tunnel.js";
 import { t } from "../i18n/index.js";
 import { log, logError } from "../utils/log.js";
 
@@ -15,6 +16,7 @@ export class ApiServer {
   private port: number;
   private secret: string;
   private handler: AgentHandler | null = null;
+  private tunnelManager: TunnelManager | null = null;
 
   constructor(port: number, secret: string) {
     this.port = port;
@@ -24,6 +26,10 @@ export class ApiServer {
 
   setHandler(handler: AgentHandler): void {
     this.handler = handler;
+  }
+
+  setTunnelManager(tunnelManager: TunnelManager): void {
+    this.tunnelManager = tunnelManager;
   }
 
   start(): Promise<void> {
@@ -58,8 +64,15 @@ export class ApiServer {
     app.use(express.json({ limit: "10mb" }));
     app.get(ApiRoute.ResponseData, (req, res) => {
       const requestOrigin = req.headers.origin ?? "";
-      const isTunnel = requestOrigin.endsWith(".trycloudflare.com");
-      res.header("Access-Control-Allow-Origin", isTunnel ? requestOrigin : ALLOWED_CORS_ORIGIN);
+      const tunnelUrl = this.tunnelManager?.getPublicUrl();
+      const tunnelOrigin = tunnelUrl ? new URL(tunnelUrl).origin : null;
+      const allowedOrigin =
+        requestOrigin === ALLOWED_CORS_ORIGIN
+          ? ALLOWED_CORS_ORIGIN
+          : tunnelOrigin && requestOrigin === tunnelOrigin
+            ? tunnelOrigin
+            : ALLOWED_CORS_ORIGIN;
+      res.header("Access-Control-Allow-Origin", allowedOrigin);
       const data = responseStore.get(req.params.id);
       if (!data) {
         res.status(404).json({ error: "not_found" });

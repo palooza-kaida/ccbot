@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 
 const CLAUDE_PROMPT_PATTERNS = [/[❯>]\s*$/, /\$\s*$/];
-const DEFAULT_CAPTURE_LINES = 50;
+const IDLE_SCAN_LINES = 5;
 
 export class TmuxBridge {
   private available: boolean | null = null;
@@ -36,7 +36,7 @@ export class TmuxBridge {
     }
   }
 
-  capturePane(target: string, lineCount = DEFAULT_CAPTURE_LINES): string {
+  capturePane(target: string, lineCount = 50): string {
     return execSync(`tmux capture-pane -t ${escapeShellArg(target)} -p -S -${lineCount}`, {
       encoding: "utf-8",
       stdio: "pipe",
@@ -46,12 +46,14 @@ export class TmuxBridge {
 
   isClaudeIdle(target: string): boolean {
     try {
-      const content = this.capturePane(target);
+      const content = this.capturePane(target, IDLE_SCAN_LINES);
       const lines = content.split("\n");
 
       for (let i = lines.length - 1; i >= 0; i--) {
         const line = lines[i]!.trimEnd();
+        if (line.length === 0) continue;
         if (CLAUDE_PROMPT_PATTERNS.some((pattern) => pattern.test(line))) return true;
+        return false;
       }
       return false;
     } catch {

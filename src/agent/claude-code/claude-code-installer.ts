@@ -1,4 +1,11 @@
-import { readFileSync, writeFileSync, mkdirSync, unlinkSync, existsSync } from "node:fs";
+import {
+  readFileSync,
+  writeFileSync,
+  mkdirSync,
+  unlinkSync,
+  existsSync,
+  renameSync,
+} from "node:fs";
 import { paths } from "../../utils/paths.js";
 import { ApiRoute } from "../../utils/constants.js";
 import { AgentName } from "../types.js";
@@ -67,13 +74,17 @@ export class ClaudeCodeInstaller {
       { hooks: [{ type: "command", command: paths.claudeCodeHookScript, timeout: 10 }] },
     ];
 
-    settings.hooks.SessionStart = [
-      ...(settings.hooks.SessionStart ?? []),
-      { hooks: [{ type: "command", command: paths.claudeCodeSessionStartScript, timeout: 5 }] },
-    ];
+    if (process.platform !== "win32") {
+      settings.hooks.SessionStart = [
+        ...(settings.hooks.SessionStart ?? []),
+        { hooks: [{ type: "command", command: paths.claudeCodeSessionStartScript, timeout: 5 }] },
+      ];
+    }
 
     mkdirSync(paths.claudeDir, { recursive: true });
-    writeFileSync(paths.claudeSettings, JSON.stringify(settings, null, 2));
+    const tmpSettings = `${paths.claudeSettings}.tmp`;
+    writeFileSync(tmpSettings, JSON.stringify(settings, null, 2));
+    renameSync(tmpSettings, paths.claudeSettings);
 
     ClaudeCodeInstaller.writeStopScript(hookPort, hookSecret);
     ClaudeCodeInstaller.writeSessionStartScript(hookPort, hookSecret);
@@ -109,7 +120,7 @@ echo "$INPUT" | curl -s -X POST "http://localhost:${hookPort}${ApiRoute.HookStop
   --data-binary @- > /dev/null 2>&1 || true
 `;
 
-    writeFileSync(paths.claudeCodeHookScript, script, { mode: 0o755 });
+    writeFileSync(paths.claudeCodeHookScript, script, { mode: 0o700 });
   }
 
   private static writeSessionStartScript(hookPort: number, hookSecret: string): void {
@@ -141,7 +152,7 @@ curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookSessionStart}" \\
   --max-time 3 > /dev/null 2>&1 || true
 `;
 
-    writeFileSync(paths.claudeCodeSessionStartScript, script, { mode: 0o755 });
+    writeFileSync(paths.claudeCodeSessionStartScript, script, { mode: 0o700 });
   }
 
   private static removeStopScript(): void {
@@ -184,7 +195,9 @@ curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookSessionStart}" \\
       delete settings.hooks;
     }
 
-    writeFileSync(paths.claudeSettings, JSON.stringify(settings, null, 2));
+    const tmpSettings = `${paths.claudeSettings}.tmp`;
+    writeFileSync(tmpSettings, JSON.stringify(settings, null, 2));
+    renameSync(tmpSettings, paths.claudeSettings);
   }
 
   private static readSettings(): ClaudeSettings {

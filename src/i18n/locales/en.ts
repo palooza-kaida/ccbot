@@ -139,6 +139,7 @@ export const en: TranslationKeys = {
     invalidUserId: "user_id must be an integer — run 'ccpoke setup'",
     invalidPort: "hook_port must be an integer between 1 and 65535",
     invalidSecret: "hook_secret must contain only hex characters (a-f, 0-9)",
+    invalidJson: "config.json is corrupted — delete ~/.ccpoke/config.json and run 'ccpoke setup'",
     invalidHookPort: "invalid hook port: {port} (must be 1-65535)",
     hookAlreadyInstalled: "ccpoke hook already installed",
   },

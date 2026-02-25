@@ -108,6 +108,7 @@ async function startBot(): Promise<void> {
   log(`ccpoke: ${t("bot.started", { port: cfg.hook_port })}`);
 
   const tunnelManager = new TunnelManager();
+  apiServer.setTunnelManager(tunnelManager);
   try {
     const tunnelUrl = await tunnelManager.start(cfg.hook_port);
     log(t("tunnel.started", { url: tunnelUrl }));
@@ -148,7 +149,10 @@ async function startBot(): Promise<void> {
     log(t("bot.globalInstallTip"));
   }
 
+  let shutdownStarted = false;
   const shutdown = async () => {
+    if (shutdownStarted) return;
+    shutdownStarted = true;
     log(t("bot.shuttingDown"));
     sessionMap.stopPeriodicScan();
     sessionMap.save();

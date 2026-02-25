@@ -5,6 +5,7 @@ import { isPaneAlive } from "./tmux-scanner.js";
 
 export type InjectResult =
   | { sent: true }
+  | { empty: true }
   | { busy: true }
   | { desktopActive: true }
   | { sessionNotFound: true }
@@ -28,7 +29,7 @@ export class SessionStateManager {
     }
 
     const trimmed = text.trim();
-    if (trimmed.length === 0) return { sent: true };
+    if (trimmed.length === 0) return { empty: true };
 
     const safeText =
       trimmed.length > MAX_MESSAGE_LENGTH ? trimmed.slice(0, MAX_MESSAGE_LENGTH) : trimmed;

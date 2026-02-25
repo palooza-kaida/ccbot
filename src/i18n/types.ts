@@ -127,6 +127,7 @@ export interface TranslationKeys {
     invalidUserId: string;
     invalidPort: string;
     invalidSecret: string;
+    invalidJson: string;
     invalidHookPort: string;
     hookAlreadyInstalled: string;
   };

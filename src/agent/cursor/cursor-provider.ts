@@ -79,14 +79,14 @@ export class CursorProvider implements AgentProvider {
 
   private createFallbackResult(raw: unknown): AgentEventResult {
     const obj = (typeof raw === "object" && raw !== null ? raw : {}) as Record<string, unknown>;
-    const cwd = typeof obj.cwd === "string" ? obj.cwd : process.cwd();
+    const cwd = typeof obj.cwd === "string" ? obj.cwd : "";
     const transcriptPath = typeof obj.transcript_path === "string" ? obj.transcript_path : "";
 
     return {
-      projectName: extractProjectName(cwd, transcriptPath),
+      projectName: cwd ? extractProjectName(cwd, transcriptPath) : "unknown",
       responseSummary: "",
       durationMs: 0,
-      gitChanges: collectGitChanges(cwd),
+      gitChanges: cwd ? collectGitChanges(cwd) : [],
       inputTokens: 0,
       outputTokens: 0,
       model: "",

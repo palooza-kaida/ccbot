@@ -40,6 +40,7 @@ export class TelegramChannel implements NotificationChannel {
   }
 
   async shutdown(): Promise<void> {
+    this.pendingReplyStore.destroy();
     this.bot.stopPolling();
   }
 
@@ -206,6 +207,8 @@ export class TelegramChannel implements NotificationChannel {
 
       if ("sent" in result) {
         await this.bot.sendMessage(msg.chat.id, t("chat.sent", { project: pending.project }));
+      } else if ("empty" in result) {
+        // Silently ignore empty messages — nothing to send
       } else if ("busy" in result) {
         await this.bot.sendMessage(msg.chat.id, t("chat.busy"));
       } else if ("desktopActive" in result) {

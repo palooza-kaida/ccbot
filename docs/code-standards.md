@@ -345,18 +345,42 @@ const config = { port: 9377, secret: 'x' };
 
 **Use discriminated unions for variants:**
 ```typescript
-// ✅ Good
+// ✅ Good: Tagged unions with exhaustive checking
+type InjectResult =
+  | { sent: true }
+  | { empty: true }
+  | { busy: true }
+  | { sessionNotFound: true }
+  | { tmuxDead: true };
+
+// Handles all variants at compile time
+function handleResult(result: InjectResult) {
+  if (result.sent) {
+    // result is { sent: true }
+  } else if (result.empty) {
+    // result is { empty: true }
+  } else if (result.busy) {
+    // Etc. — TypeScript ensures all cases covered
+  }
+}
+
+// ✅ Good: Discriminated union with data
 type AgentEventResult =
   | { type: 'response'; content: string }
   | { type: 'thinking'; duration: number };
 
-// ❌ Avoid
+// ❌ Avoid: Optional fields instead of union
 interface AgentEventResult {
   type: string;
   content?: string;
   duration?: number;
 }
 ```
+
+**Benefits:**
+- Exhaustive pattern matching (compiler catches missing cases)
+- No optional fields, all properties required on each variant
+- Clear semantics for failure modes
 
 ---
 
@@ -665,14 +689,44 @@ logger.info('Sending request', {
 ### Input Validation
 
 ```typescript
-// ✅ Good: Validate and sanitize
-function handleUserMessage(text: string): string {
+// ✅ Good: Validate disk ↔ memory consistency
+class SessionMap {
+  load(): void {
+    try {
+      const raw = readFileSync(sessionsPath, 'utf-8');
+      const parsed = JSON.parse(raw) as { sessions: PersistedSession[] };
+
+      for (const s of parsed.sessions) {
+        // Validate required fields
+        if (!s.sessionId || !s.tmuxTarget || !s.project) continue;
+
+        // Validate date format
+        const date = new Date(s.lastActivity);
+        if (isNaN(date.getTime())) continue;  // Skip malformed timestamps
+
+        // Only add valid entries
+        this._sessions.set(s.sessionId, { ...s, lastActivity: date });
+      }
+    } catch {
+      // File missing or JSON parse failed — continue with empty map
+    }
+  }
+}
+
+// ✅ Good: Validate user input
+function handleUserMessage(text: string): InjectResult | string {
   const trimmed = text.trim();
-  if (!trimmed) throw new Error('Empty message');
+  if (trimmed.length === 0) return { empty: true };  // Return result type
   if (trimmed.length > 4096) throw new Error('Message too long');
   return trimmed;
 }
 ```
+
+**Patterns:**
+- **Skip invalid entries** — Log and continue (graceful degradation)
+- **Validate schemas** — Required fields, type coercion, format checks
+- **Date validation** — Check `isNaN(date.getTime())` for invalid timestamps
+- **Return result types** — Use discriminated unions instead of exceptions for expected failures
 
 ### Rate Limiting
 
@@ -730,15 +784,46 @@ class SessionMap {
 ### Cleanup
 
 ```typescript
-// ✅ Good: Cleanup resources
+// ✅ Good: Cleanup resources with explicit destroy methods
 class Service {
+  private _pendingReplies = new PendingReplyStore();
+  private _scanInterval: ReturnType<typeof setInterval> | null = null;
+
   async shutdown(): Promise<void> {
-    clearInterval(this._scanInterval);
+    // Explicit cleanup for in-memory collections
+    await this._pendingReplies.destroy();  // Clear all pending TTLs
+
+    // Clear timers
+    if (this._scanInterval) clearInterval(this._scanInterval);
+
+    // Close connections
     await this._bot.close();
     await this._server.close();
   }
 }
+
+// ✅ Good: Bounded collections with eviction
+class SessionMap {
+  private _sessions = new Map<string, TmuxSession>();
+  private static readonly MAX_SESSIONS = 200;
+
+  register(sessionId: string, ...): void {
+    // LRU eviction when limit exceeded
+    if (this._sessions.size >= SessionMap.MAX_SESSIONS
+        && !this._sessions.has(sessionId)) {
+      const oldest = this._getOldestSession();
+      if (oldest) this._sessions.delete(oldest[0]);
+    }
+    this._sessions.set(sessionId, { /* ... */ });
+  }
+}
 ```
+
+**Patterns:**
+- **Explicit destroy()** — Collections with timers/listeners
+- **Bounded collections** — MAX_SIZE constant with LRU eviction
+- **Guard double-execution** — Track shutdown state to prevent re-entrance
+- **Warn on data loss** — Log pending items before shutdown
 
 ---
 

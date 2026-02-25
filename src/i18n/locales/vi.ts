@@ -139,6 +139,7 @@ export const vi: TranslationKeys = {
     invalidUserId: "user_id phải là số nguyên — chạy 'ccpoke setup'",
     invalidPort: "hook_port phải là số nguyên từ 1 đến 65535",
     invalidSecret: "hook_secret chỉ được chứa ký tự hex (a-f, 0-9)",
+    invalidJson: "config.json bị hỏng — xóa ~/.ccpoke/config.json rồi chạy 'ccpoke setup'",
     invalidHookPort: "hook port không hợp lệ: {port} (phải từ 1-65535)",
     hookAlreadyInstalled: "ccpoke hook đã được cài rồi",
   },

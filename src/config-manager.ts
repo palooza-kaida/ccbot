@@ -34,7 +34,12 @@ export class ConfigManager {
       throw err;
     }
 
-    const raw: Record<string, unknown> = JSON.parse(data);
+    let raw: Record<string, unknown>;
+    try {
+      raw = JSON.parse(data);
+    } catch (err: unknown) {
+      throw new Error(t("config.invalidJson"), { cause: err });
+    }
     const cfg = ConfigManager.validate(raw);
     if (cfg.hook_secret !== raw.hook_secret || !raw.agents) {
       ConfigManager.save(cfg);
