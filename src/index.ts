@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-
+import { basename } from "node:path";
 import { ConfigManager, type Config } from "./config-manager.js";
 import { TelegramChannel } from "./channel/telegram/telegram-channel.js";
 import { ApiServer } from "./server/api-server.js";
@@ -15,6 +14,10 @@ import { TunnelManager } from "./utils/tunnel.js";
 import { log, logError } from "./utils/log.js";
 import { detectInstallMethod } from "./utils/install-detection.js";
 import { checkForUpdates } from "./utils/version-check.js";
+import { TmuxBridge } from "./tmux/tmux-bridge.js";
+import { SessionMap } from "./tmux/session-map.js";
+import { SessionStateManager } from "./tmux/session-state.js";
+import { TmuxSessionResolver } from "./tmux/tmux-session-resolver.js";
 
 const args = process.argv.slice(2);
 
@@ -46,7 +49,9 @@ function ensureAgentHooks(config: Config): void {
   for (const agentName of config.agents) {
     const provider = registry.resolve(agentName);
     if (!provider) continue;
-    if (provider.isHookInstalled()) continue;
+
+    const integrity = provider.verifyIntegrity();
+    if (integrity.complete) continue;
 
     if (!provider.detect()) {
       logError(t("setup.agentNotInstalled", { agent: provider.displayName }));
@@ -54,7 +59,9 @@ function ensureAgentHooks(config: Config): void {
     }
 
     provider.installHook(config.hook_port, config.hook_secret);
-    log(t("setup.agentHookInstalled", { agent: provider.displayName }));
+    log(
+      t("tmux.hookRepaired", { agent: provider.displayName, missing: integrity.missing.join(", ") })
+    );
   }
 }
 
@@ -62,6 +69,39 @@ async function startBot(): Promise<void> {
   await checkForUpdates().catch(() => {});
 
   const cfg = await loadOrSetupConfig();
+
+  const tmuxBridge = new TmuxBridge();
+  const sessionMap = new SessionMap();
+  const stateManager = new SessionStateManager(sessionMap, tmuxBridge);
+
+  let chatResolver: TmuxSessionResolver | undefined;
+
+  if (tmuxBridge.isTmuxAvailable()) {
+    sessionMap.load();
+    const bootResult = sessionMap.refreshFromTmux(tmuxBridge);
+    chatResolver = new TmuxSessionResolver(sessionMap, stateManager);
+    sessionMap.startPeriodicScan(tmuxBridge, 15_000, (result) => {
+      for (const s of result.discovered)
+        log(t("tmux.sessionDiscovered", { target: s.tmuxTarget, project: s.project }));
+      for (const s of result.removed) {
+        log(t("tmux.sessionLost", { target: s.tmuxTarget, project: s.project }));
+      }
+      if (result.discovered.length > 0 || result.removed.length > 0)
+        log(
+          t("tmux.scanSummary", {
+            active: result.total,
+            discovered: result.discovered.length,
+            lost: result.removed.length,
+          })
+        );
+    });
+    for (const s of bootResult.discovered)
+      log(t("tmux.sessionDiscovered", { target: s.tmuxTarget, project: s.project }));
+    log(t("tmux.scanComplete", { count: bootResult.total }));
+    log(t("bot.twowayEnabled"));
+  } else {
+    log(t("tmux.notAvailable"));
+  }
 
   const apiServer = new ApiServer(cfg.hook_port, cfg.hook_secret);
   await apiServer.start();
@@ -76,8 +116,30 @@ async function startBot(): Promise<void> {
   }
 
   const registry = createDefaultRegistry();
-  const channel = new TelegramChannel(cfg);
-  const handler = new AgentHandler(registry, channel, cfg.hook_port, tunnelManager);
+  const channel = new TelegramChannel(cfg, sessionMap, stateManager);
+  const handler = new AgentHandler(registry, channel, cfg.hook_port, tunnelManager, chatResolver);
+
+  handler.onSessionStart = (rawEvent) => {
+    const obj = (typeof rawEvent === "object" && rawEvent !== null ? rawEvent : {}) as Record<
+      string,
+      unknown
+    >;
+    if (typeof obj.session_id !== "string" || typeof obj.tmux_target !== "string") return;
+    if (!/^[a-zA-Z0-9_.:/@ -]+$/.test(obj.tmux_target)) return;
+    const cwd = typeof obj.cwd === "string" ? obj.cwd : "";
+    const project = basename(cwd) || "unknown";
+    sessionMap.register(obj.session_id, obj.tmux_target, project, cwd);
+    sessionMap.save();
+    log(
+      t("tmux.hookReceived", {
+        event: "SessionStart",
+        sessionId: obj.session_id,
+        target: obj.tmux_target,
+        project,
+      })
+    );
+  };
+
   apiServer.setHandler(handler);
 
   await channel.initialize();
@@ -88,6 +150,8 @@ async function startBot(): Promise<void> {
 
   const shutdown = async () => {
     log(t("bot.shuttingDown"));
+    sessionMap.stopPeriodicScan();
+    sessionMap.save();
     tunnelManager.stop();
     await channel.shutdown();
     await apiServer.stop();
