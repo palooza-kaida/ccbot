@@ -1,7 +1,7 @@
 import type { ChatSessionResolver } from "../agent/chat-session-resolver.js";
+import { log } from "../utils/log.js";
 import type { SessionMap } from "./session-map.js";
 import type { SessionStateManager } from "./session-state.js";
-import { log } from "../utils/log.js";
 
 const MAX_AGENT_CACHE = 100;
 

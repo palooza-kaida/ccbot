@@ -1,9 +1,11 @@
-import * as p from "@clack/prompts";
 import { rmSync } from "node:fs";
+
+import * as p from "@clack/prompts";
+
 import { createDefaultRegistry } from "../agent/agent-registry.js";
-import { detectInstallMethod } from "../utils/install-detection.js";
-import { InstallMethod } from "../utils/constants.js";
 import { t } from "../i18n/index.js";
+import { InstallMethod } from "../utils/constants.js";
+import { detectInstallMethod } from "../utils/install-detection.js";
 import { paths } from "../utils/paths.js";
 
 export function runUninstall(): void {

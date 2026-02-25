@@ -1,6 +1,7 @@
 import * as p from "@clack/prompts";
-import { detectCliPrefix } from "../utils/install-detection.js";
+
 import { t } from "../i18n/index.js";
+import { detectCliPrefix } from "../utils/install-detection.js";
 
 export function runHelp(): void {
   const prefix = detectCliPrefix();

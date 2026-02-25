@@ -1,23 +1,24 @@
 import { basename } from "node:path";
-import { ConfigManager, type Config } from "./config-manager.js";
-import { TelegramChannel } from "./channel/telegram/telegram-channel.js";
-import { ApiServer } from "./server/api-server.js";
+
 import { AgentHandler } from "./agent/agent-handler.js";
 import { createDefaultRegistry } from "./agent/agent-registry.js";
-import { runSetup } from "./commands/setup.js";
-import { runUpdate } from "./commands/update.js";
-import { runUninstall } from "./commands/uninstall.js";
+import { TelegramChannel } from "./channel/telegram/telegram-channel.js";
 import { runHelp } from "./commands/help.js";
-import { CliCommand, InstallMethod } from "./utils/constants.js";
+import { runSetup } from "./commands/setup.js";
+import { runUninstall } from "./commands/uninstall.js";
+import { runUpdate } from "./commands/update.js";
+import { ConfigManager, type Config } from "./config-manager.js";
 import { t } from "./i18n/index.js";
-import { TunnelManager } from "./utils/tunnel.js";
-import { log, logError } from "./utils/log.js";
-import { detectInstallMethod } from "./utils/install-detection.js";
-import { checkForUpdates } from "./utils/version-check.js";
-import { TmuxBridge } from "./tmux/tmux-bridge.js";
+import { ApiServer } from "./server/api-server.js";
 import { SessionMap } from "./tmux/session-map.js";
 import { SessionStateManager } from "./tmux/session-state.js";
+import { TmuxBridge } from "./tmux/tmux-bridge.js";
 import { TmuxSessionResolver } from "./tmux/tmux-session-resolver.js";
+import { CliCommand, InstallMethod } from "./utils/constants.js";
+import { detectInstallMethod } from "./utils/install-detection.js";
+import { log, logError } from "./utils/log.js";
+import { TunnelManager } from "./utils/tunnel.js";
+import { checkForUpdates } from "./utils/version-check.js";
 
 const args = process.argv.slice(2);
 

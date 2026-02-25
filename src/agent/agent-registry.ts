@@ -1,6 +1,6 @@
-import type { AgentProvider } from "./types.js";
 import { ClaudeCodeProvider } from "./claude-code/claude-code-provider.js";
 import { CursorProvider } from "./cursor/cursor-provider.js";
+import type { AgentProvider } from "./types.js";
 
 export class AgentRegistry {
   private providers = new Map<string, AgentProvider>();

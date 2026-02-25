@@ -1,6 +1,7 @@
-import { readFileSync, writeFileSync, mkdirSync, unlinkSync, existsSync } from "node:fs";
-import { paths } from "../../utils/paths.js";
+import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+
 import { ApiRoute } from "../../utils/constants.js";
+import { paths } from "../../utils/paths.js";
 import { AgentName } from "../types.js";
 
 interface CursorStopHook {

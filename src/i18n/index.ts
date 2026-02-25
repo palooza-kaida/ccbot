@@ -1,7 +1,7 @@
-import type { TranslationKeys } from "./types.js";
 import { en } from "./locales/en.js";
 import { vi } from "./locales/vi.js";
 import { zh } from "./locales/zh.js";
+import type { TranslationKeys } from "./types.js";
 
 export const Locale = {
   EN: "en",

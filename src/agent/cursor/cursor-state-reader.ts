@@ -1,7 +1,8 @@
-import Database from "better-sqlite3";
-import { join } from "node:path";
-import { homedir } from "node:os";
 import { existsSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
+
+import Database from "better-sqlite3";
 
 export interface CursorComposerData {
   durationMs: number;

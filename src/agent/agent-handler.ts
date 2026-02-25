@@ -1,11 +1,11 @@
+import type { NotificationChannel, NotificationData } from "../channel/types.js";
+import { t } from "../i18n/index.js";
+import { MINI_APP_BASE_URL } from "../utils/constants.js";
+import { log, logError } from "../utils/log.js";
+import { responseStore } from "../utils/response-store.js";
+import type { TunnelManager } from "../utils/tunnel.js";
 import type { AgentRegistry } from "./agent-registry.js";
 import type { ChatSessionResolver } from "./chat-session-resolver.js";
-import type { NotificationChannel, NotificationData } from "../channel/types.js";
-import type { TunnelManager } from "../utils/tunnel.js";
-import { MINI_APP_BASE_URL } from "../utils/constants.js";
-import { responseStore } from "../utils/response-store.js";
-import { t } from "../i18n/index.js";
-import { log, logError } from "../utils/log.js";
 
 export class AgentHandler {
   constructor(

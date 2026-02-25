@@ -1,12 +1,14 @@
-import express, { type Express } from "express";
 import type { Server } from "node:http";
+
+import express, { type Express } from "express";
+
 import { AgentHandler } from "../agent/agent-handler.js";
 import { AgentName } from "../agent/types.js";
-import { responseStore } from "../utils/response-store.js";
-import { MINI_APP_BASE_URL, ApiRoute } from "../utils/constants.js";
-import type { TunnelManager } from "../utils/tunnel.js";
 import { t } from "../i18n/index.js";
+import { ApiRoute, MINI_APP_BASE_URL } from "../utils/constants.js";
 import { log, logError } from "../utils/log.js";
+import { responseStore } from "../utils/response-store.js";
+import type { TunnelManager } from "../utils/tunnel.js";
 
 const ALLOWED_CORS_ORIGIN = new URL(MINI_APP_BASE_URL).origin;
 

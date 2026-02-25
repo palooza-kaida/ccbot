@@ -1,10 +1,12 @@
-import * as p from "@clack/prompts";
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { detectInstallMethod, getGitRepoRoot } from "../utils/install-detection.js";
-import { InstallMethod, PackageManager } from "../utils/constants.js";
+import { dirname, join } from "node:path";
+
+import * as p from "@clack/prompts";
+
 import { t } from "../i18n/index.js";
+import { InstallMethod, PackageManager } from "../utils/constants.js";
+import { detectInstallMethod, getGitRepoRoot } from "../utils/install-detection.js";
 import { getPackageVersion } from "../utils/paths.js";
 
 export function runUpdate(): void {

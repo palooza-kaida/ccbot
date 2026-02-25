@@ -1,5 +1,6 @@
-import { readFileSync, existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename } from "node:path";
+
 import { expandHome, paths } from "../../utils/paths.js";
 
 export function extractProjectName(cwd: string, transcriptPath: string): string {

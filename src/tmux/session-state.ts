@@ -1,5 +1,4 @@
-import type { SessionMap } from "./session-map.js";
-import { SessionState } from "./session-map.js";
+import { SessionState, type SessionMap } from "./session-map.js";
 import type { TmuxBridge } from "./tmux-bridge.js";
 import { isPaneAlive } from "./tmux-scanner.js";
 

@@ -1,8 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, renameSync } from "node:fs";
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { basename } from "node:path";
+
 import { paths } from "../utils/paths.js";
-import { scanClaudePanes, isClaudeAliveInPane } from "./tmux-scanner.js";
 import type { TmuxBridge } from "./tmux-bridge.js";
+import { isClaudeAliveInPane, scanClaudePanes } from "./tmux-scanner.js";
 
 export const SessionState = {
   Idle: "idle",

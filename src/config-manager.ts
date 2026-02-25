@@ -1,9 +1,9 @@
-import { readFileSync, writeFileSync, mkdirSync, renameSync } from "node:fs";
 import { randomBytes } from "node:crypto";
-import { Locale, isValidLocale, setLocale } from "./i18n/index.js";
-import { t } from "./i18n/index.js";
-import { paths } from "./utils/paths.js";
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+
+import { isValidLocale, Locale, setLocale, t } from "./i18n/index.js";
 import { DEFAULT_HOOK_PORT } from "./utils/constants.js";
+import { paths } from "./utils/paths.js";
 
 export interface Config {
   telegram_bot_token: string;

@@ -1,16 +1,16 @@
 import TelegramBot from "node-telegram-bot-api";
-import type { Config } from "../../config-manager.js";
-import { ConfigManager } from "../../config-manager.js";
-import type { NotificationChannel, NotificationData } from "../types.js";
-import { sendTelegramMessage } from "./telegram-sender.js";
-import { PendingReplyStore } from "./pending-reply-store.js";
+
+import { ConfigManager, type Config } from "../../config-manager.js";
+import { getTranslations, t } from "../../i18n/index.js";
 import type { SessionMap } from "../../tmux/session-map.js";
 import type { SessionStateManager } from "../../tmux/session-state.js";
 import { MINI_APP_BASE_URL } from "../../utils/constants.js";
-import { formatModelName, formatDuration, formatTokenCount } from "../../utils/stats-format.js";
-import { extractProseSnippet } from "../../utils/markdown.js";
-import { t, getTranslations } from "../../i18n/index.js";
 import { log, logError, logWarn } from "../../utils/log.js";
+import { extractProseSnippet } from "../../utils/markdown.js";
+import { formatDuration, formatModelName, formatTokenCount } from "../../utils/stats-format.js";
+import type { NotificationChannel, NotificationData } from "../types.js";
+import { PendingReplyStore } from "./pending-reply-store.js";
+import { sendTelegramMessage } from "./telegram-sender.js";
 
 export class TelegramChannel implements NotificationChannel {
   private bot: TelegramBot;

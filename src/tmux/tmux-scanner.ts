@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process";
+
 import { escapeShellArg } from "./tmux-bridge.js";
 
 export interface TmuxPaneInfo {
