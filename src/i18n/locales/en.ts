@@ -29,6 +29,8 @@ export const en: TranslationKeys = {
     globalInstallTip: "💡 Tip: run 'npm i -g ccpoke' for faster startup",
     alreadyRunning:
       "another ccpoke is already running on port {port}\n\n  To stop it:\n    kill $(lsof -ti:{port})\n",
+    twowayEnabled: "📱 2-way chat: enabled",
+    twowayDisabled: "📱 2-way chat: disabled (no tmux)",
   },
 
   setup: {
@@ -116,6 +118,8 @@ export const en: TranslationKeys = {
     stopEventReceived: "stop event received for session {sessionId} at {cwd}",
     transcriptFailed: "failed to parse transcript",
     notificationFailed: "failed to send notification",
+    stopEventFailed: "stop event handling failed",
+    sessionStartFailed: "session start handling failed",
   },
 
   tunnel: {
@@ -150,5 +154,26 @@ export const en: TranslationKeys = {
   versionCheck: {
     updateAvailable: "Update available! {current} → {latest}",
     runToUpdate: "Run `{command}` to update",
+  },
+  tmux: {
+    notAvailable: "tmux not installed — 2-way chat disabled, notifications still work",
+    scanComplete: "tmux: found {count} Claude Code session(s)",
+    sessionRegistered: "Session registered: {sessionId} → {target} ({project})",
+    sessionDiscovered: "Session discovered: {target} ({project})",
+    sessionLost: "Session lost: {target} ({project})",
+    scanSummary: "Scan: {active} active, +{discovered} new, -{lost} removed",
+    hookRepaired: "{agent} hooks repaired (missing: {missing})",
+    hookReceived: "Hook {event}: {sessionId} → {target} ({project})",
+    noSessions: "No active Claude Code sessions in tmux",
+  },
+  chat: {
+    placeholder: "Message to Claude...",
+    replyHint: "Type your message below ↓",
+    sessionExpired: "Session expired or closed",
+    sessionNotFound: "Session not found",
+    tmuxDead: "tmux session disconnected",
+    sent: "📩 Sent → {project}",
+    busy: "⏳ Claude is busy — try again later",
+    desktopActive: "⚠️ Someone typing on desktop",
   },
 };

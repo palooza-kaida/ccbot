@@ -28,6 +28,8 @@ export const zh: TranslationKeys = {
     globalInstallTip: "💡 提示: 运行 'npm i -g ccpoke' 可加快启动速度",
     alreadyRunning:
       "另一个 ccpoke 已在端口 {port} 上运行\n\n  停止方法:\n    kill $(lsof -ti:{port})\n",
+    twowayEnabled: "📱 双向聊天: 已启用",
+    twowayDisabled: "📱 双向聊天: 已禁用 (无 tmux)",
   },
 
   setup: {
@@ -115,6 +117,8 @@ export const zh: TranslationKeys = {
     stopEventReceived: "收到 session {sessionId} 的 stop event，位于 {cwd}",
     transcriptFailed: "解析 transcript 失败",
     notificationFailed: "发送通知失败",
+    stopEventFailed: "处理 stop event 失败",
+    sessionStartFailed: "处理 session start 失败",
   },
 
   tunnel: {
@@ -149,5 +153,26 @@ export const zh: TranslationKeys = {
   versionCheck: {
     updateAvailable: "发现新版本！{current} → {latest}",
     runToUpdate: "运行 `{command}` 进行更新",
+  },
+  tmux: {
+    notAvailable: "未安装 tmux — 双向聊天已禁用，通知仍正常工作",
+    scanComplete: "tmux: 找到 {count} 个 Claude Code 会话",
+    sessionRegistered: "已注册会话: {sessionId} → {target} ({project})",
+    sessionDiscovered: "发现会话: {target} ({project})",
+    sessionLost: "失去会话: {target} ({project})",
+    scanSummary: "扫描: {active} 活跃, +{discovered} 新增, -{lost} 已移除",
+    hookRepaired: "{agent} 钩子已修复 (缺少: {missing})",
+    hookReceived: "钩子 {event}: {sessionId} → {target} ({project})",
+    noSessions: "tmux 中没有活动的 Claude Code 会话",
+  },
+  chat: {
+    placeholder: "给 Claude 发消息...",
+    replyHint: "在下方输入消息 ↓",
+    sessionExpired: "会话已过期或关闭",
+    sessionNotFound: "未找到会话",
+    tmuxDead: "tmux 会话已断开",
+    sent: "📩 已发送 → {project}",
+    busy: "⏳ Claude 正在忙 — 请稍后再试",
+    desktopActive: "⚠️ 有人正在桌面输入",
   },
 };

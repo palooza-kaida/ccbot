@@ -25,6 +25,8 @@ export interface TranslationKeys {
     firstTimeSetup: string;
     globalInstallTip: string;
     alreadyRunning: string;
+    twowayEnabled: string;
+    twowayDisabled: string;
   };
   setup: {
     intro: string;
@@ -106,6 +108,8 @@ export interface TranslationKeys {
     stopEventReceived: string;
     transcriptFailed: string;
     notificationFailed: string;
+    stopEventFailed: string;
+    sessionStartFailed: string;
   };
   tunnel: {
     installing: string;
@@ -137,5 +141,26 @@ export interface TranslationKeys {
   versionCheck: {
     updateAvailable: string;
     runToUpdate: string;
+  };
+  tmux: {
+    notAvailable: string;
+    scanComplete: string;
+    sessionRegistered: string;
+    sessionDiscovered: string;
+    sessionLost: string;
+    scanSummary: string;
+    hookRepaired: string;
+    hookReceived: string;
+    noSessions: string;
+  };
+  chat: {
+    placeholder: string;
+    replyHint: string;
+    sessionExpired: string;
+    sessionNotFound: string;
+    tmuxDead: string;
+    sent: string;
+    busy: string;
+    desktopActive: string;
   };
 }

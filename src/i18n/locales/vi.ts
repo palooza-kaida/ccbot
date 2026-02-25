@@ -29,6 +29,8 @@ export const vi: TranslationKeys = {
     globalInstallTip: "💡 Tip: chạy 'npm i -g ccpoke' để khởi động nhanh hơn",
     alreadyRunning:
       "một ccpoke khác đang chạy trên port {port}\n\n  Để dừng nó:\n    kill $(lsof -ti:{port})\n",
+    twowayEnabled: "📱 Chat 2 chiều: đã bật",
+    twowayDisabled: "📱 Chat 2 chiều: tắt (không có tmux)",
   },
 
   setup: {
@@ -116,6 +118,8 @@ export const vi: TranslationKeys = {
     stopEventReceived: "nhận stop event cho session {sessionId} tại {cwd}",
     transcriptFailed: "parse transcript thất bại",
     notificationFailed: "gửi notification thất bại",
+    stopEventFailed: "xử lý stop event thất bại",
+    sessionStartFailed: "xử lý session start thất bại",
   },
 
   tunnel: {
@@ -150,5 +154,26 @@ export const vi: TranslationKeys = {
   versionCheck: {
     updateAvailable: "Có bản cập nhật mới! {current} → {latest}",
     runToUpdate: "Chạy `{command}` để cập nhật",
+  },
+  tmux: {
+    notAvailable: "Chưa cài tmux — chat 2 chiều tắt, notification vẫn hoạt động",
+    scanComplete: "tmux: tìm thấy {count} Claude Code session(s)",
+    sessionRegistered: "Đã đăng ký session: {sessionId} → {target} ({project})",
+    sessionDiscovered: "Phát hiện session: {target} ({project})",
+    sessionLost: "Mất session: {target} ({project})",
+    scanSummary: "Scan: {active} active, +{discovered} mới, -{lost} đã xóa",
+    hookRepaired: "{agent} hooks đã sửa (thiếu: {missing})",
+    hookReceived: "Hook {event}: {sessionId} → {target} ({project})",
+    noSessions: "Không có Claude Code session nào trong tmux",
+  },
+  chat: {
+    placeholder: "Nhắn cho Claude...",
+    replyHint: "Nhập tin nhắn bên dưới ↓",
+    sessionExpired: "Session đã hết hạn hoặc đóng",
+    sessionNotFound: "Không tìm thấy session",
+    tmuxDead: "tmux session đã ngắt kết nối",
+    sent: "📩 Đã gửi → {project}",
+    busy: "⏳ Claude đang bận — thử lại sau",
+    desktopActive: "⚠️ Có người đang gõ trên desktop",
   },
 };
