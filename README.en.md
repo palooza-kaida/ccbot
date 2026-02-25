@@ -1,4 +1,4 @@
-# 🤖 ccpoke — AI Agent ↔ Telegram Notification Bot
+# 🐾 ccpoke — AI Agent Notification Bridge
 
 [Tiếng Việt](./README.md)
 
