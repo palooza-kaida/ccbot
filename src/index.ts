@@ -175,7 +175,7 @@ function handleSubcommand(args: string[]): void {
   try {
     ConfigManager.load();
   } catch {
-    // config not yet created, subcommands handle this
+    // config may not exist yet for setup command
   }
 
   switch (args[0]) {
