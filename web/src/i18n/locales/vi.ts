@@ -1,4 +1,6 @@
-export const vi: Record<string, string | string[]> = {
+import type { LocaleDict } from "./en";
+
+export const vi: LocaleDict = {
   title: "ccpoke — Code mọi nơi với AI Agents",
   metaDesc: "Tương tác 2 chiều với Claude Code, Cursor và nhiều AI agent khác từ Telegram, Discord, Zalo. Code mọi lúc mọi nơi.",
 
@@ -84,6 +86,13 @@ export const vi: Record<string, string | string[]> = {
   responseNotFound: "Không tìm thấy response",
   responseExpired: "Dữ liệu response đã hết hạn. Thông tin cơ bản hiển thị ở trên.",
   responseChanges: "Thay đổi",
+
+  ariaLanguage: "Ngôn ngữ",
+  ariaGitHub: "GitHub",
+  ariaMenu: "Menu",
+  ariaClose: "Đóng",
+  responseTitle: "ccpoke — Phản hồi",
+  responseMetaDesc: "Trình xem phản hồi của AI agent — ccpoke",
 
   navBrand: "Thương hiệu",
   brandTitle: "ccpoke — Nhận diện thương hiệu",

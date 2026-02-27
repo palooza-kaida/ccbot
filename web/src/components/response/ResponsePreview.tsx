@@ -104,7 +104,7 @@ export default function ResponsePreview() {
         {mode === "success" && (
           <>
             <MarkdownBody content={MOCK_MARKDOWN} />
-            <GitChangesPanel changes={MOCK_CHANGES} />
+            <GitChangesPanel changes={MOCK_CHANGES} locale="en" />
           </>
         )}
       </main>

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "preact/hooks";
 import type { ViewState } from "./types";
-import { tClient } from "../../i18n";
+import { ts, getLocaleFromUrl, type Locale } from "../../i18n";
 import { fetchResponse, parseQueryParams } from "./api";
 import { ErrorState, GitChangesPanel, LoadingState, ResponseMeta } from "./ResponseParts";
 import { MarkdownBody } from "./MarkdownBody";
 
 declare const Telegram: { WebApp: { ready: () => void; expand: () => void } } | undefined;
 
-export default function ResponseViewer() {
+export default function ResponseViewer({ locale: localeProp }: { locale?: Locale }) {
+  const locale = localeProp ?? getLocaleFromUrl(new URL(window.location.href));
   const [viewState, setViewState] = useState<ViewState>({ kind: "loading" });
   const [project, setProject] = useState("");
   const [durationMs, setDurationMs] = useState(0);
@@ -19,19 +20,19 @@ export default function ResponseViewer() {
     loadResponse();
   }, []);
 
-  function initTelegram() {
+  function initTelegram(retries = 0) {
     if (typeof Telegram !== "undefined" && Telegram?.WebApp) {
       Telegram.WebApp.ready();
       Telegram.WebApp.expand();
-    } else {
-      setTimeout(initTelegram, 300);
+    } else if (retries < 10) {
+      setTimeout(() => initTelegram(retries + 1), 300);
     }
   }
 
   async function loadResponse() {
     const params = parseQueryParams();
     if (!params) {
-      setViewState({ kind: "error", message: tClient("responseNotFound") });
+      setViewState({ kind: "error", message: ts(locale, "responseNotFound") });
       return;
     }
 
@@ -41,7 +42,7 @@ export default function ResponseViewer() {
     try {
       const result = await fetchResponse(params);
       if (result.kind !== "success") {
-        setViewState({ kind: "error", message: tClient("responseExpired") });
+        setViewState({ kind: "error", message: ts(locale, "responseExpired") });
         return;
       }
 
@@ -51,14 +52,14 @@ export default function ResponseViewer() {
       if (result.data.model) setModel(result.data.model);
       setViewState(result);
     } catch {
-      setViewState({ kind: "error", message: tClient("responseExpired") });
+      setViewState({ kind: "error", message: ts(locale, "responseExpired") });
     }
   }
 
   return (
     <div class="rv">
       <main class="rv__body">
-        <ResponseMeta project={project} durationMs={durationMs} timestamp={timestamp} model={model} />
+        <ResponseMeta project={project} durationMs={durationMs} timestamp={timestamp} model={model} locale={locale} />
         {viewState.kind === "loading" && <LoadingState />}
         {viewState.kind === "error" && <ErrorState message={viewState.message} />}
         {viewState.kind === "success" && (
@@ -66,7 +67,7 @@ export default function ResponseViewer() {
             {viewState.data.responseSummary && (
               <MarkdownBody content={viewState.data.responseSummary} />
             )}
-            <GitChangesPanel changes={viewState.data.gitChanges ?? []} />
+            <GitChangesPanel changes={viewState.data.gitChanges ?? []} locale={locale} />
           </>
         )}
       </main>

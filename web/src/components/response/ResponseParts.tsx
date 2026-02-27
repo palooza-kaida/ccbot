@@ -1,6 +1,6 @@
 
 import { useState } from "preact/hooks";
-import { tClient } from "../../i18n";
+import { ts, type Locale } from "../../i18n";
 import { formatDuration, formatModelName } from "../../lib/format";
 import { GIT_STATUS_STYLES } from "../../lib/constants";
 import chevronDown16 from "../../assets/icons/chevron-down-16.svg?raw";
@@ -12,11 +12,13 @@ export function ResponseMeta({
   durationMs,
   timestamp,
   model,
+  locale,
 }: {
   project: string;
   durationMs: number;
   timestamp?: string;
   model?: string;
+  locale?: Locale;
 }) {
   const hasAnyMeta = project || durationMs > 0 || timestamp || model;
   if (!hasAnyMeta) return null;
@@ -28,8 +30,8 @@ export function ResponseMeta({
   let dateStr = "";
   if (timestamp) {
     const d = new Date(timestamp);
-    const date = d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
-    const time = d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+    const date = d.toLocaleDateString(locale, { day: "numeric", month: "short" });
+    const time = d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
     dateStr = `${date} ${time}`;
   }
 
@@ -51,7 +53,7 @@ export function ResponseMeta({
   );
 }
 
-export function GitChangesPanel({ changes }: { changes: GitChange[] }) {
+export function GitChangesPanel({ changes, locale }: { changes: GitChange[]; locale: Locale }) {
   const [expanded, setExpanded] = useState(true);
   if (!changes.length) return null;
 
@@ -72,7 +74,7 @@ export function GitChangesPanel({ changes }: { changes: GitChange[] }) {
         onClick={() => setExpanded(!expanded)}
         aria-expanded={expanded}
       >
-        <span class="rv-changes__label">{tClient("responseChanges")}</span>
+        <span class="rv-changes__label">{ts(locale, "responseChanges")}</span>
         <span class="rv-changes__badge">{changes.length}</span>
         <span class="rv-changes__stats">
           {counts.added > 0 && <span class="rv-stat rv-stat--add">+{counts.added}</span>}

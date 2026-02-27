@@ -1,4 +1,4 @@
-export const en: Record<string, string | string[]> = {
+const en = {
   title: "ccpoke — Code anywhere with AI Agents",
   metaDesc: "Two-way interaction with Claude Code, Cursor and more from Telegram, Discord, Zalo. Code anytime, anywhere.",
 
@@ -85,6 +85,13 @@ export const en: Record<string, string | string[]> = {
   responseExpired: "Response data has expired. Basic info is shown above.",
   responseChanges: "Changes",
 
+  ariaLanguage: "Language",
+  ariaGitHub: "GitHub",
+  ariaMenu: "Menu",
+  ariaClose: "Close",
+  responseTitle: "ccpoke — Response",
+  responseMetaDesc: "AI agent response viewer — ccpoke",
+
   navBrand: "Brand",
   brandTitle: "ccpoke — Brand Identity",
   brandMetaDesc: "Brand guidelines, logos, colors, and typography for ccpoke.",
@@ -129,4 +136,7 @@ export const en: Record<string, string | string[]> = {
   brandMascotBodyDesc: "Rounded, warm shape like bánh mì — fun, approachable, full of energy.",
   brandMascotRocket: "Rocket Flames",
   brandMascotRocketDesc: "Speed, energy — the \"poke\" moment when task is done.",
-};
+} as const satisfies Record<string, string | string[]>;
+
+export type LocaleDict = { [K in keyof typeof en]: (typeof en)[K] extends string[] ? string[] : string } & Record<string, string | string[]>;
+export { en };

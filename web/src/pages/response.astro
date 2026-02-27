@@ -1,11 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ResponseViewer from "../components/response/ResponseViewer";
+import { ts } from "../i18n";
 
 const locale = "en";
 ---
 
-<BaseLayout locale={locale} title="ccpoke — Response" description="AI agent response viewer — ccpoke" currentPath="/response">
+<BaseLayout locale={locale} title={ts(locale, "responseTitle")} description={ts(locale, "responseMetaDesc")} currentPath="/response">
   <script is:inline>
     (function() {
       var s = document.createElement('script');
@@ -15,5 +16,5 @@ const locale = "en";
       document.head.appendChild(s);
     })();
   </script>
-  <ResponseViewer client:load />
+  <ResponseViewer locale="en" client:load />
 </BaseLayout>

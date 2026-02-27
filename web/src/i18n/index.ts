@@ -1,6 +1,5 @@
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES, type Locale } from "./config";
 import { translations } from "./locales";
-import { getStorage } from "../utils/storage";
 
 export { DEFAULT_LOCALE, SUPPORTED_LOCALES, LOCALE_LABELS } from "./config";
 export type { Locale } from "./config";
@@ -17,22 +16,6 @@ export function ts(locale: Locale, key: string): string {
 export function ta(locale: Locale, key: string): string[] {
   const value = t(locale, key);
   return Array.isArray(value) ? value : [value];
-}
-
-export function detectLocale(): Locale {
-  if (typeof window === "undefined") return DEFAULT_LOCALE;
-
-  const saved = getStorage("locale");
-  if (saved && SUPPORTED_LOCALES.includes(saved as Locale)) return saved as Locale;
-
-  const navLang = navigator.language?.slice(0, 2);
-  if (navLang === "zh") return "zh";
-  if (navLang === "vi") return "vi";
-  return DEFAULT_LOCALE;
-}
-
-export function tClient(key: string): string {
-  return ts(detectLocale(), key);
 }
 
 export function getLocaleFromUrl(url: URL): Locale {

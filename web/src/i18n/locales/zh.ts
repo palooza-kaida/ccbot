@@ -1,4 +1,6 @@
-export const zh: Record<string, string | string[]> = {
+import type { LocaleDict } from "./en";
+
+export const zh: LocaleDict = {
   title: "ccpoke — 使用 AI Agents 随时随地编程",
   metaDesc: "通过 Telegram、Discord、Zalo 与 Claude Code、Cursor 等 AI 代理双向交互。随时随地编程。",
 
@@ -84,6 +86,13 @@ export const zh: Record<string, string | string[]> = {
   responseNotFound: "未找到响应",
   responseExpired: "响应数据已过期。基本信息显示在上方。",
   responseChanges: "变更",
+
+  ariaLanguage: "语言",
+  ariaGitHub: "GitHub",
+  ariaMenu: "菜单",
+  ariaClose: "关闭",
+  responseTitle: "ccpoke — 响应",
+  responseMetaDesc: "AI 代理响应查看器 — ccpoke",
 
   navBrand: "品牌",
   brandTitle: "ccpoke — 品牌识别",
