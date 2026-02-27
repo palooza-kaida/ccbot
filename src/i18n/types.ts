@@ -177,4 +177,20 @@ export interface TranslationKeys {
     expired: string;
     sessionNotFound: string;
   };
+  askQuestion: {
+    title: string;
+    selectHint: string;
+    multiSelectHint: string;
+    otherButton: string;
+    confirmButton: string;
+    sending: string;
+    selected: string;
+    selectedMultiple: string;
+    answered: string;
+    allAnswered: string;
+    injectionFailed: string;
+    sessionExpired: string;
+    waitingNext: string;
+    hookFailed: string;
+  };
 }
