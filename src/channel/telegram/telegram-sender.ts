@@ -87,7 +87,7 @@ function buildResponseReplyMarkup(
   responseUrl: string,
   sessionId?: string
 ): TelegramBot.InlineKeyboardMarkup {
-  const viewText = sessionId ? "📖" : t("bot.viewDetails");
+  const viewText = `📖 ${t("bot.viewDetails")}`;
   const viewButton = responseUrl.startsWith("https://")
     ? { text: viewText, web_app: { url: responseUrl } }
     : { text: viewText, url: responseUrl };

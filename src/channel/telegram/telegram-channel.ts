@@ -1,6 +1,6 @@
 import TelegramBot from "node-telegram-bot-api";
 
-import type { NotificationEvent } from "../../agent/agent-handler.js";
+import type { AskUserQuestionEvent, NotificationEvent } from "../../agent/agent-handler.js";
 import { ConfigManager, type Config } from "../../config-manager.js";
 import { getTranslations, t } from "../../i18n/index.js";
 import type { SessionMap } from "../../tmux/session-map.js";
@@ -10,6 +10,8 @@ import { log, logError, logWarn } from "../../utils/log.js";
 import { extractProseSnippet } from "../../utils/markdown.js";
 import { formatDuration, formatModelName, formatTokenCount } from "../../utils/stats-format.js";
 import type { NotificationChannel, NotificationData } from "../types.js";
+import { AskQuestionHandler } from "./ask-question-handler.js";
+import { escapeMarkdownV2 } from "./escape-markdown.js";
 import { PendingReplyStore } from "./pending-reply-store.js";
 import { PromptHandler } from "./prompt-handler.js";
 import { formatSessionList } from "./session-list.js";
@@ -25,6 +27,7 @@ export class TelegramChannel implements NotificationChannel {
   private stateManager: SessionStateManager | null;
   private tmuxBridge: TmuxBridge | null;
   private promptHandler: PromptHandler | null = null;
+  private askQuestionHandler: AskQuestionHandler | null = null;
 
   constructor(
     cfg: Config,
@@ -53,6 +56,11 @@ export class TelegramChannel implements NotificationChannel {
       this.promptHandler.onElicitationSent = (chatId, messageId, sessionId, project) => {
         this.pendingReplyStore.set(chatId, messageId, sessionId, project);
       };
+      this.askQuestionHandler = new AskQuestionHandler(
+        this.bot,
+        () => this.chatId,
+        this.tmuxBridge
+      );
     }
   }
 
@@ -65,12 +73,17 @@ export class TelegramChannel implements NotificationChannel {
 
   async shutdown(): Promise<void> {
     this.promptHandler?.destroy();
+    this.askQuestionHandler?.destroy();
     this.pendingReplyStore.destroy();
     this.bot.stopPolling();
   }
 
   handleNotificationEvent(event: NotificationEvent): void {
     this.promptHandler?.forwardPrompt(event).catch(() => {});
+  }
+
+  handleAskUserQuestionEvent(event: AskUserQuestionEvent): void {
+    this.askQuestionHandler?.forwardQuestion(event).catch(() => {});
   }
 
   async sendNotification(data: NotificationData, responseUrl?: string): Promise<void> {
@@ -170,8 +183,14 @@ export class TelegramChannel implements NotificationChannel {
 
   private registerChatHandlers(): void {
     this.bot.on("callback_query", async (query) => {
-      if (!query.data?.startsWith("chat:")) return;
       if (!ConfigManager.isOwner(this.cfg, query.from.id)) return;
+
+      if (query.data?.startsWith("aq:") || query.data?.startsWith("am:")) {
+        await this.askQuestionHandler?.handleCallback(query);
+        return;
+      }
+
+      if (!query.data?.startsWith("chat:")) return;
 
       const sessionId = query.data.slice(5);
 
@@ -217,6 +236,17 @@ export class TelegramChannel implements NotificationChannel {
       if (!msg.reply_to_message) return;
       if (!msg.text) return;
       if (!ConfigManager.isOwner(this.cfg, msg.from?.id ?? 0)) return;
+
+      if (
+        this.askQuestionHandler?.hasPendingOtherReply(msg.chat.id, msg.reply_to_message.message_id)
+      ) {
+        const handled = await this.askQuestionHandler.handleOtherTextReply(
+          msg.chat.id,
+          msg.reply_to_message.message_id,
+          msg.text
+        );
+        if (handled) return;
+      }
 
       const pending = this.pendingReplyStore.get(msg.chat.id, msg.reply_to_message.message_id);
       if (!pending) return;
@@ -290,8 +320,4 @@ export class TelegramChannel implements NotificationChannel {
       }
     });
   }
-}
-
-function escapeMarkdownV2(text: string): string {
-  return text.replace(/[_*[\]()~`>#+\-=|{}.!\\]/g, (m) => `\\${m}`);
 }
