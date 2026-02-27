@@ -18,21 +18,62 @@ export class TmuxBridge {
 
   sendKeys(target: string, text: string): void {
     const tgt = escapeShellArg(target);
-    const lines = text.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i]!;
-      if (line.length === 0 && i < lines.length - 1) continue;
+    const collapsed = text.replace(/\n+/g, " ").trim();
+    if (collapsed.length === 0) return;
 
-      const escaped = escapeTmuxText(line);
-      execSync(`tmux send-keys -t ${tgt} -l ${escaped}`, {
-        stdio: "pipe",
-        timeout: 5000,
-      });
-      execSync(`tmux send-keys -t ${tgt} Enter`, {
-        stdio: "pipe",
-        timeout: 5000,
-      });
-    }
+    const escaped = escapeTmuxText(collapsed);
+    execSync(`tmux send-keys -t ${tgt} -l ${escaped}`, {
+      stdio: "pipe",
+      timeout: 5000,
+    });
+    execSync(`tmux send-keys -t ${tgt} Enter`, {
+      stdio: "pipe",
+      timeout: 5000,
+    });
+  }
+
+  sendSpecialKey(target: string, key: "Down" | "Up" | "Space" | "Enter"): void {
+    const tgt = escapeShellArg(target);
+    execSync(`tmux send-keys -t ${tgt} ${key}`, {
+      stdio: "pipe",
+      timeout: 5000,
+    });
+  }
+
+  capturePane(target: string, lines = 50): string {
+    const tgt = escapeShellArg(target);
+    return execSync(`tmux capture-pane -t ${tgt} -p -S -${lines}`, {
+      encoding: "utf-8",
+      stdio: "pipe",
+      timeout: 5000,
+    });
+  }
+
+  waitForTuiReady(target: string, timeoutMs = 5000): Promise<boolean> {
+    const TUI_INDICATORS = [/❯/, /\[ \]/, /\( \)/, /\(●\)/, /\[✓\]/, />/];
+    const POLL_INTERVAL = 150;
+    const start = Date.now();
+
+    return new Promise((resolve) => {
+      const check = () => {
+        try {
+          const content = this.capturePane(target, 30);
+          const ready = TUI_INDICATORS.some((re) => re.test(content));
+          if (ready) {
+            resolve(true);
+            return;
+          }
+        } catch {
+          // pane may not be ready
+        }
+        if (Date.now() - start >= timeoutMs) {
+          resolve(false);
+          return;
+        }
+        setTimeout(check, POLL_INTERVAL);
+      };
+      check();
+    });
   }
 
   isClaudeIdle(target: string, tree?: ProcessTree): boolean {
