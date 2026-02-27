@@ -6,7 +6,6 @@ export type InjectResult =
   | { sent: true }
   | { empty: true }
   | { busy: true }
-  | { desktopActive: true }
   | { sessionNotFound: true }
   | { tmuxDead: true };
 
@@ -33,12 +32,8 @@ export class SessionStateManager {
     const safeText =
       trimmed.length > MAX_MESSAGE_LENGTH ? trimmed.slice(0, MAX_MESSAGE_LENGTH) : trimmed;
 
-    if (this.tmuxBridge.hasUncommittedInput(session.tmuxTarget)) {
-      return { desktopActive: true };
-    }
-
-    // Always check actual pane state instead of trusting cached session.state
-    if (!this.tmuxBridge.isClaudeIdle(session.tmuxTarget)) {
+    // Trust event-driven state: stop_hook → Idle, injectMessage → Busy
+    if (session.state === SessionState.Busy) {
       return { busy: true };
     }
 
@@ -53,13 +48,9 @@ export class SessionStateManager {
     }
   }
 
-  onStopHook(sessionId: string): void {
+  onStopHook(sessionId: string, model?: string): void {
     this.sessionMap.updateState(sessionId, SessionState.Idle);
-    this.sessionMap.touch(sessionId);
-  }
-
-  onNotificationBlock(sessionId: string): void {
-    this.sessionMap.updateState(sessionId, SessionState.Blocked);
+    if (model) this.sessionMap.updateModel(sessionId, model);
     this.sessionMap.touch(sessionId);
   }
 }

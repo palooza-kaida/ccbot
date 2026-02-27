@@ -1,4 +1,7 @@
 import { execSync } from "node:child_process";
+import { readdirSync, statSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 
 import { escapeShellArg } from "./tmux-bridge.js";
 
@@ -9,7 +12,6 @@ export interface TmuxPaneInfo {
   panePid: string;
 }
 
-const CLAUDE_TITLE_PATTERN = /claude code/i;
 const FORMAT_STRING =
   "#{session_name}:#{window_index}.#{pane_index}|#{pane_title}|#{pane_current_path}|#{pane_pid}";
 const MAX_DESCENDANT_DEPTH = 4;
@@ -62,9 +64,41 @@ export function hasClaudeDescendant(panePid: string, tree?: ProcessTree): boolea
 }
 
 function isClaudePane(pane: TmuxPaneInfo, tree?: ProcessTree): boolean {
-  if (CLAUDE_TITLE_PATTERN.test(pane.paneTitle)) return true;
-
   return hasClaudeDescendant(pane.panePid, tree);
+}
+
+const SHELL_PATTERN = /\b(bash|zsh|sh|fish)\b/;
+// Claude Code keeps persistent shell-snapshot processes; exclude them from busy detection
+const SHELL_SNAPSHOT_PATTERN = /shell-snapshots\/snapshot-/;
+
+/**
+ * Claude is idle when its process has no active child shell processes.
+ * Shell-snapshot processes (persistent) are excluded.
+ * When busy, Claude spawns /bin/zsh -c ... for tool execution.
+ */
+export function isClaudeIdleByProcess(panePid: string, tree?: ProcessTree): boolean {
+  const processTree = tree ?? buildProcessTree();
+
+  function findClaudePid(pid: string, depth: number): string | undefined {
+    if (depth >= MAX_DESCENDANT_DEPTH) return undefined;
+    const children = processTree.get(pid);
+    if (!children) return undefined;
+    for (const child of children) {
+      if (/\bclaude\b/i.test(child.command)) return child.pid;
+      const found = findClaudePid(child.pid, depth + 1);
+      if (found) return found;
+    }
+    return undefined;
+  }
+
+  const claudePid = findClaudePid(panePid, 0);
+  if (!claudePid) return false;
+
+  const children = processTree.get(claudePid);
+  if (!children) return true;
+  return !children.some(
+    (c) => SHELL_PATTERN.test(c.command) && !SHELL_SNAPSHOT_PATTERN.test(c.command)
+  );
 }
 
 export interface ScanOutput {
@@ -116,17 +150,6 @@ export function isClaudeAliveInPane(target: string, tree?: ProcessTree): boolean
   }
 
   try {
-    const title = execSync(`tmux display-message -t ${escapeShellArg(target)} -p '#{pane_title}'`, {
-      encoding: "utf-8",
-      stdio: "pipe",
-      timeout: 3000,
-    }).trim();
-    if (CLAUDE_TITLE_PATTERN.test(title)) return true;
-  } catch {
-    // pane may not exist anymore
-  }
-
-  try {
     const panePid = execSync(`tmux display-message -t ${escapeShellArg(target)} -p '#{pane_pid}'`, {
       encoding: "utf-8",
       stdio: "pipe",
@@ -149,5 +172,36 @@ export function isPaneAlive(target: string): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Detect model from the latest transcript file for a given cwd.
+ * Claude Code stores transcripts in ~/.claude/projects/{encoded-cwd}/{session-id}.jsonl
+ */
+export function detectModelFromCwd(cwd: string): string {
+  try {
+    const encoded = cwd.replaceAll("/", "-");
+    const projectDir = join(homedir(), ".claude", "projects", encoded);
+
+    const jsonlFiles = readdirSync(projectDir)
+      .filter((f) => f.endsWith(".jsonl"))
+      .map((f) => {
+        const fullPath = join(projectDir, f);
+        return { path: fullPath, mtime: statSync(fullPath).mtimeMs };
+      })
+      .sort((a, b) => b.mtime - a.mtime);
+
+    if (jsonlFiles.length === 0) return "";
+
+    const output = execSync(
+      `grep -o '"model":"[^"]*"' ${escapeShellArg(jsonlFiles[0]!.path)} | tail -1`,
+      { encoding: "utf-8", stdio: "pipe", timeout: 3000 }
+    ).trim();
+
+    const match = output.match(/"model":"([^"]*)"/);
+    return match?.[1] ?? "";
+  } catch {
+    return "";
   }
 }

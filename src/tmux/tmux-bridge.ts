@@ -1,7 +1,6 @@
 import { execSync } from "node:child_process";
 
-const CLAUDE_PROMPT_PATTERNS = [/[❯>]\s*$/, /\$\s*$/];
-const IDLE_SCAN_LINES = 5;
+import { isClaudeIdleByProcess, type ProcessTree } from "./tmux-scanner.js";
 
 export class TmuxBridge {
   private available: boolean | null = null;
@@ -36,45 +35,17 @@ export class TmuxBridge {
     }
   }
 
-  capturePane(target: string, lineCount = 50): string {
-    return execSync(`tmux capture-pane -t ${escapeShellArg(target)} -p -S -${lineCount}`, {
-      encoding: "utf-8",
-      stdio: "pipe",
-      timeout: 5000,
-    }).trimEnd();
-  }
-
-  isClaudeIdle(target: string): boolean {
+  isClaudeIdle(target: string, tree?: ProcessTree): boolean {
     try {
-      const content = this.capturePane(target, IDLE_SCAN_LINES);
-      const lines = content.split("\n");
-
-      for (let i = lines.length - 1; i >= 0; i--) {
-        const line = lines[i]!.trimEnd();
-        if (line.length === 0) continue;
-        if (CLAUDE_PROMPT_PATTERNS.some((pattern) => pattern.test(line))) return true;
-        return false;
-      }
-      return false;
-    } catch {
-      return false;
-    }
-  }
-
-  hasUncommittedInput(target: string): boolean {
-    try {
-      const content = this.capturePane(target, 10);
-      const lines = content.split("\n");
-
-      for (let i = lines.length - 1; i >= 0; i--) {
-        const line = lines[i]!.trimEnd();
-        const promptMatch = line.match(/[❯>]\s*/);
-        if (promptMatch && promptMatch.index !== undefined) {
-          const afterPrompt = line.slice(promptMatch.index + promptMatch[0].length);
-          return afterPrompt.trim().length > 0;
+      const panePid = execSync(
+        `tmux display-message -t ${escapeShellArg(target)} -p '#{pane_pid}'`,
+        {
+          encoding: "utf-8",
+          stdio: "pipe",
+          timeout: 3000,
         }
-      }
-      return false;
+      ).trim();
+      return isClaudeIdleByProcess(panePid, tree);
     } catch {
       return false;
     }
