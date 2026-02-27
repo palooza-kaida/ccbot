@@ -1,7 +1,7 @@
 import type { NotificationChannel, NotificationData } from "../channel/types.js";
 import { t } from "../i18n/index.js";
 import { MINI_APP_BASE_URL } from "../utils/constants.js";
-import { log, logError } from "../utils/log.js";
+import { log, logDebug, logError } from "../utils/log.js";
 import { responseStore } from "../utils/response-store.js";
 import type { TunnelManager } from "../utils/tunnel.js";
 import type { AgentRegistry } from "./agent-registry.js";
@@ -56,6 +56,9 @@ export class AgentHandler {
     }
 
     const result = provider.parseEvent(rawEvent);
+    logDebug(
+      `[Stop:raw] agent=${agentName} agentSessionId=${result.agentSessionId ?? "NONE"} project=${result.projectName} tmuxTarget=${result.tmuxTarget ?? "NONE"} cwd=${result.cwd ?? "NONE"}`
+    );
 
     let chatSessionId: string | undefined;
     if (this.chatResolver) {
@@ -65,6 +68,7 @@ export class AgentHandler {
         result.cwd,
         result.tmuxTarget
       );
+      logDebug(`[Stop:resolved] chatSessionId=${chatSessionId ?? "NONE"}`);
     }
 
     const data: NotificationData = {
@@ -97,6 +101,10 @@ export class AgentHandler {
     const event = this.parseAskUserQuestionEvent(rawEvent);
     if (!event) return;
 
+    logDebug(
+      `[AskQ:raw] agentSessionId=${event.sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"} cwd=${event.cwd ?? "NONE"} questions=${event.questions.length}`
+    );
+
     let sessionId: string | undefined;
     if (this.chatResolver) {
       sessionId = this.chatResolver.resolveSessionId(
@@ -105,15 +113,26 @@ export class AgentHandler {
         event.cwd,
         event.tmuxTarget
       );
+      logDebug(
+        `[AskQ:resolved] agentSessionId=${event.sessionId} → resolvedSessionId=${sessionId ?? "NONE"}`
+      );
     }
 
-    this.onAskUserQuestion?.({ ...event, sessionId: sessionId ?? event.sessionId });
+    const finalSessionId = sessionId ?? event.sessionId;
+    logDebug(
+      `[AskQ:forward] finalSessionId=${finalSessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"}`
+    );
+    this.onAskUserQuestion?.({ ...event, sessionId: finalSessionId });
   }
 
   async handleNotification(rawEvent: unknown): Promise<void> {
     const event = this.parseNotificationEvent(rawEvent);
     if (!event) return;
 
+    logDebug(
+      `[Notif:raw] agentSessionId=${event.sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"} type=${event.notificationType}`
+    );
+
     let sessionId: string | undefined;
     if (this.chatResolver) {
       sessionId = this.chatResolver.resolveSessionId(
@@ -122,12 +141,16 @@ export class AgentHandler {
         event.cwd,
         event.tmuxTarget
       );
+      logDebug(`[Notif:resolved] ${event.sessionId} → ${sessionId ?? "NONE"}`);
     }
 
     if (!sessionId) {
       sessionId = event.sessionId;
     }
 
+    logDebug(
+      `[Notif:forward] finalSessionId=${sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"}`
+    );
     this.onNotification?.({ ...event, sessionId });
   }
 

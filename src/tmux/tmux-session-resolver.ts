@@ -1,5 +1,5 @@
 import type { ChatSessionResolver } from "../agent/chat-session-resolver.js";
-import { log } from "../utils/log.js";
+import { log, logDebug } from "../utils/log.js";
 import type { SessionMap } from "./session-map.js";
 import type { SessionStateManager } from "./session-state.js";
 
@@ -19,17 +19,26 @@ export class TmuxSessionResolver implements ChatSessionResolver {
     cwd?: string,
     tmuxTarget?: string
   ): string | undefined {
+    logDebug(
+      `[Resolver] input: agentSessionId=${agentSessionId} project=${projectName} cwd=${cwd ?? "NONE"} tmuxTarget=${tmuxTarget ?? "NONE"}`
+    );
+
     if (tmuxTarget) {
       const exactMatch = this.findByTmuxTarget(tmuxTarget);
       if (exactMatch) {
         if (agentSessionId) this.cacheAgent(agentSessionId, exactMatch);
+        logDebug(`[Resolver] matched by tmuxTarget: ${tmuxTarget} → ${exactMatch}`);
         return exactMatch;
       }
+      logDebug(`[Resolver] NO match for tmuxTarget=${tmuxTarget}`);
     }
 
     if (agentSessionId) {
       const cached = this.agentToTmux.get(agentSessionId);
-      if (cached && this.sessionMap.getBySessionId(cached)) return cached;
+      if (cached && this.sessionMap.getBySessionId(cached)) {
+        logDebug(`[Resolver] matched by cache: ${agentSessionId} → ${cached}`);
+        return cached;
+      }
       this.agentToTmux.delete(agentSessionId);
     }
 
@@ -37,6 +46,7 @@ export class TmuxSessionResolver implements ChatSessionResolver {
     if (tmuxSessionId && agentSessionId) {
       this.cacheAgent(agentSessionId, tmuxSessionId);
     }
+    logDebug(`[Resolver] matched by project: ${projectName} → ${tmuxSessionId ?? "NONE"}`);
     return tmuxSessionId;
   }
 
