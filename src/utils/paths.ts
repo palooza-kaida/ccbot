@@ -28,6 +28,7 @@ export const paths = {
   ),
   claudeCodeSessionStartScript: join(CCPOKE_HOME, "hooks", "claude-code-session-start.sh"),
   claudeCodeNotificationScript: join(CCPOKE_HOME, "hooks", "claude-code-notification.sh"),
+  claudeCodePreToolUseScript: join(CCPOKE_HOME, "hooks", "claude-code-pretooluse.sh"),
   cursorHookScript: join(
     CCPOKE_HOME,
     "hooks",
