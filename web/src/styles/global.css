@@ -179,7 +179,7 @@ a:hover { color: var(--color-accent-hover) }
   bottom: 0.25rem;
   width: 3px;
   border-radius: 2px;
-  background: linear-gradient(to bottom, var(--color-emerald) 0%, var(--color-emerald) 33%, var(--color-accent) 33%, var(--color-accent) 50%, var(--color-border) 50%, var(--color-border) 100%);
+  background: linear-gradient(to bottom, var(--color-emerald) 0%, var(--color-emerald) 66%, var(--color-accent) 66%, var(--color-accent) 83%, var(--color-border) 83%, var(--color-border) 100%);
 }
 
 .tl-dot {
