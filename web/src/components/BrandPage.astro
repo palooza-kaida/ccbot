@@ -23,12 +23,12 @@ const primaryColors = [
 ];
 
 const neutralColors = [
-  { name: "Text", hex: "#1A1A2E" },
-  { name: "Text Secondary", hex: "#5A5A72" },
-  { name: "Text Tertiary", hex: "#8E8E9F" },
-  { name: "Background", hex: "#FFFFFF" },
-  { name: "Background Warm", hex: "#FAF9F7" },
-  { name: "Border", hex: "#EBEBEB" },
+  { name: "Text", var: "--color-txt" },
+  { name: "Text Secondary", var: "--color-txt-2" },
+  { name: "Text Tertiary", var: "--color-txt-3" },
+  { name: "Background", var: "--color-bg" },
+  { name: "Background Warm", var: "--color-bg-warm" },
+  { name: "Border", var: "--color-border" },
 ];
 
 const semanticColors = [
@@ -131,10 +131,10 @@ const dontItems = ta(locale, "brandDontItems");
     <div class="color-grid">
       {neutralColors.map(c => (
         <div class="color-swatch color-swatch--small">
-          <div class="color-swatch__dot" style={`background: ${c.hex}; ${c.hex === '#FFFFFF' ? 'border: 1px solid var(--color-border)' : ''}`}></div>
+          <div class="color-swatch__dot" style={`background: var(${c.var}); ${c.name === 'Background' ? 'border: 1px solid var(--color-border)' : ''}`}></div>
           <div class="color-swatch__meta">
             <strong>{c.name}</strong>
-            <code>{c.hex}</code>
+            <code class="neutral-hex" data-var={c.var}></code>
           </div>
         </div>
       ))}
@@ -325,7 +325,7 @@ const dontItems = ta(locale, "brandDontItems");
   }
   .logo-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   }
   .logo-card__preview {
     display: flex;
@@ -463,3 +463,21 @@ const dontItems = ta(locale, "brandDontItems");
     .color-grid { grid-template-columns: 1fr 1fr; }
   }
 </style>
+
+<script>
+  function rgbToHex(rgb: string): string {
+    const m = rgb.match(/\d+/g);
+    if (!m || m.length < 3) return rgb;
+    return "#" + m.slice(0, 3).map(n => parseInt(n).toString(16).padStart(2, "0")).join("").toUpperCase();
+  }
+  function updateNeutralHex() {
+    document.querySelectorAll<HTMLElement>(".neutral-hex").forEach(el => {
+      const v = el.dataset.var;
+      if (!v) return;
+      const raw = getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+      el.textContent = raw.startsWith("#") ? raw.toUpperCase() : rgbToHex(raw);
+    });
+  }
+  updateNeutralHex();
+  new MutationObserver(updateNeutralHex).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
