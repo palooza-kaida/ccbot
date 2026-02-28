@@ -18,6 +18,7 @@ export const en: TranslationKeys = {
     alreadyConnected: "ccpoke is already connected — bot is running normally.",
     connectionLost: "lost connection to Telegram — retrying...",
     connectionRestored: "reconnected to Telegram",
+    startupReady: "🟢 *ccpoke* is online and ready\\.",
     commands: {
       start: "Connect bot to this chat",
       sessions: "List active sessions",

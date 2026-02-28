@@ -18,10 +18,11 @@ export const vi: TranslationKeys = {
     alreadyConnected: "ccpoke đã kết nối rồi — bot đang hoạt động bình thường.",
     connectionLost: "mất kết nối tới Telegram — đang thử kết nối lại...",
     connectionRestored: "đã kết nối lại Telegram",
+    startupReady: "🟢 *ccpoke* đã online và sẵn sàng\\.",
     commands: {
       start: "Kết nối bot với chat này",
       sessions: "Danh sách phiên",
-      projects: "Danh sách project đã đăng ký",
+      projects: "Danh sách dự án",
     },
     viewDetails: "Chi tiết",
     sendFailed: "gửi thất bại, dùng fallback",

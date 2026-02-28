@@ -73,6 +73,11 @@ export class TelegramChannel implements NotificationChannel {
     await this.registerCommands();
     await this.registerMenuButton();
     log(t("bot.telegramStarted"));
+    if (this.chatId) {
+      this.bot
+        .sendMessage(this.chatId, t("bot.startupReady"), { parse_mode: "MarkdownV2" })
+        .catch(() => {});
+    }
   }
 
   async shutdown(): Promise<void> {

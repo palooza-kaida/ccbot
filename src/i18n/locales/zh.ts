@@ -17,6 +17,7 @@ export const zh: TranslationKeys = {
     alreadyConnected: "ccpoke 已连接 — 机器人运行正常。",
     connectionLost: "与 Telegram 连接中断 — 正在重试...",
     connectionRestored: "已重新连接 Telegram",
+    startupReady: "🟢 *ccpoke* 已上线并就绪\\.",
     commands: {
       start: "将机器人连接到此聊天",
       sessions: "列出活跃会话",

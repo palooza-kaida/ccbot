@@ -15,6 +15,7 @@ export interface TranslationKeys {
     alreadyConnected: string;
     connectionLost: string;
     connectionRestored: string;
+    startupReady: string;
     commands: {
       start: string;
       sessions: string;
