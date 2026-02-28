@@ -20,6 +20,7 @@ export const zh: TranslationKeys = {
     commands: {
       start: "将机器人连接到此聊天",
       sessions: "列出活跃会话",
+      projects: "列出已注册项目",
     },
     viewDetails: "查看详情",
     sendFailed: "发送失败，使用备用方式",
@@ -109,6 +110,7 @@ export const zh: TranslationKeys = {
     cmdUpdate: "  update      更新 ccpoke 到最新版本",
     cmdUninstall: "  uninstall   删除所有 ccpoke 数据和钩子",
     cmdHelp: "  help        显示此帮助信息",
+    cmdProject: "  project     管理已注册项目 (add/list/remove)",
     docs: "文档 → https://github.com/palooza-kaida/ccpoke",
   },
 
@@ -181,6 +183,13 @@ export const zh: TranslationKeys = {
     title: "活跃会话",
     empty: "没有活跃的 Claude Code 会话",
     chatButton: "聊天",
+  },
+  projects: {
+    title: "项目",
+    empty: "未注册任何项目。使用 'ccpoke project add <path>' 添加。",
+    started: "正在启动 Claude Code 于 {project}...",
+    startFailed: "无法为 {project} 启动面板",
+    noTmux: "tmux 不可用 — 无法创建新面板",
   },
   prompt: {
     elicitationTitle: "Claude 需要输入",

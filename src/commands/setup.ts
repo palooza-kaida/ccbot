@@ -206,6 +206,7 @@ function buildConfig(
     hook_secret: existing?.hook_secret || ConfigManager.generateSecret(),
     locale,
     agents,
+    projects: existing?.projects || [],
   };
 }
 

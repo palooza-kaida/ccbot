@@ -104,6 +104,15 @@ export class TmuxBridge {
       return false;
     }
   }
+
+  createWindow(sessionName: string, cwd: string): string {
+    const sess = escapeShellArg(sessionName);
+    const dir = escapeShellArg(cwd);
+    return execSync(
+      `tmux new-window -t ${sess} -c ${dir} -P -F '#{session_name}:#{window_index}.#{pane_index}'`,
+      { encoding: "utf-8", stdio: "pipe", timeout: 5000 }
+    ).trim();
+  }
 }
 
 function escapeTmuxText(text: string): string {

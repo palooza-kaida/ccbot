@@ -4,6 +4,7 @@ import { AgentHandler } from "./agent/agent-handler.js";
 import { createDefaultRegistry } from "./agent/agent-registry.js";
 import { TelegramChannel } from "./channel/telegram/telegram-channel.js";
 import { runHelp } from "./commands/help.js";
+import { runProject } from "./commands/project.js";
 import { runSetup } from "./commands/setup.js";
 import { runUninstall } from "./commands/uninstall.js";
 import { runUpdate } from "./commands/update.js";
@@ -196,6 +197,10 @@ function handleSubcommand(args: string[]): void {
 
     case CliCommand.Uninstall:
       runUninstall();
+      break;
+
+    case CliCommand.Project:
+      runProject(args.slice(1));
       break;
 
     case CliCommand.Help:

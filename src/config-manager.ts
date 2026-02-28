@@ -5,6 +5,11 @@ import { isValidLocale, Locale, setLocale, t } from "./i18n/index.js";
 import { DEFAULT_HOOK_PORT } from "./utils/constants.js";
 import { paths } from "./utils/paths.js";
 
+export interface ProjectEntry {
+  name: string;
+  path: string;
+}
+
 export interface Config {
   telegram_bot_token: string;
   user_id: number;
@@ -12,6 +17,7 @@ export interface Config {
   hook_secret: string;
   locale: Locale;
   agents: string[];
+  projects: ProjectEntry[];
 }
 
 export interface ChatState {
@@ -41,7 +47,7 @@ export class ConfigManager {
       throw new Error(t("config.invalidJson"), { cause: err });
     }
     const cfg = ConfigManager.validate(raw);
-    if (cfg.hook_secret !== raw.hook_secret || !raw.agents) {
+    if (cfg.hook_secret !== raw.hook_secret || !raw.agents || !raw.projects) {
       ConfigManager.save(cfg);
     }
     setLocale(cfg.locale);
@@ -122,6 +128,17 @@ export class ConfigManager {
       agents = data.agents.filter((a): a is string => typeof a === "string");
     }
 
+    let projects: ProjectEntry[] = [];
+    if (Array.isArray(data.projects)) {
+      projects = data.projects.filter(
+        (p): p is ProjectEntry =>
+          typeof p === "object" &&
+          p !== null &&
+          typeof (p as Record<string, unknown>).name === "string" &&
+          typeof (p as Record<string, unknown>).path === "string"
+      );
+    }
+
     const cfg: Config = {
       telegram_bot_token: data.telegram_bot_token,
       user_id: data.user_id,
@@ -129,6 +146,7 @@ export class ConfigManager {
       hook_secret: hookSecret,
       locale,
       agents,
+      projects,
     };
 
     return cfg;

@@ -1,3 +1,5 @@
+import { execSync } from "node:child_process";
+
 import TelegramBot from "node-telegram-bot-api";
 
 import type { AskUserQuestionEvent, NotificationEvent } from "../../agent/agent-handler.js";
@@ -13,6 +15,7 @@ import type { NotificationChannel, NotificationData } from "../types.js";
 import { AskQuestionHandler } from "./ask-question-handler.js";
 import { escapeMarkdownV2 } from "./escape-markdown.js";
 import { PendingReplyStore } from "./pending-reply-store.js";
+import { formatProjectList } from "./project-list.js";
 import { PromptHandler } from "./prompt-handler.js";
 import { formatSessionList } from "./session-list.js";
 import { sendTelegramMessage } from "./telegram-sender.js";
@@ -44,6 +47,7 @@ export class TelegramChannel implements NotificationChannel {
     this.registerHandlers();
     this.registerChatHandlers();
     this.registerSessionsHandlers();
+    this.registerProjectsHandlers();
     this.registerPollingErrorHandler();
 
     if (this.sessionMap && this.tmuxBridge) {
@@ -136,6 +140,7 @@ export class TelegramChannel implements NotificationChannel {
     const commands: TelegramBot.BotCommand[] = [
       { command: "start", description: translations.bot.commands.start },
       { command: "sessions", description: translations.bot.commands.sessions },
+      { command: "projects", description: translations.bot.commands.projects },
     ];
 
     try {
@@ -195,6 +200,11 @@ export class TelegramChannel implements NotificationChannel {
           const sessionId = query.data.slice(7);
           logDebug(`[Elicit:callback] sessionId=${sessionId}`);
           await this.handleElicitReplyButton(query, sessionId);
+          return;
+        }
+
+        if (query.data?.startsWith("proj:")) {
+          await this.handleProjectCallback(query);
           return;
         }
 
@@ -273,13 +283,19 @@ export class TelegramChannel implements NotificationChannel {
       }
 
       const pending = this.pendingReplyStore.get(msg.chat.id, msg.reply_to_message.message_id);
-      if (!pending) return;
+      if (!pending) {
+        if (this.pendingReplyStore.wasExpired(msg.chat.id, msg.reply_to_message.message_id)) {
+          await this.bot.sendMessage(msg.chat.id, t("chat.sessionExpired"));
+        }
+        return;
+      }
 
       this.pendingReplyStore.delete(msg.chat.id, msg.reply_to_message.message_id);
 
       if (this.promptHandler) {
         const injected = this.promptHandler.injectElicitationResponse(pending.sessionId, msg.text);
         if (injected) {
+          logDebug(`[Chat:result] elicitation injected → sessionId=${pending.sessionId}`);
           await this.bot.sendMessage(
             msg.chat.id,
             t("prompt.responded", { project: pending.project })
@@ -296,12 +312,16 @@ export class TelegramChannel implements NotificationChannel {
       const result = this.stateManager.injectMessage(pending.sessionId, msg.text);
 
       if ("sent" in result) {
+        logDebug(`[Chat:result] sent → sessionId=${pending.sessionId}`);
         await this.bot.sendMessage(msg.chat.id, t("chat.sent", { project: pending.project }));
       } else if ("busy" in result) {
+        logDebug(`[Chat:result] busy → sessionId=${pending.sessionId}`);
         await this.bot.sendMessage(msg.chat.id, t("chat.busy"));
       } else if ("sessionNotFound" in result) {
+        logDebug(`[Chat:result] sessionNotFound → sessionId=${pending.sessionId}`);
         await this.bot.sendMessage(msg.chat.id, t("chat.sessionNotFound"));
       } else if ("tmuxDead" in result) {
+        logDebug(`[Chat:result] tmuxDead → sessionId=${pending.sessionId}`);
         await this.bot.sendMessage(msg.chat.id, t("chat.tmuxDead"));
       }
     });
@@ -363,6 +383,69 @@ export class TelegramChannel implements NotificationChannel {
 
       this.bot.sendMessage(msg.chat.id, text, opts).catch(() => {});
     });
+  }
+
+  private registerProjectsHandlers(): void {
+    this.bot.onText(/\/projects(?:\s|$)/, (msg) => {
+      if (!ConfigManager.isOwner(this.cfg, msg.from?.id ?? 0)) return;
+
+      const cfg = ConfigManager.load();
+      const { text, replyMarkup } = formatProjectList(cfg.projects);
+
+      const opts: TelegramBot.SendMessageOptions = {};
+      if (replyMarkup) opts.reply_markup = replyMarkup;
+
+      this.bot.sendMessage(msg.chat.id, text, opts).catch(() => {});
+    });
+  }
+
+  private async handleProjectCallback(query: TelegramBot.CallbackQuery): Promise<void> {
+    const idx = Number(query.data!.slice(5));
+    const cfg = ConfigManager.load();
+    const project = cfg.projects[idx];
+
+    if (!project || !query.message) {
+      await this.bot.answerCallbackQuery(query.id);
+      return;
+    }
+
+    if (!this.tmuxBridge || !this.tmuxBridge.isTmuxAvailable()) {
+      await this.bot.answerCallbackQuery(query.id, { text: t("projects.noTmux") });
+      return;
+    }
+
+    await this.bot.answerCallbackQuery(query.id);
+    await this.bot.sendMessage(
+      query.message.chat.id,
+      t("projects.started", { project: project.name })
+    );
+
+    try {
+      const tmuxSession = this.getTmuxSessionName();
+      const paneTarget = this.tmuxBridge.createWindow(tmuxSession, project.path);
+      this.tmuxBridge.sendKeys(paneTarget, "claude");
+      log(`[Projects] started claude in ${paneTarget} for ${project.name}`);
+    } catch (err) {
+      logError(`[Projects] failed to start panel for ${project.name}`, err);
+      await this.bot.sendMessage(
+        query.message.chat.id,
+        t("projects.startFailed", { project: project.name })
+      );
+    }
+  }
+
+  private getTmuxSessionName(): string {
+    try {
+      const output = execSync("tmux list-sessions -F '#{session_name}'", {
+        encoding: "utf-8",
+        stdio: "pipe",
+        timeout: 3000,
+      }).trim();
+      const first = output.split("\n")[0];
+      return first || "0";
+    } catch {
+      return "0";
+    }
   }
 
   private registerPollingErrorHandler(): void {

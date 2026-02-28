@@ -21,6 +21,7 @@ export const en: TranslationKeys = {
     commands: {
       start: "Connect bot to this chat",
       sessions: "List active sessions",
+      projects: "List registered projects",
     },
     viewDetails: "View details",
     sendFailed: "send failed, falling back",
@@ -110,6 +111,7 @@ export const en: TranslationKeys = {
     cmdUpdate: "  update      Update ccpoke to latest version",
     cmdUninstall: "  uninstall   Remove all ccpoke data and hooks",
     cmdHelp: "  help        Show this help message",
+    cmdProject: "  project     Manage registered projects (add/list/remove)",
     docs: "docs → https://github.com/palooza-kaida/ccpoke",
   },
 
@@ -182,6 +184,13 @@ export const en: TranslationKeys = {
     title: "Active Sessions",
     empty: "No active Claude Code sessions",
     chatButton: "Chat",
+  },
+  projects: {
+    title: "Projects",
+    empty: "No projects registered. Use 'ccpoke project add <path>' to add one.",
+    started: "Starting Claude Code in {project}...",
+    startFailed: "Failed to start panel for {project}",
+    noTmux: "tmux not available — cannot create new panels",
   },
   prompt: {
     elicitationTitle: "Claude needs input",

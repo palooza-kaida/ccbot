@@ -21,6 +21,7 @@ export const vi: TranslationKeys = {
     commands: {
       start: "Kết nối bot với chat này",
       sessions: "Danh sách phiên",
+      projects: "Danh sách project đã đăng ký",
     },
     viewDetails: "Chi tiết",
     sendFailed: "gửi thất bại, dùng fallback",
@@ -110,6 +111,7 @@ export const vi: TranslationKeys = {
     cmdUpdate: "  update      Cập nhật ccpoke lên bản mới nhất",
     cmdUninstall: "  uninstall   Xóa toàn bộ dữ liệu và hooks ccpoke",
     cmdHelp: "  help        Hiện hướng dẫn này",
+    cmdProject: "  project     Quản lý project đã đăng ký (add/list/remove)",
     docs: "docs → https://github.com/palooza-kaida/ccpoke",
   },
 
@@ -182,6 +184,13 @@ export const vi: TranslationKeys = {
     title: "Phiên hoạt động",
     empty: "Không có phiên Claude Code nào",
     chatButton: "Chat",
+  },
+  projects: {
+    title: "Projects",
+    empty: "Chưa đăng ký project nào. Dùng 'ccpoke project add <path>' để thêm.",
+    started: "Đang khởi động Claude Code trong {project}...",
+    startFailed: "Không thể khởi động panel cho {project}",
+    noTmux: "tmux không khả dụng — không thể tạo panel mới",
   },
   prompt: {
     elicitationTitle: "Claude cần input",

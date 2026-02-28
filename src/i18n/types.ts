@@ -18,6 +18,7 @@ export interface TranslationKeys {
     commands: {
       start: string;
       sessions: string;
+      projects: string;
     };
     viewDetails: string;
     sendFailed: string;
@@ -101,6 +102,7 @@ export interface TranslationKeys {
     cmdUpdate: string;
     cmdUninstall: string;
     cmdHelp: string;
+    cmdProject: string;
     docs: string;
   };
   hook: {
@@ -169,6 +171,13 @@ export interface TranslationKeys {
     title: string;
     empty: string;
     chatButton: string;
+  };
+  projects: {
+    title: string;
+    empty: string;
+    started: string;
+    startFailed: string;
+    noTmux: string;
   };
   prompt: {
     elicitationTitle: string;
