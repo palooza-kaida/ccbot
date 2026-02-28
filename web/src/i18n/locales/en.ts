@@ -55,17 +55,17 @@ const en = {
   phase2Desc: "Chat with Claude Code from Telegram — view sessions, send prompts, answer simple questions remotely. Single panel, macOS and Linux only.",
   phase2Tags: ["Send prompt → Claude Code","Session list","Answer questions (single/multi-select)","Idle prompt forwarding","tmux send-keys","macOS · Linux"],
 
-  phase3Label: "Phase 3 · In development",
+  phase3Label: "Phase 3 · Complete",
   phase3Title: "Smart reply",
   phase3Desc: "Handle complex AskUser interactions — elicitation forms, multi-select with descriptions, and structured input — all from Telegram.",
   phase3Tags: ["Elicitation forms","Multi-select + descriptions","Structured input","Rich Telegram UI","Permission approve/deny"],
 
-  phase4Label: "Phase 4",
+  phase4Label: "Phase 4 · Complete",
   phase4Title: "Multi-session",
   phase4Desc: "Manage multiple Claude Code panels simultaneously — switch between sessions, parallel monitoring, and per-session context.",
   phase4Tags: ["Multiple panels","Session switching","Parallel monitoring","Per-session context"],
 
-  phase5Label: "Phase 5",
+  phase5Label: "Phase 5 · In development",
   phase5Title: "Terminal control",
   phase5Desc: "View live terminal output, capture screenshots, browse files, and run commands — all from Telegram.",
   phase5Tags: ["Screenshot capture","Live output stream","File browser","Remote command execution"],

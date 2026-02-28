@@ -57,17 +57,17 @@ export const zh: LocaleDict = {
   phase2Desc: "从 Telegram 与 Claude Code 聊天 — 查看会话、发送提示、远程回答简单问题。单面板，仅支持 macOS 和 Linux。",
   phase2Tags: ["发送提示 → Claude Code","会话列表","回答问题 (单选/多选)","空闲提示转发","tmux send-keys","macOS · Linux"],
 
-  phase3Label: "阶段 3 · 开发中",
+  phase3Label: "阶段 3 · 已完成",
   phase3Title: "智能回复",
   phase3Desc: "处理复杂的 AskUser 交互 — elicitation 表单、带描述的多选、结构化输入 — 全部通过 Telegram。",
   phase3Tags: ["Elicitation 表单","多选 + 描述","结构化输入","丰富 Telegram UI","权限批准/拒绝"],
 
-  phase4Label: "阶段 4",
+  phase4Label: "阶段 4 · 已完成",
   phase4Title: "多会话",
   phase4Desc: "同时管理多个 Claude Code 面板 — 切换会话、并行监控、每会话独立上下文。",
   phase4Tags: ["多面板","会话切换","并行监控","每会话上下文"],
 
-  phase5Label: "阶段 5",
+  phase5Label: "阶段 5 · 开发中",
   phase5Title: "终端控制",
   phase5Desc: "查看实时终端输出、截图、浏览文件、执行命令 — 全部通过 Telegram。",
   phase5Tags: ["截图捕获","实时输出流","文件浏览器","远程命令执行"],

@@ -57,17 +57,17 @@ export const vi: LocaleDict = {
   phase2Desc: "Chat với Claude Code từ Telegram — xem sessions, gửi prompt, trả lời câu hỏi đơn giản từ xa. Một panel duy nhất, chỉ macOS và Linux.",
   phase2Tags: ["Gửi prompt → Claude Code","Danh sách sessions","Trả lời câu hỏi (đơn/đa chọn)","Chuyển tiếp idle prompt","tmux send-keys","macOS · Linux"],
 
-  phase3Label: "Giai đoạn 3 · Đang phát triển",
+  phase3Label: "Giai đoạn 3 · Hoàn thành",
   phase3Title: "Trả lời thông minh",
   phase3Desc: "Xử lý tương tác AskUser phức tạp — form elicitation, đa lựa chọn kèm mô tả, nhập liệu có cấu trúc — tất cả từ Telegram.",
   phase3Tags: ["Form elicitation","Đa lựa chọn + mô tả","Nhập liệu có cấu trúc","Giao diện Telegram phong phú","Phê duyệt quyền"],
 
-  phase4Label: "Giai đoạn 4",
+  phase4Label: "Giai đoạn 4 · Hoàn thành",
   phase4Title: "Đa phiên",
   phase4Desc: "Quản lý nhiều panel Claude Code cùng lúc — chuyển đổi giữa sessions, giám sát song song, context riêng từng session.",
   phase4Tags: ["Nhiều panel","Chuyển đổi session","Giám sát song song","Context riêng từng session"],
 
-  phase5Label: "Giai đoạn 5",
+  phase5Label: "Giai đoạn 5 · Đang phát triển",
   phase5Title: "Điều khiển terminal",
   phase5Desc: "Xem log terminal real-time, chụp ảnh màn hình, duyệt file, chạy lệnh — tất cả từ Telegram.",
   phase5Tags: ["Chụp ảnh màn hình","Luồng output trực tiếp","Duyệt file","Chạy lệnh từ xa"],
