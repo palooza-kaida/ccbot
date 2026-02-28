@@ -3,7 +3,7 @@
 **ccpoke** is a TypeScript/Node.js notification bridge for AI coding agents. This document provides a high-level overview of the codebase structure, module responsibilities, and key architectural components.
 
 - **Language:** TypeScript 5.7.3, targeting ES2022 with ESM modules
-- **Runtime:** Node.js ≥18
+- **Runtime:** Node.js ≥20
 - **Lines of Code:** ~4,208 LOC in src/ (42 TS files)
 - **Architecture:** Multi-agent provider pattern with channel abstraction
 - **Version:** 1.5.4

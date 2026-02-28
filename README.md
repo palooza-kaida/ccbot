@@ -43,7 +43,7 @@ Thêm agent mới qua kiến trúc plugin — contributions welcome!
 
 ## Yêu cầu
 
-- **Node.js** ≥ 18
+- **Node.js** ≥ 20
 - **Telegram Bot Token** — tạo từ [@BotFather](https://t.me/BotFather)
 
 ## Bắt đầu

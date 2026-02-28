@@ -43,7 +43,7 @@ Adding new agents is easy via the plugin architecture — contributions welcome!
 
 ## Requirements
 
-- **Node.js** ≥ 18
+- **Node.js** ≥ 20
 - **Telegram Bot Token** — create from [@BotFather](https://t.me/BotFather)
 
 ## Getting Started

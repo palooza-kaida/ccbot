@@ -99,7 +99,7 @@ pnpm start      # Run compiled bot
 ### Minimum
 
 - **OS:** macOS 10.14+, Linux (any distro), Windows 10+ (WSL2)
-- **Node.js:** 18.0.0 or higher
+- **Node.js:** 20.0.0 or higher
 - **RAM:** 100 MB minimum
 - **Disk:** 50 MB (with dependencies)
 - **Terminal:** bash/zsh shell, tmux installed

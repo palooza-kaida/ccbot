@@ -35,7 +35,7 @@ export const zh: LocaleDict = {
 
   setupLabel: "安装",
   setupTitle: "2 步，30 秒",
-  setupSub: "需要 Node.js ≥ 18 和一个 Telegram Bot Token。",
+  setupSub: "需要 Node.js ≥ 20 和一个 Telegram Bot Token。",
   setupStep1Title: "创建 Bot Token",
   setupStep1Desc: '在 Telegram 上打开 <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; 保存 Token。',
   setupStep2Title: "运行一个命令",

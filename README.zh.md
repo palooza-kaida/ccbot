@@ -43,7 +43,7 @@ AI agent 完成响应
 
 ## 前置要求
 
-- **Node.js** ≥ 18
+- **Node.js** ≥ 20
 - **Telegram Bot Token** — 从 [@BotFather](https://t.me/BotFather) 创建
 
 ## 快速开始

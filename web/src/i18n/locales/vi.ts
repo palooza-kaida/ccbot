@@ -35,7 +35,7 @@ export const vi: LocaleDict = {
 
   setupLabel: "Cài đặt",
   setupTitle: "2 bước, 30 giây",
-  setupSub: "Cần Node.js ≥ 18 và một Telegram Bot Token.",
+  setupSub: "Cần Node.js ≥ 20 và một Telegram Bot Token.",
   setupStep1Title: "Tạo Bot Token",
   setupStep1Desc: 'Mở <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> trên Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; lưu token.',
   setupStep2Title: "Chạy một lệnh duy nhất",

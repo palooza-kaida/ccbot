@@ -415,7 +415,7 @@ RIGHT:  ccpoke ──(bridges)──→ [existing tmux] ──→ Claude Code
 
 | Requirement | Support |
 |---|---|
-| Node.js version | ≥18 |
+| Node.js version | ≥20 |
 | Operating systems | macOS, Linux, Windows (WSL) |
 | Terminal | tmux only (primary), bash/zsh shell |
 | AI agents | Claude Code, Cursor (extensible) |

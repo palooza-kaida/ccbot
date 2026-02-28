@@ -33,7 +33,7 @@ const en = {
 
   setupLabel: "Setup",
   setupTitle: "2 steps, 30 seconds",
-  setupSub: "Requires Node.js ≥ 18 and a Telegram Bot Token.",
+  setupSub: "Requires Node.js ≥ 20 and a Telegram Bot Token.",
   setupStep1Title: "Create Bot Token",
   setupStep1Desc: 'Open <a href="https://t.me/BotFather" target="_blank" rel="noopener">@BotFather</a> on Telegram &rarr; <code class="font-mono text-[0.78rem] bg-bg-warm px-[7px] py-0.5 rounded text-accent">/newbot</code> &rarr; save the token.',
   setupStep2Title: "Run one command",
