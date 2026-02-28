@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite";
 import preact from "@astrojs/preact";
 
 export default defineConfig({
-  site: "https://palooza-kaida.github.io",
+  site: "https://kaida-palooza.github.io",
   base: "/ccpoke/",
   integrations: [preact()],
   vite: {
