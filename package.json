@@ -10,11 +10,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/palooza-kaida/ccpoke.git"
+    "url": "git+https://github.com/kaida-palooza/ccpoke.git"
   },
-  "homepage": "https://palooza-kaida.github.io/ccpoke/",
+  "homepage": "https://kaida-palooza.github.io/ccpoke/",
   "bugs": {
-    "url": "https://github.com/palooza-kaida/ccpoke/issues"
+    "url": "https://github.com/kaida-palooza/ccpoke/issues"
   },
   "keywords": [
     "claude",

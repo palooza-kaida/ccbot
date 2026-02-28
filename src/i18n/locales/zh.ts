@@ -111,7 +111,7 @@ export const zh: TranslationKeys = {
     cmdUninstall: "  uninstall   删除所有 ccpoke 数据和钩子",
     cmdHelp: "  help        显示此帮助信息",
     cmdProject: "  project     管理已注册项目 (add/list/remove)",
-    docs: "文档 → https://github.com/palooza-kaida/ccpoke",
+    docs: "文档 → https://github.com/kaida-palooza/ccpoke",
   },
 
   hook: {

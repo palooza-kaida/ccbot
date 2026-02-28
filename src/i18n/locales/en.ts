@@ -112,7 +112,7 @@ export const en: TranslationKeys = {
     cmdUninstall: "  uninstall   Remove all ccpoke data and hooks",
     cmdHelp: "  help        Show this help message",
     cmdProject: "  project     Manage registered projects (add/list/remove)",
-    docs: "docs → https://github.com/palooza-kaida/ccpoke",
+    docs: "docs → https://github.com/kaida-palooza/ccpoke",
   },
 
   hook: {

@@ -112,7 +112,7 @@ export const vi: TranslationKeys = {
     cmdUninstall: "  uninstall   Xóa toàn bộ dữ liệu và hooks ccpoke",
     cmdHelp: "  help        Hiện hướng dẫn này",
     cmdProject: "  project     Quản lý project đã đăng ký (add/list/remove)",
-    docs: "docs → https://github.com/palooza-kaida/ccpoke",
+    docs: "docs → https://github.com/kaida-palooza/ccpoke",
   },
 
   hook: {

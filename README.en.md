@@ -66,7 +66,7 @@ ccpoke
 ### Option 3: Clone repo (for development)
 
 ```bash
-git clone https://github.com/palooza-kaida/ccpoke.git
+git clone https://github.com/kaida-palooza/ccpoke.git
 cd ccpoke
 pnpm install
 pnpm dev
@@ -192,6 +192,6 @@ MIT
 <a href="https://github.com/lethai2597">
   <img src="https://github.com/lethai2597.png" width="50" />
 </a>
-<a href="https://github.com/palooza-kaida">
-  <img src="https://github.com/palooza-kaida.png" width="50" />
+<a href="https://github.com/kaida-palooza">
+  <img src="https://github.com/kaida-palooza.png" width="50" />
 </a>

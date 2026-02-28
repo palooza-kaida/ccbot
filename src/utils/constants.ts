@@ -46,4 +46,4 @@ export const ApiRoute = {
 } as const;
 
 export const DEFAULT_HOOK_PORT = 9377;
-export const MINI_APP_BASE_URL = "https://palooza-kaida.github.io/ccpoke";
+export const MINI_APP_BASE_URL = "https://kaida-palooza.github.io/ccpoke";
