@@ -131,7 +131,7 @@ const dontItems = ta(locale, "brandDontItems");
     <div class="color-grid">
       {neutralColors.map(c => (
         <div class="color-swatch color-swatch--small">
-          <div class="color-swatch__dot" style={`background: ${c.hex}; ${c.hex === '#FFFFFF' ? 'border: 1px solid #EBEBEB' : ''}`}></div>
+          <div class="color-swatch__dot" style={`background: ${c.hex}; ${c.hex === '#FFFFFF' ? 'border: 1px solid var(--color-border)' : ''}`}></div>
           <div class="color-swatch__meta">
             <strong>{c.name}</strong>
             <code>{c.hex}</code>
@@ -398,10 +398,10 @@ const dontItems = ta(locale, "brandDontItems");
   .usage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
   .usage-card { padding: 1.25rem 1.5rem; border-radius: 12px; border: 1px solid var(--color-border); }
   .usage-card--do { border-color: var(--color-emerald); background: var(--color-emerald-light); }
-  .usage-card--dont { border-color: #C53030; background: #FFF5F5; }
+  .usage-card--dont { border-color: var(--color-danger); background: var(--color-danger-light); }
   .usage-card__badge { font-size: 0.78rem; font-weight: 800; margin-bottom: 0.75rem; }
   .usage-card--do .usage-card__badge { color: var(--color-emerald); }
-  .usage-card--dont .usage-card__badge { color: #C53030; }
+  .usage-card--dont .usage-card__badge { color: var(--color-danger); }
   .usage-card ul { margin: 0; padding-left: 1.25rem; }
   .usage-card li { font-size: 0.82rem; color: var(--color-txt-2); margin-bottom: 4px; line-height: 1.6; }
 

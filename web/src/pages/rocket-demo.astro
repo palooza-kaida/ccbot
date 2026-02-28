@@ -1,0 +1,73 @@
+---
+import AnimatedRocket from '../components/AnimatedRocket.astro';
+---
+
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rocket Animation Demo</title>
+  </head>
+  <body>
+    <main>
+      <h1>🚀 Rocket Animation</h1>
+
+      <section>
+        <h2>Small (60px)</h2>
+        <AnimatedRocket size={60} />
+      </section>
+
+      <section>
+        <h2>Medium (120px)</h2>
+        <AnimatedRocket size={120} />
+      </section>
+
+      <section>
+        <h2>Large (200px)</h2>
+        <AnimatedRocket size={200} />
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #0f0f0f;
+    color: #e5e5e5;
+    font-family: 'Inter', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  main {
+    text-align: center;
+    padding: 3rem 2rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, #D97757, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  h2 {
+    font-size: 1rem;
+    color: #888;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  section {
+    margin-bottom: 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+</style>

@@ -13,6 +13,8 @@ import filePlus from "./icons/file-plus.svg?raw";
 import lock from "./icons/lock.svg?raw";
 import chevronDown16 from "./icons/chevron-down-16.svg?raw";
 import alertCircle from "./icons/alert-circle.svg?raw";
+import sun from "./icons/sun.svg?raw";
+import moon from "./icons/moon.svg?raw";
 import logoFilled from "./icons/logo/filled.svg?raw";
 import logoFilledRocket from "./icons/logo/filled-rocket.svg?raw";
 import logoOutline from "./icons/logo/outline.svg?raw";
@@ -42,6 +44,8 @@ export const icons = {
   lock,
   chevronDown16,
   alertCircle,
+  sun,
+  moon,
   logoFilled,
   logoFilledRocket,
   logoOutline,

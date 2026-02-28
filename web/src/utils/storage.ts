@@ -1,6 +1,7 @@
 const STORAGE_KEYS = {
   locale: "ccpoke-locale",
   tunnelUrl: "ccpoke_tunnel_url",
+  theme: "ccpoke-theme",
 } as const;
 
 type StorageKey = keyof typeof STORAGE_KEYS;

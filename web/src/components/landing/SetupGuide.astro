@@ -17,7 +17,7 @@ const { locale } = Astro.props;
 
   <div class="flex flex-col gap-8">
     <div class="grid grid-cols-[32px_1fr] gap-4">
-      <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">1</div>
+      <div class="w-8 h-8 rounded-full bg-txt text-bg flex items-center justify-center text-[0.8rem] font-bold shrink-0">1</div>
       <div class="min-w-0">
         <h3 class="text-base font-bold mb-1.5">{ts(locale, "setupStep1Title")}</h3>
         <p class="text-[0.88rem] text-txt-2 leading-relaxed" set:html={ts(locale, "setupStep1Desc")} />
@@ -25,7 +25,7 @@ const { locale } = Astro.props;
     </div>
 
     <div class="grid grid-cols-[32px_1fr] gap-4">
-      <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">2</div>
+      <div class="w-8 h-8 rounded-full bg-txt text-bg flex items-center justify-center text-[0.8rem] font-bold shrink-0">2</div>
       <div class="min-w-0">
         <h3 class="text-base font-bold mb-1.5">{ts(locale, "setupStep2Title")}</h3>
         <pre class="step-term mt-3 bg-bg-code rounded-[10px] px-5 py-4 font-mono text-[0.78rem] text-term-sub leading-[1.9] overflow-x-auto max-w-full m-0"><span class="d">$ </span>npx -y ccpoke
@@ -70,7 +70,7 @@ ccpoke: telegram bot started</span></pre>
     </div>
 
     <div class="grid grid-cols-[32px_1fr] gap-4">
-      <div class="w-8 h-8 rounded-full bg-txt text-white flex items-center justify-center text-[0.8rem] font-bold shrink-0">3</div>
+      <div class="w-8 h-8 rounded-full bg-txt text-bg flex items-center justify-center text-[0.8rem] font-bold shrink-0">3</div>
       <div class="min-w-0">
         <h3 class="text-base font-bold mb-1.5">{ts(locale, "setupStep3Title")}</h3>
         <p class="text-[0.88rem] text-txt-2 leading-relaxed" set:html={ts(locale, "setupStep3Desc")} />

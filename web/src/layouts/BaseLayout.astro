@@ -34,6 +34,13 @@ const alternates = alternateLocales(locale, currentPath, base);
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script is:inline>
+    (function() {
+      var saved = localStorage.getItem("ccpoke-theme");
+      var theme = saved || "dark";
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
   <script is:inline define:vars={{ base, locale }}>
     (function() {
       var saved = localStorage.getItem("ccpoke-locale");
