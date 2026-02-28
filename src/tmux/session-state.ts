@@ -1,3 +1,4 @@
+import { logDebug } from "../utils/log.js";
 import { SessionState, type SessionMap } from "./session-map.js";
 import type { TmuxBridge } from "./tmux-bridge.js";
 import { isPaneAlive } from "./tmux-scanner.js";
@@ -10,6 +11,15 @@ export type InjectResult =
   | { tmuxDead: true };
 
 const MAX_MESSAGE_LENGTH = 10_000;
+const SEND_RETRIES = 2;
+const RETRY_DELAY_MS = 300;
+
+function sleepSync(ms: number): void {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    /* busy-wait */
+  }
+}
 
 export class SessionStateManager {
   constructor(
@@ -19,9 +29,17 @@ export class SessionStateManager {
 
   injectMessage(sessionId: string, text: string): InjectResult {
     const session = this.sessionMap.getBySessionId(sessionId);
-    if (!session) return { sessionNotFound: true };
+    if (!session) {
+      logDebug(`[Inject] sessionNotFound: sessionId=${sessionId}`);
+      return { sessionNotFound: true };
+    }
 
-    if (!isPaneAlive(session.tmuxTarget)) {
+    logDebug(
+      `[Inject] found: sessionId=${sessionId} tmuxTarget=${session.tmuxTarget} state=${session.state}`
+    );
+
+    if (!this.checkPaneAlive(session.tmuxTarget)) {
+      logDebug(`[Inject] pane dead after retries: tmuxTarget=${session.tmuxTarget}`);
       this.sessionMap.unregister(sessionId);
       return { tmuxDead: true };
     }
@@ -32,25 +50,52 @@ export class SessionStateManager {
     const safeText =
       trimmed.length > MAX_MESSAGE_LENGTH ? trimmed.slice(0, MAX_MESSAGE_LENGTH) : trimmed;
 
-    // Trust event-driven state: stop_hook → Idle, injectMessage → Busy
     if (session.state === SessionState.Busy) {
+      logDebug(`[Inject] busy: sessionId=${sessionId}`);
       return { busy: true };
     }
 
-    try {
-      this.tmuxBridge.sendKeys(session.tmuxTarget, safeText);
-      this.sessionMap.updateState(sessionId, SessionState.Busy);
-      this.sessionMap.touch(sessionId);
-      return { sent: true };
-    } catch {
-      this.sessionMap.unregister(sessionId);
+    const sendResult = this.trySendKeys(session.tmuxTarget, safeText);
+    if (!sendResult) {
+      logDebug(`[Inject] sendKeys failed after retries: sessionId=${sessionId}`);
       return { tmuxDead: true };
     }
+
+    this.sessionMap.updateState(sessionId, SessionState.Busy);
+    this.sessionMap.touch(sessionId);
+    logDebug(`[Inject] sent: sessionId=${sessionId} tmuxTarget=${session.tmuxTarget}`);
+    return { sent: true };
   }
 
   onStopHook(sessionId: string, model?: string): void {
     this.sessionMap.updateState(sessionId, SessionState.Idle);
     if (model) this.sessionMap.updateModel(sessionId, model);
     this.sessionMap.touch(sessionId);
+  }
+
+  private checkPaneAlive(target: string): boolean {
+    for (let i = 0; i <= SEND_RETRIES; i++) {
+      if (isPaneAlive(target)) return true;
+      if (i < SEND_RETRIES) {
+        logDebug(`[Inject] isPaneAlive failed, retry ${i + 1}/${SEND_RETRIES} for ${target}`);
+        sleepSync(RETRY_DELAY_MS);
+      }
+    }
+    return false;
+  }
+
+  private trySendKeys(target: string, text: string): boolean {
+    for (let i = 0; i <= SEND_RETRIES; i++) {
+      try {
+        this.tmuxBridge.sendKeys(target, text);
+        return true;
+      } catch (err) {
+        logDebug(
+          `[Inject] sendKeys attempt ${i + 1}/${SEND_RETRIES + 1} failed: target=${target} err=${err}`
+        );
+        if (i < SEND_RETRIES) sleepSync(RETRY_DELAY_MS);
+      }
+    }
+    return false;
   }
 }

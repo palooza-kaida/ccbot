@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { basename } from "node:path";
 
+import { logDebug } from "../utils/log.js";
 import { paths } from "../utils/paths.js";
 import type { TmuxBridge } from "./tmux-bridge.js";
 import { detectModelFromCwd, scanClaudePanes } from "./tmux-scanner.js";
@@ -52,6 +53,9 @@ export class SessionMap {
     if (tmuxTarget) {
       for (const [existingId, existing] of this.sessions) {
         if (existing.tmuxTarget === tmuxTarget && existingId !== sessionId) {
+          logDebug(
+            `[Register:dedup] removing ${existingId} (tmuxTarget=${tmuxTarget}) in favor of ${sessionId}`
+          );
           this.sessions.delete(existingId);
         }
       }
@@ -155,6 +159,9 @@ export class SessionMap {
     // Remove sessions whose pane no longer runs Claude
     for (const [id, session] of this.sessions) {
       if (!alivePaneTargets.has(session.tmuxTarget)) {
+        logDebug(
+          `[Scan:remove] id=${id} tmuxTarget=${session.tmuxTarget} project=${session.project}`
+        );
         removed.push(session);
         this.sessions.delete(id);
       }
