@@ -11,7 +11,7 @@ This guide covers installation, configuration, and deployment options for ccpoke
 **Best for:** First-time users, trying it out, minimal overhead
 
 ```bash
-npx ccpoke
+npx -y ccpoke
 ```
 
 **What happens:**
@@ -210,7 +210,7 @@ After first setup, ccpoke creates:
 
 **One command:**
 ```bash
-npx ccpoke
+npx -y ccpoke
 ```
 
 **Or if globally installed:**
@@ -291,7 +291,7 @@ This allows bot to see group messages (not needed for 1:1 chat, but safe).
 ### Foreground (Development)
 
 ```bash
-npx ccpoke
+npx -y ccpoke
 ```
 
 **Output:**
@@ -325,7 +325,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/npx ccpoke
+ExecStart=/usr/bin/npx -y ccpoke
 Restart=on-failure
 RestartSec=10
 User=youruser

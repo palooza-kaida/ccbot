@@ -354,7 +354,7 @@ pnpm dev          # Dev mode (tsx)
 pnpm lint         # Run ESLint
 pnpm format       # Format with Prettier
 pnpm start        # Run compiled bot
-npx ccpoke        # Zero-install via npm
+npx -y ccpoke     # Zero-install via npm
 ```
 
 ---

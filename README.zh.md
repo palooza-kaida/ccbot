@@ -51,7 +51,7 @@ AI agent 完成响应
 ### 方式一：npx（推荐——零安装）
 
 ```bash
-npx ccpoke
+npx -y ccpoke
 ```
 
 首次运行 → 自动设置 → 启动 bot。一条命令搞定。
@@ -133,7 +133,7 @@ pnpm dev
 
 ```bash
 # npx（零安装）
-npx ccpoke
+npx -y ccpoke
 
 # 或全局安装
 ccpoke

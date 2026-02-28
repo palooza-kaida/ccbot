@@ -51,7 +51,7 @@ Adding new agents is easy via the plugin architecture — contributions welcome!
 ### Option 1: npx (recommended — zero install)
 
 ```bash
-npx ccpoke
+npx -y ccpoke
 ```
 
 First run → auto setup → start bot. One command, that's it.
@@ -133,7 +133,7 @@ Then run `ccpoke setup` to install the hook and register your chat ID.
 
 ```bash
 # npx (zero install)
-npx ccpoke
+npx -y ccpoke
 
 # Or global install
 ccpoke

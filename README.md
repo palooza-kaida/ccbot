@@ -51,7 +51,7 @@ Thêm agent mới qua kiến trúc plugin — contributions welcome!
 ### Cách 1: npx (khuyến nghị — zero install)
 
 ```bash
-npx ccpoke
+npx -y ccpoke
 ```
 
 Lần đầu chạy → tự động setup → start bot. Một lệnh duy nhất.
@@ -133,7 +133,7 @@ Sau đó chạy `ccpoke setup` để cài hook và đăng ký chat ID.
 
 ```bash
 # npx (zero install)
-npx ccpoke
+npx -y ccpoke
 
 # Hoặc global install
 ccpoke
