@@ -186,6 +186,7 @@ export interface TranslationKeys {
   projects: {
     title: string;
     empty: string;
+    chooseAgent: string;
     started: string;
     startFailed: string;
     noTmux: string;

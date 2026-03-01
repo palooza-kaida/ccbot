@@ -199,7 +199,8 @@ export const zh: TranslationKeys = {
   projects: {
     title: "项目",
     empty: "未注册任何项目。运行 'ccpoke project' 添加。",
-    started: "✅ 已在 {project} 中启动 Claude Code",
+    chooseAgent: "为 {project} 选择代理:",
+    started: "✅ 已在 {project} 中启动代理",
     startFailed: "无法为 {project} 启动面板",
     noTmux: "tmux 不可用 — 无法创建新面板",
   },

@@ -200,7 +200,8 @@ export const vi: TranslationKeys = {
   projects: {
     title: "Projects",
     empty: "Chưa đăng ký project nào. Chạy 'ccpoke project' để thêm.",
-    started: "✅ Đã khởi động Claude Code trong {project}",
+    chooseAgent: "Chọn agent cho {project}:",
+    started: "✅ Đã khởi động agent trong {project}",
     startFailed: "Không thể khởi động panel cho {project}",
     noTmux: "tmux không khả dụng — không thể tạo panel mới",
   },

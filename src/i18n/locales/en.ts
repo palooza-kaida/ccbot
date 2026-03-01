@@ -200,7 +200,8 @@ export const en: TranslationKeys = {
   projects: {
     title: "Projects",
     empty: "No projects registered. Run 'ccpoke project' to add one.",
-    started: "✅ Claude Code started in {project}",
+    chooseAgent: "Choose agent for {project}:",
+    started: "✅ Agent started in {project}",
     startFailed: "Failed to start panel for {project}",
     noTmux: "tmux not available — cannot create new panels",
   },
