@@ -20,6 +20,7 @@ export class ClaudeCodeProvider implements AgentProvider {
   readonly name = AgentName.ClaudeCode;
   readonly displayName = AGENT_DISPLAY_NAMES[AgentName.ClaudeCode];
   readonly settleDelayMs = TRANSCRIPT_SETTLE_DELAY_MS;
+  readonly submitKeys = ["Enter"];
 
   detect(): boolean {
     return existsSync(paths.claudeDir);

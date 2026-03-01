@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 import { t } from "../../i18n/index.js";
 import { collectGitChanges } from "../../utils/git-collector.js";
-import { logError } from "../../utils/log.js";
+import { logDebug, logError } from "../../utils/log.js";
 import {
   AGENT_DISPLAY_NAMES,
   AgentName,
@@ -24,6 +24,7 @@ export class CursorProvider implements AgentProvider {
   readonly name = AgentName.Cursor;
   readonly displayName = AGENT_DISPLAY_NAMES[AgentName.Cursor];
   readonly settleDelayMs = 0;
+  readonly submitKeys = ["Enter"];
 
   detect(): boolean {
     return existsSync(join(homedir(), ".cursor"));
@@ -51,7 +52,12 @@ export class CursorProvider implements AgentProvider {
     }
 
     const event = parseStopEvent(raw);
+    logDebug(`[Cursor:raw] ${JSON.stringify(raw)}`);
+
     const composerData = readComposerData(event.conversationId);
+    logDebug(
+      `[Cursor:composer] model=${composerData.model || "NONE"} durationMs=${composerData.durationMs}`
+    );
 
     let summary = {
       lastAssistantMessage: "",
@@ -64,6 +70,11 @@ export class CursorProvider implements AgentProvider {
     try {
       if (event.transcriptPath) {
         summary = parseTranscript(event.transcriptPath);
+        logDebug(
+          `[Cursor:transcript] lastMsg=${summary.lastAssistantMessage.slice(0, 80) || "EMPTY"}`
+        );
+      } else {
+        logDebug(`[Cursor:transcript] SKIPPED — no transcriptPath`);
       }
     } catch (err: unknown) {
       logError(t("hook.transcriptFailed"), err);
@@ -79,6 +90,8 @@ export class CursorProvider implements AgentProvider {
       inputTokens: summary.inputTokens,
       outputTokens: summary.outputTokens,
       model: composerData.model || event.model,
+      agentSessionId: event.conversationId,
+      cwd: event.cwd,
     };
   }
 
@@ -95,6 +108,7 @@ export class CursorProvider implements AgentProvider {
       inputTokens: 0,
       outputTokens: 0,
       model: "",
+      cwd,
     };
   }
 }

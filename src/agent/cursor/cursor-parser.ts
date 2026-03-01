@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { basename } from "node:path";
+import { basename, join } from "node:path";
 
 import { expandHome, paths } from "../../utils/paths.js";
 
@@ -58,21 +58,37 @@ export function parseStopEvent(raw: Record<string, unknown>): StopEvent {
     ? (raw.workspace_roots as string[]).filter((r) => typeof r === "string")
     : [];
 
-  const transcriptPath = typeof raw.transcript_path === "string" ? raw.transcript_path : "";
-
   const cwd =
     (workspaceRoots.length > 0 && workspaceRoots[0]) ||
     (typeof raw.cwd === "string" && raw.cwd) ||
     process.cwd();
 
+  const conversationId = typeof raw.conversation_id === "string" ? raw.conversation_id : "";
+
+  let transcriptPath = typeof raw.transcript_path === "string" ? raw.transcript_path : "";
+  if (!transcriptPath && conversationId && cwd) {
+    transcriptPath = resolveAgentTranscriptPath(cwd, conversationId);
+  }
+
   return {
-    conversationId: typeof raw.conversation_id === "string" ? raw.conversation_id : "",
+    conversationId,
     model: typeof raw.model === "string" ? raw.model : "",
     status: typeof raw.status === "string" ? raw.status : "unknown",
     transcriptPath,
     cursorVersion: typeof raw.cursor_version === "string" ? raw.cursor_version : "",
     cwd,
   };
+}
+
+function resolveAgentTranscriptPath(cwd: string, conversationId: string): string {
+  const encodedDir = cwd.replace(/^\//, "").replace(/[/.]/g, "-");
+  const candidate = join(
+    paths.cursorProjectsDir,
+    encodedDir,
+    "agent-transcripts",
+    `${conversationId}.jsonl`
+  );
+  return existsSync(candidate) ? candidate : "";
 }
 
 export function parseTranscript(transcriptPath: string): TranscriptSummary {
@@ -84,8 +100,9 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
   const lines = raw.split("\n");
   let lastAssistantText = "";
 
-  for (const line of lines) {
-    if (!line.trim()) continue;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i]!.trim();
+    if (!line) continue;
 
     let entry: CursorTranscriptEntry;
     try {
@@ -99,7 +116,10 @@ export function parseTranscript(transcriptPath: string): TranscriptSummary {
         .filter((p) => p.type === "text" && p.text)
         .map((p) => p.text!)
         .join("\n");
-      if (text) lastAssistantText = text;
+      if (text) {
+        lastAssistantText = text;
+        break;
+      }
     }
   }
 

@@ -187,6 +187,7 @@ export class ClaudeCodeInstaller {
     const script = `#!/bin/bash
 # ccpoke-version: ${version}
 INPUT=$(cat | tr -d '\\n\\r')
+echo "$INPUT" | grep -q '"session_id"' || exit 0
 TMUX_TARGET=""
 if [ -n "$TMUX_PANE" ]; then
   TMUX_TARGET=$(tmux display-message -t "$TMUX_PANE" -p '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null || echo "")
@@ -325,6 +326,9 @@ echo "$PAYLOAD" | curl -s -X POST "http://127.0.0.1:${hookPort}${ApiRoute.HookAs
     const script = `#!/bin/bash
 # ccpoke-version: ${version}
 INPUT=$(cat)
+TOOL_NAME=$(echo "$INPUT" | grep -o '"tool_name":"[^"]*"' | head -1 | cut -d'"' -f4)
+[ "$TOOL_NAME" = "AskUserQuestion" ] && exit 0
+
 SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
 [ -z "$SESSION_ID" ] && exit 0
 
