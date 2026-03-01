@@ -1,10 +1,10 @@
 const en = {
   title: "ccpoke — Code anywhere with AI Agents",
-  metaDesc: "Two-way interaction with Claude Code, Cursor and more from Telegram, Discord, Zalo. Code anytime, anywhere.",
+  metaDesc: "Two-way interaction with Claude Code, Codex CLI, Cursor CLI and more from Telegram, Discord, Zalo. Code anytime, anywhere.",
 
   heroTitle: "Code anywhere, ",
   heroAccent: "anytime",
-  heroSub: "Two-way interaction with Claude Code, Cursor and more via Telegram, Discord, Zalo. Code on the go with your phone.",
+  heroSub: "Two-way interaction with Claude Code, Codex CLI, Cursor CLI and more via Telegram, Discord, Zalo. Code on the go with your phone.",
   heroCta: "Get Started",
 
   navHow: "How it works",
@@ -24,12 +24,8 @@ const en = {
   feature2wayTitle: "Two-way interaction",
   feature2wayDesc: "Chat with your AI agent from Telegram. View active sessions, send prompts, answer questions — all without touching your laptop.",
   feature2wayBadge: "Claude Code",
-  featureGitTitle: "Auto git diff",
-  featureGitDesc: "Each notification includes file list: added, modified, deleted. Know what your AI agent changed without opening your laptop.",
-  featureSummaryTitle: "Response summary + cost",
-  featureSummaryDesc: "Extract response content from JSONL transcript, with processing time.",
-  featureSecurityTitle: "Self-hosted, code stays on your machine",
-  featureSecurityDesc: "Whitelist User ID, unauthorized gets silently ignored. Everything runs on your machine.",
+  featureMultiSessionTitle: "Multi-session",
+  featureMultiSessionDesc: "Manage multiple AI agent sessions simultaneously — switch between sessions, parallel monitoring, per-session context.",
 
   setupLabel: "Setup",
   setupTitle: "2 steps, 30 seconds",
@@ -47,8 +43,8 @@ const en = {
 
   phase1Label: "Phase 1 · Complete",
   phase1Title: "Notification bridge",
-  phase1Desc: "Push notification when your AI agent completes — git diff, token/cost stats, and full response viewer via Telegram Mini App. Supports Claude Code and Cursor on macOS, Linux, and Windows.",
-  phase1Tags: ["Claude Code","Cursor","macOS · Linux · Windows","Stop hook","Git diff","Token stats","Mini App viewer","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","QR code setup"],
+  phase1Desc: "Push notification when your AI agent completes — git diff, token/cost stats, and full response viewer via Telegram Mini App. Supports Claude Code and Cursor CLI on macOS, Linux, and Windows.",
+  phase1Tags: ["Claude Code","Codex CLI","Cursor CLI","macOS · Linux · Windows","Stop hook","Git diff","Token stats","Mini App viewer","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","QR code setup"],
 
   phase2Label: "Phase 2 · Complete",
   phase2Title: "Two-way chat",

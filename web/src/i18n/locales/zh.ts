@@ -2,11 +2,11 @@ import type { LocaleDict } from "./en";
 
 export const zh: LocaleDict = {
   title: "ccpoke — 使用 AI Agents 随时随地编程",
-  metaDesc: "通过 Telegram、Discord、Zalo 与 Claude Code、Cursor 等 AI 代理双向交互。随时随地编程。",
+  metaDesc: "通过 Telegram、Discord、Zalo 与 Claude Code、Codex CLI、Cursor CLI 等 AI 代理双向交互。随时随地编程。",
 
   heroTitle: "随时随地，",
   heroAccent: "编程",
-  heroSub: "通过 Telegram、Discord、Zalo 与 Claude Code、Cursor 等 AI 代理双向交互。手机在手，代码在心。",
+  heroSub: "通过 Telegram、Discord、Zalo 与 Claude Code、Codex CLI、Cursor CLI 等 AI 代理双向交互。手机在手，代码在心。",
   heroCta: "开始使用",
 
   navHow: "工作原理",
@@ -26,12 +26,8 @@ export const zh: LocaleDict = {
   feature2wayTitle: "双向交互",
   feature2wayDesc: "从 Telegram 与 AI 代理聊天。查看活跃会话、发送提示、回答问题 — 无需触碰电脑。",
   feature2wayBadge: "Claude Code",
-  featureGitTitle: "自动 Git diff",
-  featureGitDesc: "每个通知包含文件列表：添加、修改、删除。无需打开电脑即可了解 AI 代理的更改。",
-  featureSummaryTitle: "响应摘要 + 费用",
-  featureSummaryDesc: "从 JSONL 转录中提取响应内容，附带处理时间。",
-  featureSecurityTitle: "自托管，代码不离开您的机器",
-  featureSecurityDesc: "白名单用户 ID，未授权请求被静默忽略。一切在您的机器上运行。",
+  featureMultiSessionTitle: "多会话",
+  featureMultiSessionDesc: "同时管理多个 AI 代理会话 — 切换会话、并行监控、每会话独立上下文。",
 
   setupLabel: "安装",
   setupTitle: "2 步，30 秒",
@@ -49,8 +45,8 @@ export const zh: LocaleDict = {
 
   phase1Label: "阶段 1 · 已完成",
   phase1Title: "通知桥接",
-  phase1Desc: "AI 代理完成时推送通知 — git diff、token/费用统计，通过 Telegram Mini App 查看完整响应。支持 Claude Code 和 Cursor，适用于 macOS、Linux、Windows。",
-  phase1Tags: ["Claude Code","Cursor","macOS · Linux · Windows","停止钩子","Git 差异","Token 统计","Mini App 查看器","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","二维码设置"],
+  phase1Desc: "AI 代理完成时推送通知 — git diff、token/费用统计，通过 Telegram Mini App 查看完整响应。支持 Claude Code 和 Cursor CLI，适用于 macOS、Linux、Windows。",
+  phase1Tags: ["Claude Code","Codex CLI","Cursor CLI","macOS · Linux · Windows","停止钩子","Git 差异","Token 统计","Mini App 查看器","i18n (EN/VI/ZH)","CLI (setup/update/uninstall)","二维码设置"],
 
   phase2Label: "阶段 2 · 已完成",
   phase2Title: "双向聊天",

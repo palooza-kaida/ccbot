@@ -2,11 +2,11 @@ import type { LocaleDict } from "./en";
 
 export const vi: LocaleDict = {
   title: "ccpoke — Code mọi nơi với AI Agents",
-  metaDesc: "Tương tác 2 chiều với Claude Code, Cursor và nhiều AI agent khác từ Telegram, Discord, Zalo. Code mọi lúc mọi nơi.",
+  metaDesc: "Tương tác 2 chiều với Claude Code, Codex CLI, Cursor CLI và nhiều AI agent khác từ Telegram, Discord, Zalo. Code mọi lúc mọi nơi.",
 
   heroTitle: "Code mọi nơi, ",
   heroAccent: "mọi lúc",
-  heroSub: "Tương tác 2 chiều với Claude Code, Cursor và nhiều AI agents khác qua Telegram, Discord, Zalo. Cầm điện thoại mà vẫn code.",
+  heroSub: "Tương tác 2 chiều với Claude Code, Codex CLI, Cursor CLI và nhiều AI agents khác qua Telegram, Discord, Zalo. Cầm điện thoại mà vẫn code.",
   heroCta: "Bắt đầu ngay",
 
   navHow: "Cách hoạt động",
@@ -26,12 +26,8 @@ export const vi: LocaleDict = {
   feature2wayTitle: "Tương tác 2 chiều",
   feature2wayDesc: "Chat với AI agent từ Telegram. Xem sessions đang hoạt động, gửi prompt, trả lời câu hỏi — không cần chạm máy tính.",
   feature2wayBadge: "Claude Code",
-  featureGitTitle: "Git diff tự động",
-  featureGitDesc: "Mỗi thông báo kèm danh sách file: thêm mới, sửa đổi, xóa. Biết AI agent thay đổi gì mà không cần mở máy.",
-  featureSummaryTitle: "Tóm tắt phản hồi + chi phí",
-  featureSummaryDesc: "Trích xuất nội dung phản hồi từ transcript JSONL, kèm thời gian xử lý.",
-  featureSecurityTitle: "Tự host, code không rời máy",
-  featureSecurityDesc: "Danh sách trắng User ID, truy cập trái phép bị bỏ qua. Mọi thứ chạy trên máy bạn.",
+  featureMultiSessionTitle: "Đa phiên",
+  featureMultiSessionDesc: "Quản lý nhiều phiên AI agent cùng lúc — chuyển đổi giữa các sessions, giám sát song song, context riêng từng session.",
 
   setupLabel: "Cài đặt",
   setupTitle: "2 bước, 30 giây",
@@ -49,8 +45,8 @@ export const vi: LocaleDict = {
 
   phase1Label: "Giai đoạn 1 · Hoàn thành",
   phase1Title: "Cầu nối thông báo",
-  phase1Desc: "Đẩy thông báo khi AI agent hoàn thành — git diff, thống kê token/chi phí, và xem phản hồi đầy đủ qua Telegram Mini App. Hỗ trợ Claude Code và Cursor trên macOS, Linux, Windows.",
-  phase1Tags: ["Claude Code","Cursor","macOS · Linux · Windows","Hook dừng","Git diff","Thống kê token","Mini App xem phản hồi","Đa ngôn ngữ (EN/VI/ZH)","CLI (cài/cập nhật/gỡ)","Thiết lập qua QR"],
+  phase1Desc: "Đẩy thông báo khi AI agent hoàn thành — git diff, thống kê token/chi phí, và xem phản hồi đầy đủ qua Telegram Mini App. Hỗ trợ Claude Code và Cursor CLI trên macOS, Linux, Windows.",
+  phase1Tags: ["Claude Code","Codex CLI","Cursor CLI","macOS · Linux · Windows","Hook dừng","Git diff","Thống kê token","Mini App xem phản hồi","Đa ngôn ngữ (EN/VI/ZH)","CLI (cài/cập nhật/gỡ)","Thiết lập qua QR"],
 
   phase2Label: "Giai đoạn 2 · Hoàn thành",
   phase2Title: "Chat 2 chiều",
