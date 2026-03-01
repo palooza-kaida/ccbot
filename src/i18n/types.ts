@@ -116,6 +116,7 @@ export interface TranslationKeys {
     stopEventFailed: string;
     sessionStartFailed: string;
     notificationHookFailed: string;
+    permissionRequestFailed: string;
   };
   tunnel: {
     installing: string;
@@ -212,6 +213,16 @@ export interface TranslationKeys {
     sessionExpired: string;
     waitingNext: string;
     hookFailed: string;
+  };
+  permissionRequest: {
+    title: string;
+    allow: string;
+    deny: string;
+    allowed: string;
+    denied: string;
+    sending: string;
+    sessionExpired: string;
+    injectionFailed: string;
   };
   projectCmd: {
     intro: string;

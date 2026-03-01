@@ -127,6 +127,7 @@ export const vi: TranslationKeys = {
     stopEventFailed: "xử lý stop event thất bại",
     sessionStartFailed: "xử lý session start thất bại",
     notificationHookFailed: "xử lý notification hook thất bại",
+    permissionRequestFailed: "xử lý permission request hook thất bại",
   },
 
   tunnel: {
@@ -226,6 +227,16 @@ export const vi: TranslationKeys = {
     sessionExpired: "Session đã hết hạn",
     waitingNext: "Đang tải câu hỏi tiếp...",
     hookFailed: "ask-user-question hook thất bại",
+  },
+  permissionRequest: {
+    title: "Yêu cầu quyền",
+    allow: "Cho phép",
+    deny: "Từ chối",
+    allowed: "Đã cho phép: {tool} → {summary}",
+    denied: "Đã từ chối: {tool} → {summary}",
+    sending: "Đang gửi...",
+    sessionExpired: "Phiên đã hết hạn",
+    injectionFailed: "Gửi thất bại. Thử trên terminal.",
   },
   projectCmd: {
     intro: "📁 Quản lý Project",

@@ -2,7 +2,11 @@ import { execSync } from "node:child_process";
 
 import TelegramBot from "node-telegram-bot-api";
 
-import type { AskUserQuestionEvent, NotificationEvent } from "../../agent/agent-handler.js";
+import type {
+  AskUserQuestionEvent,
+  NotificationEvent,
+  PermissionRequestEvent,
+} from "../../agent/agent-handler.js";
 import { ConfigManager, type Config } from "../../config-manager.js";
 import { getTranslations, t } from "../../i18n/index.js";
 import type { SessionMap } from "../../tmux/session-map.js";
@@ -15,6 +19,7 @@ import type { NotificationChannel, NotificationData } from "../types.js";
 import { AskQuestionHandler } from "./ask-question-handler.js";
 import { escapeMarkdownV2 } from "./escape-markdown.js";
 import { PendingReplyStore } from "./pending-reply-store.js";
+import { PermissionRequestHandler } from "./permission-request-handler.js";
 import { formatProjectList } from "./project-list.js";
 import { PromptHandler } from "./prompt-handler.js";
 import { formatSessionList } from "./session-list.js";
@@ -31,6 +36,7 @@ export class TelegramChannel implements NotificationChannel {
   private tmuxBridge: TmuxBridge | null;
   private promptHandler: PromptHandler | null = null;
   private askQuestionHandler: AskQuestionHandler | null = null;
+  private permissionRequestHandler: PermissionRequestHandler | null = null;
 
   constructor(
     cfg: Config,
@@ -65,6 +71,12 @@ export class TelegramChannel implements NotificationChannel {
         () => this.chatId,
         this.tmuxBridge
       );
+      this.permissionRequestHandler = new PermissionRequestHandler(
+        this.bot,
+        () => this.chatId,
+        this.sessionMap,
+        this.tmuxBridge
+      );
     }
   }
 
@@ -83,6 +95,7 @@ export class TelegramChannel implements NotificationChannel {
   async shutdown(): Promise<void> {
     this.promptHandler?.destroy();
     this.askQuestionHandler?.destroy();
+    this.permissionRequestHandler?.destroy();
     this.pendingReplyStore.destroy();
     this.bot.stopPolling();
   }
@@ -93,6 +106,10 @@ export class TelegramChannel implements NotificationChannel {
 
   handleAskUserQuestionEvent(event: AskUserQuestionEvent): void {
     this.askQuestionHandler?.forwardQuestion(event).catch(() => {});
+  }
+
+  handlePermissionRequestEvent(event: PermissionRequestEvent): void {
+    this.permissionRequestHandler?.forwardPermission(event).catch(() => {});
   }
 
   async sendNotification(data: NotificationData, responseUrl?: string): Promise<void> {
@@ -198,6 +215,11 @@ export class TelegramChannel implements NotificationChannel {
 
         if (query.data?.startsWith("aq:") || query.data?.startsWith("am:")) {
           await this.askQuestionHandler?.handleCallback(query);
+          return;
+        }
+
+        if (query.data?.startsWith("perm:")) {
+          await this.permissionRequestHandler?.handleCallback(query);
           return;
         }
 

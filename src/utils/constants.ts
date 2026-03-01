@@ -41,6 +41,7 @@ export const ApiRoute = {
   HookSessionStart: "/hook/session-start",
   HookNotification: "/hook/notification",
   HookAskUserQuestion: "/hook/ask-user-question",
+  HookPermissionRequest: "/hook/permission-request",
   ResponseData: "/api/responses/:id",
   Health: "/health",
 } as const;

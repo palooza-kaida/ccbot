@@ -145,6 +145,21 @@ export class ApiServer {
       res.status(200).send("ok");
     });
 
+    app.post(ApiRoute.HookPermissionRequest, (req, res) => {
+      const receivedSecret = req.headers["x-ccpoke-secret"];
+      if (receivedSecret !== this.secret) {
+        res.status(403).send("forbidden");
+        return;
+      }
+
+      setImmediate(() => {
+        this.handler?.handlePermissionRequest(req.body).catch((err: unknown) => {
+          logError(t("hook.permissionRequestFailed"), err);
+        });
+      });
+      res.status(200).send("ok");
+    });
+
     app.get(ApiRoute.Health, (_req, res) => {
       res.status(200).send("healthy");
     });

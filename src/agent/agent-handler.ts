@@ -35,6 +35,15 @@ export interface AskUserQuestionEvent {
   questions: AskUserQuestionItem[];
 }
 
+export interface PermissionRequestEvent {
+  sessionId: string;
+  tmuxTarget?: string;
+  cwd?: string;
+  toolName: string;
+  toolInput: Record<string, unknown>;
+  permissionMode?: string;
+}
+
 export class AgentHandler {
   constructor(
     private registry: AgentRegistry,
@@ -96,6 +105,7 @@ export class AgentHandler {
 
   onNotification?: (event: NotificationEvent) => void;
   onAskUserQuestion?: (event: AskUserQuestionEvent) => void;
+  onPermissionRequest?: (event: PermissionRequestEvent) => void;
 
   async handleAskUserQuestion(rawEvent: unknown): Promise<void> {
     const event = this.parseAskUserQuestionEvent(rawEvent);
@@ -123,6 +133,32 @@ export class AgentHandler {
       `[AskQ:forward] finalSessionId=${finalSessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"}`
     );
     this.onAskUserQuestion?.({ ...event, sessionId: finalSessionId });
+  }
+
+  async handlePermissionRequest(rawEvent: unknown): Promise<void> {
+    const event = this.parsePermissionRequestEvent(rawEvent);
+    if (!event) return;
+
+    logDebug(
+      `[PermReq:raw] agentSessionId=${event.sessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"} tool=${event.toolName}`
+    );
+
+    let sessionId: string | undefined;
+    if (this.chatResolver) {
+      sessionId = this.chatResolver.resolveSessionId(
+        event.sessionId,
+        "",
+        event.cwd,
+        event.tmuxTarget
+      );
+      logDebug(`[PermReq:resolved] ${event.sessionId} → ${sessionId ?? "NONE"}`);
+    }
+
+    const finalSessionId = sessionId ?? event.sessionId;
+    logDebug(
+      `[PermReq:forward] finalSessionId=${finalSessionId} tmuxTarget=${event.tmuxTarget ?? "NONE"}`
+    );
+    this.onPermissionRequest?.({ ...event, sessionId: finalSessionId });
   }
 
   async handleNotification(rawEvent: unknown): Promise<void> {
@@ -233,6 +269,31 @@ export class AgentHandler {
       notificationType,
       message,
       title: typeof obj.title === "string" ? obj.title : undefined,
+      cwd: typeof obj.cwd === "string" ? obj.cwd : undefined,
+      tmuxTarget: typeof obj.tmux_target === "string" ? obj.tmux_target : undefined,
+    };
+  }
+
+  private parsePermissionRequestEvent(raw: unknown): PermissionRequestEvent | null {
+    if (!raw || typeof raw !== "object") return null;
+    const obj = raw as Record<string, unknown>;
+
+    const sessionId = typeof obj.session_id === "string" ? obj.session_id : "";
+    if (!sessionId) return null;
+
+    const toolName = typeof obj.tool_name === "string" ? obj.tool_name : "";
+    if (!toolName) return null;
+
+    const toolInput =
+      typeof obj.tool_input === "object" && obj.tool_input !== null
+        ? (obj.tool_input as Record<string, unknown>)
+        : {};
+
+    return {
+      sessionId,
+      toolName,
+      toolInput,
+      permissionMode: typeof obj.permission_mode === "string" ? obj.permission_mode : undefined,
       cwd: typeof obj.cwd === "string" ? obj.cwd : undefined,
       tmuxTarget: typeof obj.tmux_target === "string" ? obj.tmux_target : undefined,
     };

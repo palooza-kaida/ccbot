@@ -127,6 +127,7 @@ export const en: TranslationKeys = {
     stopEventFailed: "stop event handling failed",
     sessionStartFailed: "session start handling failed",
     notificationHookFailed: "notification hook handling failed",
+    permissionRequestFailed: "permission request hook handling failed",
   },
 
   tunnel: {
@@ -226,6 +227,16 @@ export const en: TranslationKeys = {
     sessionExpired: "Session expired",
     waitingNext: "Loading next question...",
     hookFailed: "ask-user-question hook failed",
+  },
+  permissionRequest: {
+    title: "Permission Request",
+    allow: "Allow",
+    deny: "Deny",
+    allowed: "Allowed: {tool} → {summary}",
+    denied: "Denied: {tool} → {summary}",
+    sending: "Sending...",
+    sessionExpired: "Session expired",
+    injectionFailed: "Failed to send. Try in terminal.",
   },
   projectCmd: {
     intro: "📁 Project Manager",

@@ -154,6 +154,10 @@ async function startBot(): Promise<void> {
     channel.handleAskUserQuestionEvent(event);
   };
 
+  handler.onPermissionRequest = (event) => {
+    channel.handlePermissionRequestEvent(event);
+  };
+
   apiServer.setHandler(handler);
 
   await channel.initialize();

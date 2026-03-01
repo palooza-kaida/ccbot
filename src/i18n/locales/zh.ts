@@ -126,6 +126,7 @@ export const zh: TranslationKeys = {
     stopEventFailed: "处理 stop event 失败",
     sessionStartFailed: "处理 session start 失败",
     notificationHookFailed: "处理通知钩子失败",
+    permissionRequestFailed: "处理权限请求钩子失败",
   },
 
   tunnel: {
@@ -225,6 +226,16 @@ export const zh: TranslationKeys = {
     sessionExpired: "会话已过期",
     waitingNext: "正在加载下一个问题...",
     hookFailed: "ask-user-question 钩子失败",
+  },
+  permissionRequest: {
+    title: "权限请求",
+    allow: "允许",
+    deny: "拒绝",
+    allowed: "已允许: {tool} → {summary}",
+    denied: "已拒绝: {tool} → {summary}",
+    sending: "发送中...",
+    sessionExpired: "会话已过期",
+    injectionFailed: "发送失败，请在终端操作。",
   },
   projectCmd: {
     intro: "📁 项目管理",
