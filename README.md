@@ -2,15 +2,15 @@
 
 [English](./README.en.md) · [中文](./README.zh.md)
 
-> Nhận thông báo Telegram khi AI agent (Claude Code, Cursor, ...) hoàn thành response — kèm git diff, thời gian xử lý, và tóm tắt kết quả.
+> Tương tác 2 chiều với Claude Code, Codex CLI, Cursor CLI và nhiều AI agent khác qua Telegram — code mọi lúc mọi nơi.
 
 ---
 
 ## Vấn đề giải quyết
 
-Bạn đang dùng Claude Code hoặc Cursor trên máy tính. Ra ngoài cầm điện thoại nhưng không biết AI agent đã xong chưa, thay đổi file nào.
+Bạn đang dùng Claude Code, Codex CLI hoặc Cursor CLI trên máy tính. Ra ngoài cầm điện thoại nhưng không biết AI agent đã xong chưa, muốn gửi prompt thêm mà không cần mở laptop.
 
-**ccpoke** là cầu nối nhẹ giữa AI agents và Telegram — khi agent xong việc, bạn nhận notification ngay trên điện thoại.
+**ccpoke** là cầu nối 2 chiều giữa AI agents và Telegram — nhận thông báo, gửi prompt, trả lời câu hỏi, quản lý nhiều session — tất cả từ điện thoại.
 
 ```
 AI agent xong response
@@ -24,22 +24,18 @@ AI agent xong response
 
 ## Hỗ trợ Agent
 
-| | Claude Code | Cursor |
-|---|---|---|
-| Notification Telegram | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows |
-| Chat 2 chiều (Telegram ↔ Agent) | ✅ macOS · Linux | ❌ |
+| | Claude Code | Codex CLI | Cursor CLI |
+|---|---|---|---|
+| Notification Telegram | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows |
+| Chat 2 chiều (Telegram ↔ Agent) | ✅ macOS · Linux | ✅ macOS · Linux | ✅ macOS · Linux |
 
 Thêm agent mới qua kiến trúc plugin — contributions welcome!
 
 ## Tính năng
 
-- 🤖 **Multi-agent** — hỗ trợ Claude Code, Cursor và mở rộng thêm
-- 🔔 **Notification tự động** — AI agent xong → Telegram nhận tin ngay
-- 📂 **Git diff kèm theo** — biết file nào thay đổi mà không cần mở máy tính
-- ⏱ **Thời gian xử lý** — biết agent chạy bao lâu
-- 📝 **Tóm tắt response** — xem nhanh agent trả lời gì
-- 🔐 **Whitelist user** — chỉ user được phép mới dùng được bot
-- 📄 **Auto-split message** — response dài tự động chia page `[1/N]`
+- 🔔 **Thông báo đẩy** — AI agent xong → Telegram nhận tin ngay, không polling, không delay
+- 💬 **Tương tác 2 chiều** — chat với AI agent từ Telegram, xem sessions, gửi prompt, trả lời câu hỏi, phê duyệt quyền
+- 🔀 **Đa phiên** — quản lý nhiều session AI agent cùng lúc, chuyển đổi nhanh, giám sát song song
 
 ## Yêu cầu
 
@@ -100,11 +96,12 @@ Setup wizard sẽ hướng dẫn từng bước:
 ◆  ✓ Connected! User ID: 123456789
 │
 ◇  Chọn AI agents (ấn cách để chọn)
-│  Claude Code, Cursor
+│  Claude Code, Codex CLI, Cursor CLI
 │
 ◆  Config saved
 ◆  Hook installed for Claude Code
-◆  Hook installed for Cursor
+◆  Hook installed for Codex CLI
+◆  Hook installed for Cursor CLI
 ◆  Chat ID registered
 │
 └  🎉 Setup complete!
@@ -142,15 +139,15 @@ ccpoke
 pnpm dev
 ```
 
-Bot chạy xong → dùng Claude Code / Cursor bình thường → notification tự đến Telegram.
+Bot chạy xong → dùng Claude Code / Codex CLI / Cursor CLI bình thường → notification tự đến Telegram.
 
 ### Telegram Commands
 
-| Command   | Chức năng                                       |
-|-----------|---------------------------------------------------|
-| `/start`  | Đăng ký lại chat (tự động khi setup, ít khi cần) |
-| `/ping`   | Kiểm tra bot còn sống không                      |
-| `/status` | Xem trạng thái bot                               |
+| Command     | Chức năng                                         |
+|-------------|---------------------------------------------------|
+| `/start`    | Đăng ký lại chat (tự động khi setup, ít khi cần) |
+| `/sessions` | Xem danh sách sessions AI agent đang hoạt động    |
+| `/projects` | Xem danh sách projects và mở session mới          |
 
 ### Notification mẫu
 
@@ -161,11 +158,6 @@ Bot chạy xong → dùng Claude Code / Cursor bình thường → notification 
 Đã sửa bug authentication trong login.go. Thay đổi chính:
 - Fix missing error check ở dòng 42
 - Thêm input validation...
-
-📂 Changes:
-✏️ src/login.go
-➕ src/validator.go
-❌ src/old_auth.go
 ```
 
 ## Gỡ cài đặt
@@ -178,7 +170,8 @@ ccpoke uninstall
 ┌  🗑️  Uninstalling ccpoke
 │
 ◆  Hook removed from Claude Code
-◆  Hook removed from Cursor
+◆  Hook removed from Codex CLI
+◆  Hook removed from Cursor CLI
 ◆  Removed ~/.ccpoke/ (config, state, hooks)
 │
 └  ccpoke uninstalled

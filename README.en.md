@@ -2,15 +2,15 @@
 
 [Tiếng Việt](./README.md) · [中文](./README.zh.md)
 
-> Get Telegram notifications when your AI agent (Claude Code, Cursor, ...) completes a response — with git diff, processing time, and result summary.
+> Two-way interaction with Claude Code, Codex CLI, Cursor CLI and more via Telegram — code anytime, anywhere.
 
 ---
 
 ## Problem
 
-You're using Claude Code or Cursor on your computer. You step away with your phone but have no idea if the AI agent is done yet or what files it changed.
+You're using Claude Code, Codex CLI or Cursor CLI on your computer. You step away with your phone but have no idea if the AI agent is done yet, and you want to send more prompts without opening your laptop.
 
-**ccpoke** is a lightweight bridge between AI agents and Telegram — when any agent finishes, you get a notification right on your phone.
+**ccpoke** is a two-way bridge between AI agents and Telegram — receive notifications, send prompts, answer questions, manage multiple sessions — all from your phone.
 
 ```
 AI agent completes response
@@ -24,22 +24,18 @@ AI agent completes response
 
 ## Supported Agents
 
-| | Claude Code | Cursor |
-|---|---|---|
-| Telegram notifications | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows |
-| 2-way chat (Telegram ↔ Agent) | ✅ macOS · Linux | ❌ |
+| | Claude Code | Codex CLI | Cursor CLI |
+|---|---|---|---|
+| Telegram notifications | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows |
+| 2-way chat (Telegram ↔ Agent) | ✅ macOS · Linux | ✅ macOS · Linux | ✅ macOS · Linux |
 
 Adding new agents is easy via the plugin architecture — contributions welcome!
 
 ## Features
 
-- 🤖 **Multi-agent** — supports Claude Code, Cursor and more
-- 🔔 **Auto notification** — AI agent finishes → Telegram notifies you instantly
-- 📂 **Git diff included** — see changed files without opening your computer
-- ⏱ **Processing time** — know how long the agent took
-- 📝 **Response summary** — quick glance at what the agent replied
-- 🔐 **User whitelist** — only authorized users can use the bot
-- 📄 **Auto-split messages** — long responses are automatically paginated `[1/N]`
+- 🔔 **Push notification** — AI agent done → notification pushed instantly, no polling, no delay
+- 💬 **Two-way interaction** — chat with your AI agent from Telegram, view sessions, send prompts, answer questions, approve permissions
+- 🔀 **Multi-session** — manage multiple AI agent sessions simultaneously, switch quickly, parallel monitoring
 
 ## Requirements
 
@@ -100,11 +96,12 @@ The setup wizard will guide you step by step:
 ◆  ✓ Connected! User ID: 123456789
 │
 ◇  Select AI agents (space to toggle)
-│  Claude Code, Cursor
+│  Claude Code, Codex CLI, Cursor CLI
 │
 ◆  Config saved
 ◆  Hook installed for Claude Code
-◆  Hook installed for Cursor
+◆  Hook installed for Codex CLI
+◆  Hook installed for Cursor CLI
 ◆  Chat ID registered
 │
 └  🎉 Setup complete!
@@ -142,15 +139,15 @@ ccpoke
 pnpm dev
 ```
 
-Once running, use Claude Code / Cursor as usual → notifications will arrive on Telegram.
+Once running, use Claude Code / Codex CLI / Cursor CLI as usual → notifications will arrive on Telegram.
 
 ### Telegram Commands
 
-| Command   | Description                                         |
-|-----------|-----------------------------------------------------|
-| `/start`  | Re-register chat (auto during setup, rarely needed) |
-| `/ping`   | Check if bot is alive                               |
-| `/status` | View bot status                                     |
+| Command     | Description                                         |
+|-------------|-----------------------------------------------------|
+| `/start`    | Re-register chat (auto during setup, rarely needed) |
+| `/sessions` | View active AI agent sessions                       |
+| `/projects` | View project list and start new sessions            |
 
 ### Sample Notification
 
@@ -161,11 +158,6 @@ Once running, use Claude Code / Cursor as usual → notifications will arrive on
 Fixed authentication bug in login.go. Main changes:
 - Fix missing error check at line 42
 - Add input validation...
-
-📂 Changes:
-✏️ src/login.go
-➕ src/validator.go
-❌ src/old_auth.go
 ```
 
 ## Uninstall
@@ -178,7 +170,8 @@ ccpoke uninstall
 ┌  🗑️  Uninstalling ccpoke
 │
 ◆  Hook removed from Claude Code
-◆  Hook removed from Cursor
+◆  Hook removed from Codex CLI
+◆  Hook removed from Cursor CLI
 ◆  Removed ~/.ccpoke/ (config, state, hooks)
 │
 └  ccpoke uninstalled

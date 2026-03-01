@@ -2,15 +2,15 @@
 
 [English](./README.en.md) · [Tiếng Việt](./README.md)
 
-> 当 AI agent（Claude Code、Cursor 等）完成响应时，通过 Telegram 接收通知——附带 git diff、处理时间和结果摘要。
+> 通过 Telegram 与 Claude Code、Codex CLI、Cursor CLI 等 AI 代理双向交互——随时随地编程。
 
 ---
 
 ## 解决的问题
 
-你在电脑上使用 Claude Code 或 Cursor。出门只带手机，却不知道 AI agent 是否已完成、修改了哪些文件。
+你在电脑上使用 Claude Code、Codex CLI 或 Cursor CLI。出门只带手机，却不知道 AI agent 是否已完成，想发送更多提示却不想打开电脑。
 
-**ccpoke** 是 AI agent 与 Telegram 之间的轻量桥接——agent 完成后，你立即在手机上收到通知。
+**ccpoke** 是 AI agent 与 Telegram 之间的双向桥接——接收通知、发送提示、回答问题、管理多个会话——全部通过手机完成。
 
 ```
 AI agent 完成响应
@@ -24,22 +24,18 @@ AI agent 完成响应
 
 ## 支持的 Agent
 
-| | Claude Code | Cursor |
-|---|---|---|
-| Telegram 通知 | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows |
-| 双向聊天 (Telegram ↔ Agent) | ✅ macOS · Linux | ❌ |
+| | Claude Code | Codex CLI | Cursor CLI |
+|---|---|---|---|
+| Telegram 通知 | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows | ✅ macOS · Linux · Windows |
+| 双向聊天 (Telegram ↔ Agent) | ✅ macOS · Linux | ✅ macOS · Linux | ✅ macOS · Linux |
 
 通过插件架构轻松添加新 agent——欢迎贡献！
 
 ## 功能
 
-- 🤖 **多 Agent** — 支持 Claude Code、Cursor 及更多
-- 🔔 **自动通知** — AI agent 完成 → Telegram 立即推送
-- 📂 **附带 Git diff** — 无需打开电脑即可查看文件变更
-- ⏱ **处理时间** — 了解 agent 运行了多久
-- 📝 **响应摘要** — 快速查看 agent 的回复内容
-- 🔐 **用户白名单** — 仅授权用户可使用 bot
-- 📄 **自动分页** — 长消息自动分页 `[1/N]`
+- 🔔 **推送通知** — AI 代理完成 → 立即推送通知，无轮询，无延迟
+- 💬 **双向交互** — 从 Telegram 与 AI 代理聊天，查看会话、发送提示、回答问题、审批权限
+- 🔀 **多会话** — 同时管理多个 AI 代理会话，快速切换，并行监控
 
 ## 前置要求
 
@@ -100,11 +96,12 @@ pnpm dev
 ◆  ✓ Connected! User ID: 123456789
 │
 ◇  选择 AI agents（按空格选择）
-│  Claude Code, Cursor
+│  Claude Code, Codex CLI, Cursor CLI
 │
 ◆  Config saved
 ◆  Hook installed for Claude Code
-◆  Hook installed for Cursor
+◆  Hook installed for Codex CLI
+◆  Hook installed for Cursor CLI
 ◆  Chat ID registered
 │
 └  🎉 Setup complete!
@@ -142,15 +139,15 @@ ccpoke
 pnpm dev
 ```
 
-Bot 启动后 → 正常使用 Claude Code / Cursor → 通知自动发送到 Telegram。
+Bot 启动后 → 正常使用 Claude Code / Codex CLI / Cursor CLI → 通知自动发送到 Telegram。
 
 ### Telegram 命令
 
-| 命令      | 功能                                          |
-|-----------|-----------------------------------------------|
-| `/start`  | 重新注册聊天（设置时自动完成，很少需要）      |
-| `/ping`   | 检查 bot 是否在线                             |
-| `/status` | 查看 bot 状态                                 |
+| 命令        | 功能                                          |
+|-------------|-----------------------------------------------|
+| `/start`    | 重新注册聊天（设置时自动完成，很少需要）      |
+| `/sessions` | 查看活跃的 AI 代理会话                        |
+| `/projects` | 查看项目列表并启动新会话                      |
 
 ### 通知示例
 
@@ -161,11 +158,6 @@ Bot 启动后 → 正常使用 Claude Code / Cursor → 通知自动发送到 Te
 修复了 login.go 中的认证 bug。主要变更：
 - 修复第 42 行缺失的错误检查
 - 添加输入验证...
-
-📂 Changes:
-✏️ src/login.go
-➕ src/validator.go
-❌ src/old_auth.go
 ```
 
 ## 卸载
@@ -178,7 +170,8 @@ ccpoke uninstall
 ┌  🗑️  Uninstalling ccpoke
 │
 ◆  Hook removed from Claude Code
-◆  Hook removed from Cursor
+◆  Hook removed from Codex CLI
+◆  Hook removed from Cursor CLI
 ◆  Removed ~/.ccpoke/ (config, state, hooks)
 │
 └  ccpoke uninstalled
