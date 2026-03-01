@@ -79,8 +79,13 @@ export const zh: LocaleDict = {
 
   copyBtn: "复制",
   copiedBtn: "已复制！",
+  ctaTitle: "准备好从手机编程了吗？",
   ctaSub: "MIT 许可证，开源。欢迎贡献。",
   ctaGithub: "在 GitHub 上 Star",
+  ctaGetStarted: "开始使用",
+
+  footerDocs: "文档",
+  footerChangelog: "更新日志",
 
   responseLoading: "正在加载响应...",
   responseNotFound: "未找到响应",

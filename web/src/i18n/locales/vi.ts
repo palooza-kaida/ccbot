@@ -79,8 +79,13 @@ export const vi: LocaleDict = {
 
   copyBtn: "Sao chép",
   copiedBtn: "Đã sao chép!",
+  ctaTitle: "Sẵn sàng code từ điện thoại?",
   ctaSub: "Giấy phép MIT, mã nguồn mở. Hoan nghênh đóng góp.",
   ctaGithub: "Star trên GitHub",
+  ctaGetStarted: "Bắt đầu ngay",
+
+  footerDocs: "Tài liệu",
+  footerChangelog: "Nhật ký thay đổi",
 
   responseLoading: "Đang tải phản hồi...",
   responseNotFound: "Không tìm thấy phản hồi",

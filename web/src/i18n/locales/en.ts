@@ -77,8 +77,13 @@ const en = {
 
   copyBtn: "Copy",
   copiedBtn: "Copied!",
+  ctaTitle: "Ready to code from your phone?",
   ctaSub: "MIT licensed, open-source. Contributions welcome.",
   ctaGithub: "Star on GitHub",
+  ctaGetStarted: "Get Started",
+
+  footerDocs: "Docs",
+  footerChangelog: "Changelog",
 
   responseLoading: "Loading response...",
   responseNotFound: "Response not found",

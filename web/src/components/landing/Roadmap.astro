@@ -17,7 +17,7 @@ const phases = [
 ];
 ---
 
-<section class="sect-section py-20" id="roadmap">
+<section class="sect-section py-14 reveal" id="roadmap">
   <div class="mb-12">
     <p class="text-[0.72rem] font-bold uppercase tracking-[0.14em] text-accent mb-2">{ts(locale, "roadmapLabel")}</p>
     <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold tracking-tight mb-2">{ts(locale, "roadmapTitle")}</h2>
@@ -35,7 +35,7 @@ const phases = [
         <p class="text-[0.82rem] text-txt-3 mb-3">{ts(locale, phase.descKey)}</p>
         <div class="flex flex-wrap gap-2">
           {ta(locale, phase.tagsKey).map((tag) => (
-            <span class:list={["px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium transition-transform duration-150 hover:-translate-y-px hover:shadow-md", phase.tagBg, phase.tagText]}>
+            <span class:list={["px-3.5 py-[5px] rounded-full text-[0.78rem] font-medium", phase.tagBg, phase.tagText]}>
               {tag}
             </span>
           ))}

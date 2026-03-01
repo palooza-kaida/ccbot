@@ -35,7 +35,7 @@ const navLinks = [
     {showSectionNav && (
       <div class="flex items-center gap-5 ml-auto nav-hide-mobile">
         {navLinks.map(({ key, hash }) => (
-          <a href={hash} class="text-[0.78rem] font-semibold text-txt-2 no-underline hover:text-txt transition-colors duration-150">
+          <a href={hash} class="text-[0.78rem] font-semibold text-txt-2 no-underline hover:text-txt transition-colors duration-150 cursor-pointer">
             {ts(locale, key)}
           </a>
         ))}
@@ -43,7 +43,7 @@ const navLinks = [
     )}
 
     <div class="flex items-center gap-2 ml-auto">
-      <a href={localePageHref(locale, "/brand")} class="text-[0.78rem] font-semibold text-txt-2 no-underline hover:text-txt transition-colors duration-150 nav-hide-mobile">
+      <a href={localePageHref(locale, "/brand")} class="text-[0.78rem] font-semibold text-txt-2 no-underline hover:text-txt transition-colors duration-150 cursor-pointer nav-hide-mobile">
         {ts(locale, "navBrand")}
       </a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
@@ -61,6 +61,7 @@ const navLinks = [
               href={localePageHref(loc, currentPath)}
               class:list={["lang-option", { active: loc === locale }]}
               data-locale={loc}
+              aria-current={loc === locale ? "true" : undefined}
             >
               {LOCALE_LABELS[loc]}
             </a>

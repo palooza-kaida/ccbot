@@ -1,11 +1,23 @@
 ---
+import { ts, type Locale } from "../i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
 ---
 
-<footer class="py-8 text-center border-t border-border mt-1">
+<footer class="py-8 border-t border-border mt-1">
   <div class="max-w-content mx-auto px-6">
-    <p class="text-[0.82rem] text-txt-3">
-      MIT &middot; TypeScript &middot;
-      <a href="https://github.com/kaida-palooza/ccpoke" class="text-txt-3 hover:text-txt-2">github.com/kaida-palooza/ccpoke</a>
+    <p class="text-[0.78rem] text-txt-3 text-center flex items-center justify-center gap-2 flex-wrap">
+      <a href="https://github.com/kaida-palooza/ccpoke#readme" target="_blank" rel="noopener" class="text-txt-3 hover:text-txt-2">{ts(locale, "footerDocs")}</a>
+      <span class="text-border">·</span>
+      <a href="https://github.com/kaida-palooza/ccpoke/releases" target="_blank" rel="noopener" class="text-txt-3 hover:text-txt-2">{ts(locale, "footerChangelog")}</a>
+      <span class="text-border">·</span>
+      <span>MIT</span>
+      <span class="text-border">·</span>
+      <a href="https://github.com/kaida-palooza/ccpoke" target="_blank" rel="noopener" class="text-txt-3 hover:text-txt-2">kaida-palooza/ccpoke</a>
     </p>
   </div>
 </footer>
