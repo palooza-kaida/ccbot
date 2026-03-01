@@ -1,4 +1,4 @@
-import type TelegramBot from "node-telegram-bot-api";
+import TelegramBot from "node-telegram-bot-api";
 
 import { t } from "../../i18n/index.js";
 import { SessionState, type TmuxSession } from "../../tmux/session-map.js";
@@ -59,6 +59,7 @@ function shortenModel(model: string): string {
   if (!model) return "";
   return model
     .replace(/^claude-/, "")
+    .replace(/^gpt-/, "gpt")
     .replace(/-(\d+)-(\d+)$/, " $1.$2")
     .replace(/-(\d+)$/, " $1");
 }

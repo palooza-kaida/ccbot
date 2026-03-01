@@ -1,6 +1,7 @@
 import type TelegramBot from "node-telegram-bot-api";
 
 import type { NotificationEvent } from "../../agent/agent-handler.js";
+import type { AgentRegistry } from "../../agent/agent-registry.js";
 import { t } from "../../i18n/index.js";
 import { SessionState, type SessionMap } from "../../tmux/session-map.js";
 import type { TmuxBridge } from "../../tmux/tmux-bridge.js";
@@ -24,7 +25,8 @@ export class PromptHandler {
     private bot: TelegramBot,
     private chatId: () => number | null,
     private sessionMap: SessionMap,
-    private tmuxBridge: TmuxBridge
+    private tmuxBridge: TmuxBridge,
+    private registry: AgentRegistry
   ) {}
 
   async forwardPrompt(event: NotificationEvent): Promise<void> {
@@ -51,8 +53,10 @@ export class PromptHandler {
     const safeText =
       trimmed.length > MAX_RESPONSE_LENGTH ? trimmed.slice(0, MAX_RESPONSE_LENGTH) : trimmed;
 
+    const submitKeys = this.registry.resolve(session.agent)!.submitKeys;
+
     try {
-      this.tmuxBridge.sendKeys(session.tmuxTarget, safeText);
+      this.tmuxBridge.sendKeys(session.tmuxTarget, safeText, submitKeys);
     } catch {
       return false;
     }

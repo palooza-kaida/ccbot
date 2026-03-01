@@ -140,7 +140,7 @@ export class PermissionRequestHandler {
   private async injectResponse(tmuxTarget: string, allow: boolean): Promise<void> {
     const ready = await this.tmuxBridge.waitForTuiReady(tmuxTarget, 5000);
     if (!ready) throw new Error("TUI not ready");
-    this.tmuxBridge.sendKeys(tmuxTarget, allow ? "y" : "n");
+    this.tmuxBridge.sendKeys(tmuxTarget, allow ? "y" : "n", ["Enter"]);
   }
 
   private formatMessage(project: string, toolName: string, summary: string): string {

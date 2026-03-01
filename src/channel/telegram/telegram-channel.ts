@@ -7,6 +7,8 @@ import type {
   NotificationEvent,
   PermissionRequestEvent,
 } from "../../agent/agent-handler.js";
+import type { AgentRegistry } from "../../agent/agent-registry.js";
+import { AGENT_DISPLAY_NAMES, AgentName } from "../../agent/types.js";
 import { ConfigManager, type Config } from "../../config-manager.js";
 import { getTranslations, t } from "../../i18n/index.js";
 import type { SessionMap } from "../../tmux/session-map.js";
@@ -34,6 +36,7 @@ export class TelegramChannel implements NotificationChannel {
   private sessionMap: SessionMap | null;
   private stateManager: SessionStateManager | null;
   private tmuxBridge: TmuxBridge | null;
+  private registry: AgentRegistry | null;
   private promptHandler: PromptHandler | null = null;
   private askQuestionHandler: AskQuestionHandler | null = null;
   private permissionRequestHandler: PermissionRequestHandler | null = null;
@@ -42,12 +45,14 @@ export class TelegramChannel implements NotificationChannel {
     cfg: Config,
     sessionMap?: SessionMap,
     stateManager?: SessionStateManager,
-    tmuxBridge?: TmuxBridge
+    tmuxBridge?: TmuxBridge,
+    registry?: AgentRegistry
   ) {
     this.cfg = cfg;
     this.sessionMap = sessionMap ?? null;
     this.stateManager = stateManager ?? null;
     this.tmuxBridge = tmuxBridge ?? null;
+    this.registry = registry ?? null;
     this.bot = new TelegramBot(cfg.telegram_bot_token, { polling: false });
     this.chatId = ConfigManager.loadChatState().chat_id;
     this.registerHandlers();
@@ -56,12 +61,13 @@ export class TelegramChannel implements NotificationChannel {
     this.registerProjectsHandlers();
     this.registerPollingErrorHandler();
 
-    if (this.sessionMap && this.tmuxBridge) {
+    if (this.sessionMap && this.tmuxBridge && this.registry) {
       this.promptHandler = new PromptHandler(
         this.bot,
         () => this.chatId,
         this.sessionMap,
-        this.tmuxBridge
+        this.tmuxBridge,
+        this.registry
       );
       this.promptHandler.onElicitationSent = (chatId, messageId, sessionId, project) => {
         this.pendingReplyStore.set(chatId, messageId, sessionId, project);
@@ -232,6 +238,11 @@ export class TelegramChannel implements NotificationChannel {
 
         if (query.data?.startsWith("proj:")) {
           await this.handleProjectCallback(query);
+          return;
+        }
+
+        if (query.data?.startsWith("agent_start:")) {
+          await this.handleAgentStartCallback(query);
           return;
         }
 
@@ -473,13 +484,62 @@ export class TelegramChannel implements NotificationChannel {
 
     await this.bot.answerCallbackQuery(query.id);
 
+    const agents = cfg.agents;
+    if (agents.length === 1) {
+      await this.startAgentForProject(query, project, agents[0]!);
+      return;
+    }
+
+    const buttons: TelegramBot.InlineKeyboardButton[] = agents.map((agent) => ({
+      text: AGENT_DISPLAY_NAMES[agent as AgentName] ?? agent,
+      callback_data: `agent_start:${idx}:${agent}`,
+    }));
+    const rows = [buttons];
+
+    await this.bot.sendMessage(
+      query.message.chat.id,
+      t("projects.chooseAgent", { project: project.name }),
+      { reply_markup: { inline_keyboard: rows } }
+    );
+  }
+
+  private async handleAgentStartCallback(query: TelegramBot.CallbackQuery): Promise<void> {
+    const parts = query.data!.slice(12).split(":");
+    const idx = Number(parts[0]);
+    const agentKey = parts[1];
+    const cfg = ConfigManager.load();
+    const project = cfg.projects[idx];
+
+    if (!project || !agentKey || !query.message) {
+      await this.bot.answerCallbackQuery(query.id);
+      return;
+    }
+
+    await this.bot.answerCallbackQuery(query.id);
+    await this.bot.deleteMessage(query.message.chat.id, query.message.message_id).catch(() => {});
+    await this.startAgentForProject(query, project, agentKey);
+  }
+
+  private async startAgentForProject(
+    query: TelegramBot.CallbackQuery,
+    project: { name: string; path: string },
+    agentKey: string
+  ): Promise<void> {
+    if (!this.tmuxBridge || !query.message) return;
+
     try {
+      const startCommand = resolveAgentStartCommand(agentKey);
       const tmuxSession = this.getTmuxSessionName();
       const paneTarget = this.tmuxBridge.createWindow(tmuxSession, project.path);
-      this.tmuxBridge.sendKeys(paneTarget, "claude");
-      log(`[Projects] started claude in ${paneTarget} for ${project.name}`);
+      this.tmuxBridge.sendKeys(paneTarget, startCommand, ["Enter"]);
+
+      if (agentKey === AgentName.Cursor) {
+        this.autoTrustCursorWorkspace(paneTarget);
+      }
+
+      log(`[Projects] started ${agentKey} in ${paneTarget} for ${project.name}`);
       await this.bot.sendMessage(
-        query.message.chat.id,
+        query.message!.chat.id,
         t("projects.started", { project: project.name })
       );
     } catch (err) {
@@ -489,6 +549,29 @@ export class TelegramChannel implements NotificationChannel {
         t("projects.startFailed", { project: project.name })
       );
     }
+  }
+
+  private autoTrustCursorWorkspace(paneTarget: string): void {
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    const interval = setInterval(() => {
+      attempts++;
+      if (attempts > maxAttempts || !this.tmuxBridge) {
+        clearInterval(interval);
+        return;
+      }
+      try {
+        const content = this.tmuxBridge.capturePane(paneTarget, 10);
+        if (content.includes("Trust")) {
+          this.tmuxBridge.sendSpecialKey(paneTarget, "Enter");
+          logDebug(`[Cursor] auto-trusted workspace at ${paneTarget}`);
+          clearInterval(interval);
+        }
+      } catch {
+        clearInterval(interval);
+      }
+    }, 1000);
   }
 
   /** Session sub-menu: Chat / Close */
@@ -628,4 +711,14 @@ export class TelegramChannel implements NotificationChannel {
       }
     });
   }
+}
+
+const AGENT_START_COMMANDS: Record<string, string> = {
+  [AgentName.ClaudeCode]: "claude --dangerously-skip-permissions",
+  [AgentName.Cursor]: "cursor agent --force",
+  [AgentName.Codex]: "codex --full-auto",
+};
+
+function resolveAgentStartCommand(agent: string): string {
+  return AGENT_START_COMMANDS[agent] ?? AGENT_START_COMMANDS[AgentName.ClaudeCode]!;
 }
