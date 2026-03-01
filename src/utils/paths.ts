@@ -9,6 +9,7 @@ const PROJECT_ROOT = join(MODULE_DIR, "..", "..");
 const CCPOKE_HOME = join(homedir(), ".ccpoke");
 const CLAUDE_HOME = join(homedir(), ".claude");
 const CURSOR_HOME = join(homedir(), ".cursor");
+const CODEX_HOME = join(homedir(), ".codex");
 
 export const paths = {
   projectRoot: PROJECT_ROOT,
@@ -50,6 +51,15 @@ export const paths = {
   cursorDir: CURSOR_HOME,
   cursorHooksJson: join(CURSOR_HOME, "hooks.json"),
   cursorProjectsDir: join(CURSOR_HOME, "projects"),
+
+  codexDir: CODEX_HOME,
+  codexConfigToml: join(CODEX_HOME, "config.toml"),
+  codexSessionsDir: join(CODEX_HOME, "sessions"),
+  codexHookScript: join(
+    CCPOKE_HOME,
+    "hooks",
+    process.platform === "win32" ? "codex-notify.cmd" : "codex-notify.sh"
+  ),
 } as const;
 
 export function getPackageVersion(): string {

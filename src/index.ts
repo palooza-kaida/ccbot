@@ -75,9 +75,11 @@ async function startBot(): Promise<void> {
   const cfg = await loadOrSetupConfig();
   ensureShellCompletion();
 
+  const registry = createDefaultRegistry();
+
   const tmuxBridge = new TmuxBridge();
   const sessionMap = new SessionMap();
-  const stateManager = new SessionStateManager(sessionMap, tmuxBridge);
+  const stateManager = new SessionStateManager(sessionMap, tmuxBridge, registry);
 
   let chatResolver: TmuxSessionResolver | undefined;
 
@@ -121,8 +123,7 @@ async function startBot(): Promise<void> {
     logError(t("tunnel.failed"), err);
   }
 
-  const registry = createDefaultRegistry();
-  const channel = new TelegramChannel(cfg, sessionMap, stateManager, tmuxBridge);
+  const channel = new TelegramChannel(cfg, sessionMap, stateManager, tmuxBridge, registry);
   const handler = new AgentHandler(registry, channel, cfg.hook_port, tunnelManager, chatResolver);
 
   handler.onSessionStart = (rawEvent) => {
