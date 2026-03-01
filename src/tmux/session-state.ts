@@ -1,3 +1,4 @@
+import type { AgentRegistry } from "../agent/agent-registry.js";
 import { logDebug } from "../utils/log.js";
 import { SessionState, type SessionMap } from "./session-map.js";
 import type { TmuxBridge } from "./tmux-bridge.js";
@@ -24,7 +25,8 @@ function sleepSync(ms: number): void {
 export class SessionStateManager {
   constructor(
     private sessionMap: SessionMap,
-    private tmuxBridge: TmuxBridge
+    private tmuxBridge: TmuxBridge,
+    private registry: AgentRegistry
   ) {}
 
   injectMessage(sessionId: string, text: string): InjectResult {
@@ -55,7 +57,8 @@ export class SessionStateManager {
       return { busy: true };
     }
 
-    const sendResult = this.trySendKeys(session.tmuxTarget, safeText);
+    const submitKeys = this.registry.resolve(session.agent)!.submitKeys;
+    const sendResult = this.trySendKeys(session.tmuxTarget, safeText, submitKeys);
     if (!sendResult) {
       logDebug(`[Inject] sendKeys failed after retries: sessionId=${sessionId}`);
       return { tmuxDead: true };
@@ -84,10 +87,10 @@ export class SessionStateManager {
     return false;
   }
 
-  private trySendKeys(target: string, text: string): boolean {
+  private trySendKeys(target: string, text: string, submitKeys: string[]): boolean {
     for (let i = 0; i <= SEND_RETRIES; i++) {
       try {
-        this.tmuxBridge.sendKeys(target, text);
+        this.tmuxBridge.sendKeys(target, text, submitKeys);
         return true;
       } catch (err) {
         logDebug(

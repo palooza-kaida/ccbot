@@ -1,4 +1,5 @@
 import { ClaudeCodeProvider } from "./claude-code/claude-code-provider.js";
+import { CodexProvider } from "./codex/codex-provider.js";
 import { CursorProvider } from "./cursor/cursor-provider.js";
 import type { AgentProvider } from "./types.js";
 
@@ -26,5 +27,6 @@ export function createDefaultRegistry(): AgentRegistry {
   const registry = new AgentRegistry();
   registry.register(new ClaudeCodeProvider());
   registry.register(new CursorProvider());
+  registry.register(new CodexProvider());
   return registry;
 }

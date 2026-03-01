@@ -282,7 +282,7 @@ export class AgentHandler {
     if (!sessionId) return null;
 
     const toolName = typeof obj.tool_name === "string" ? obj.tool_name : "";
-    if (!toolName) return null;
+    if (!toolName || toolName === "AskUserQuestion") return null;
 
     const toolInput =
       typeof obj.tool_input === "object" && obj.tool_input !== null

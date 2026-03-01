@@ -1,6 +1,6 @@
 import { execSync } from "node:child_process";
 
-import { isClaudeIdleByProcess, type ProcessTree } from "./tmux-scanner.js";
+import { isAgentIdleByProcess, type ProcessTree } from "./tmux-scanner.js";
 
 export class TmuxBridge {
   private available: boolean | null = null;
@@ -16,7 +16,7 @@ export class TmuxBridge {
     return this.available;
   }
 
-  sendKeys(target: string, text: string): void {
+  sendKeys(target: string, text: string, submitKeys: string[]): void {
     const tgt = escapeShellArg(target);
     const collapsed = text.replace(/\n+/g, " ").trim();
     if (collapsed.length === 0) return;
@@ -26,10 +26,13 @@ export class TmuxBridge {
       stdio: "pipe",
       timeout: 5000,
     });
-    execSync(`tmux send-keys -t ${tgt} Enter`, {
-      stdio: "pipe",
-      timeout: 5000,
-    });
+    for (let i = 0; i < submitKeys.length; i++) {
+      if (i > 0) execSync("sleep 0.15", { stdio: "pipe", timeout: 2000 });
+      execSync(`tmux send-keys -t ${tgt} ${submitKeys[i]}`, {
+        stdio: "pipe",
+        timeout: 5000,
+      });
+    }
   }
 
   /** Send text without trailing Enter — caller controls submission */
@@ -89,7 +92,7 @@ export class TmuxBridge {
     });
   }
 
-  isClaudeIdle(target: string, tree?: ProcessTree): boolean {
+  isAgentIdle(target: string, tree?: ProcessTree): boolean {
     try {
       const panePid = execSync(
         `tmux display-message -t ${escapeShellArg(target)} -p '#{pane_pid}'`,
@@ -99,7 +102,7 @@ export class TmuxBridge {
           timeout: 3000,
         }
       ).trim();
-      return isClaudeIdleByProcess(panePid, tree);
+      return isAgentIdleByProcess(panePid, undefined, tree);
     } catch {
       return false;
     }

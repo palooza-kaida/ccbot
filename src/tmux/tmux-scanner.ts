@@ -3,6 +3,7 @@ import { readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
+import { AgentName } from "../agent/types.js";
 import { escapeShellArg } from "./tmux-bridge.js";
 
 export interface TmuxPaneInfo {
@@ -10,6 +11,10 @@ export interface TmuxPaneInfo {
   paneTitle: string;
   cwd: string;
   panePid: string;
+}
+
+export interface AgentPaneInfo extends TmuxPaneInfo {
+  agentName: AgentName;
 }
 
 const FORMAT_STRING =
@@ -23,6 +28,28 @@ interface ProcessEntry {
 }
 
 export type ProcessTree = Map<string, ProcessEntry[]>;
+
+interface AgentProcessPattern {
+  name: AgentName;
+  processPattern: RegExp;
+  idleExcludePattern?: RegExp;
+}
+
+const AGENT_PATTERNS: AgentProcessPattern[] = [
+  {
+    name: AgentName.ClaudeCode,
+    processPattern: /\bclaude\b/i,
+    idleExcludePattern: /shell-snapshots\/snapshot-/,
+  },
+  {
+    name: AgentName.Cursor,
+    processPattern: /\bcursor\b/i,
+  },
+  {
+    name: AgentName.Codex,
+    processPattern: /\bcodex\b/i,
+  },
+];
 
 export function buildProcessTree(): ProcessTree {
   try {
@@ -46,67 +73,83 @@ export function buildProcessTree(): ProcessTree {
   }
 }
 
-export function hasClaudeDescendant(panePid: string, tree?: ProcessTree): boolean {
+export function findAgentDescendant(panePid: string, tree?: ProcessTree): AgentName | null {
   const processTree = tree ?? buildProcessTree();
 
-  function search(pid: string, depth: number): boolean {
-    if (depth >= MAX_DESCENDANT_DEPTH) return false;
+  function search(pid: string, depth: number): AgentName | null {
+    if (depth >= MAX_DESCENDANT_DEPTH) return null;
     const children = processTree.get(pid);
-    if (!children) return false;
+    if (!children) return null;
     for (const child of children) {
-      if (/\bclaude\b/i.test(child.command)) return true;
-      if (search(child.pid, depth + 1)) return true;
+      for (const pattern of AGENT_PATTERNS) {
+        if (pattern.processPattern.test(child.command)) return pattern.name;
+      }
+      const found = search(child.pid, depth + 1);
+      if (found) return found;
     }
-    return false;
+    return null;
   }
 
   return search(panePid, 0);
 }
 
-function isClaudePane(pane: TmuxPaneInfo, tree?: ProcessTree): boolean {
-  return hasClaudeDescendant(pane.panePid, tree);
+/** @deprecated Use findAgentDescendant instead */
+export function hasClaudeDescendant(panePid: string, tree?: ProcessTree): boolean {
+  return findAgentDescendant(panePid, tree) !== null;
 }
 
 const SHELL_PATTERN = /\b(bash|zsh|sh|fish)\b/;
-// Claude Code keeps persistent shell-snapshot processes; exclude them from busy detection
-const SHELL_SNAPSHOT_PATTERN = /shell-snapshots\/snapshot-/;
 
-/**
- * Claude is idle when its process has no active child shell processes.
- * Shell-snapshot processes (persistent) are excluded.
- * When busy, Claude spawns /bin/zsh -c ... for tool execution.
- */
-export function isClaudeIdleByProcess(panePid: string, tree?: ProcessTree): boolean {
+export function isAgentIdleByProcess(
+  panePid: string,
+  agentName?: AgentName,
+  tree?: ProcessTree
+): boolean {
   const processTree = tree ?? buildProcessTree();
+  const patterns = agentName ? AGENT_PATTERNS.filter((p) => p.name === agentName) : AGENT_PATTERNS;
 
-  function findClaudePid(pid: string, depth: number): string | undefined {
+  function findAgentPid(
+    pid: string,
+    depth: number
+  ): { agentPid: string; pattern: AgentProcessPattern } | undefined {
     if (depth >= MAX_DESCENDANT_DEPTH) return undefined;
     const children = processTree.get(pid);
     if (!children) return undefined;
     for (const child of children) {
-      if (/\bclaude\b/i.test(child.command)) return child.pid;
-      const found = findClaudePid(child.pid, depth + 1);
+      for (const pattern of patterns) {
+        if (pattern.processPattern.test(child.command)) {
+          return { agentPid: child.pid, pattern };
+        }
+      }
+      const found = findAgentPid(child.pid, depth + 1);
       if (found) return found;
     }
     return undefined;
   }
 
-  const claudePid = findClaudePid(panePid, 0);
-  if (!claudePid) return false;
+  const result = findAgentPid(panePid, 0);
+  if (!result) return false;
 
-  const children = processTree.get(claudePid);
+  const children = processTree.get(result.agentPid);
   if (!children) return true;
+
+  const excludePattern = result.pattern.idleExcludePattern;
   return !children.some(
-    (c) => SHELL_PATTERN.test(c.command) && !SHELL_SNAPSHOT_PATTERN.test(c.command)
+    (c) => SHELL_PATTERN.test(c.command) && (!excludePattern || !excludePattern.test(c.command))
   );
 }
 
-export interface ScanOutput {
-  panes: TmuxPaneInfo[];
+/** @deprecated Use isAgentIdleByProcess instead */
+export function isClaudeIdleByProcess(panePid: string, tree?: ProcessTree): boolean {
+  return isAgentIdleByProcess(panePid, AgentName.ClaudeCode, tree);
+}
+
+export interface AgentScanOutput {
+  panes: AgentPaneInfo[];
   tree: ProcessTree;
 }
 
-export function scanClaudePanes(): ScanOutput {
+export function scanAgentPanes(): AgentScanOutput {
   try {
     const output = execSync(`tmux list-panes -a -F '${FORMAT_STRING}'`, {
       encoding: "utf-8",
@@ -116,20 +159,22 @@ export function scanClaudePanes(): ScanOutput {
 
     const tree = buildProcessTree();
 
-    const panes = output
+    const panes: AgentPaneInfo[] = output
       .trim()
       .split("\n")
       .filter((line) => line.length > 0)
-      .map((line: string): TmuxPaneInfo | null => {
+      .map((line: string): AgentPaneInfo | null => {
         const parts = line.split("|");
         if (parts.length < 4) return null;
         const target = parts[0]!;
         const panePid = parts[parts.length - 1]!;
         const cwd = parts[parts.length - 2]!;
         const paneTitle = parts.slice(1, parts.length - 2).join("|");
-        return { target, paneTitle, cwd, panePid };
+        const agentName = findAgentDescendant(panePid, tree);
+        if (!agentName) return null;
+        return { target, paneTitle, cwd, panePid, agentName };
       })
-      .filter((pane): pane is TmuxPaneInfo => pane !== null && isClaudePane(pane, tree));
+      .filter((pane): pane is AgentPaneInfo => pane !== null);
 
     return { panes, tree };
   } catch {
@@ -137,7 +182,12 @@ export function scanClaudePanes(): ScanOutput {
   }
 }
 
-export function isClaudeAliveInPane(target: string, tree?: ProcessTree): boolean {
+/** @deprecated Use scanAgentPanes instead */
+export function scanClaudePanes(): { panes: TmuxPaneInfo[]; tree: ProcessTree } {
+  return scanAgentPanes();
+}
+
+export function isAgentAliveInPane(target: string, tree?: ProcessTree): boolean {
   const sessionName = target.split(":")[0];
   if (!sessionName) return false;
   try {
@@ -155,10 +205,15 @@ export function isClaudeAliveInPane(target: string, tree?: ProcessTree): boolean
       stdio: "pipe",
       timeout: 3000,
     }).trim();
-    return hasClaudeDescendant(panePid, tree);
+    return findAgentDescendant(panePid, tree) !== null;
   } catch {
     return false;
   }
+}
+
+/** @deprecated Use isAgentAliveInPane instead */
+export function isClaudeAliveInPane(target: string, tree?: ProcessTree): boolean {
+  return isAgentAliveInPane(target, tree);
 }
 
 export function isPaneAlive(target: string): boolean {
@@ -175,10 +230,6 @@ export function isPaneAlive(target: string): boolean {
   }
 }
 
-/**
- * Detect model from the latest transcript file for a given cwd.
- * Claude Code stores transcripts in ~/.claude/projects/{encoded-cwd}/{session-id}.jsonl
- */
 export function detectModelFromCwd(cwd: string): string {
   try {
     const encoded = cwd.replaceAll("/", "-");

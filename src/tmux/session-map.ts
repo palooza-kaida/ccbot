@@ -1,10 +1,11 @@
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { basename } from "node:path";
 
+import { AgentName } from "../agent/types.js";
 import { logDebug } from "../utils/log.js";
 import { paths } from "../utils/paths.js";
 import type { TmuxBridge } from "./tmux-bridge.js";
-import { detectModelFromCwd, scanClaudePanes } from "./tmux-scanner.js";
+import { detectModelFromCwd, scanAgentPanes } from "./tmux-scanner.js";
 
 export const SessionState = {
   Idle: "idle",
@@ -21,6 +22,7 @@ export interface TmuxSession {
   label: string;
   state: SessionState;
   model: string;
+  agent: AgentName;
   lastActivity: Date;
 }
 
@@ -38,6 +40,7 @@ interface PersistedSession {
   label: string;
   state: SessionState;
   model: string;
+  agent: AgentName;
   lastActivity: string;
 }
 
@@ -49,7 +52,14 @@ export class SessionMap {
   private sessions = new Map<string, TmuxSession>();
   private scanInterval: ReturnType<typeof setInterval> | null = null;
 
-  register(sessionId: string, tmuxTarget: string, project: string, cwd = "", label = ""): void {
+  register(
+    sessionId: string,
+    tmuxTarget: string,
+    project: string,
+    cwd = "",
+    label = "",
+    agent: AgentName = AgentName.ClaudeCode
+  ): void {
     if (tmuxTarget) {
       for (const [existingId, existing] of this.sessions) {
         if (existing.tmuxTarget === tmuxTarget && existingId !== sessionId) {
@@ -75,6 +85,7 @@ export class SessionMap {
       label,
       state: SessionState.Idle,
       model: "",
+      agent,
       lastActivity: new Date(),
     });
   }
@@ -139,7 +150,8 @@ export class SessionMap {
         if (!s.sessionId || !s.tmuxTarget || !s.project) continue;
         const date = new Date(s.lastActivity);
         if (isNaN(date.getTime())) continue;
-        this.register(s.sessionId, s.tmuxTarget, s.project, s.cwd, s.label);
+        const agent = s.agent ?? AgentName.ClaudeCode;
+        this.register(s.sessionId, s.tmuxTarget, s.project, s.cwd, s.label, agent);
         const session = this.sessions.get(s.sessionId)!;
         session.lastActivity = date;
         if (s.model) session.model = s.model;
@@ -150,7 +162,7 @@ export class SessionMap {
   }
 
   refreshFromTmux(tmuxBridge: TmuxBridge): ScanResult {
-    const { panes, tree } = scanClaudePanes();
+    const { panes, tree } = scanAgentPanes();
     const discovered: TmuxSession[] = [];
     const removed: TmuxSession[] = [];
 
@@ -182,11 +194,13 @@ export class SessionMap {
 
       const syntheticId = `tmux-${pane.target.replace(/[:.]/g, "-")}`;
       const project = basename(pane.cwd) || "unknown";
-      const state = tmuxBridge.isClaudeIdle(pane.target, tree)
+      const agentName =
+        "agentName" in pane ? (pane as { agentName: AgentName }).agentName : AgentName.ClaudeCode;
+      const state = tmuxBridge.isAgentIdle(pane.target, tree)
         ? SessionState.Idle
         : SessionState.Unknown;
 
-      this.register(syntheticId, pane.target, project, pane.cwd);
+      this.register(syntheticId, pane.target, project, pane.cwd, "", agentName);
       this.updateState(syntheticId, state);
       this.updateModel(syntheticId, detectModelFromCwd(pane.cwd));
       discovered.push(this.sessions.get(syntheticId)!);
