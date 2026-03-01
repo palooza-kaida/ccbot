@@ -20,10 +20,10 @@
 
 | Goal | Success Metric | Target Date |
 |------|---|---|
-| **Phase 1: Foundation** | Claude Code notifications working, 50+ GitHub stars | ✅ Done (v1.5.4) |
-| **Phase 2: Multi-Agent** | Support Cursor + Claude Code, 100+ weekly npm downloads | Q2 2026 |
-| **Phase 3: Multi-Channel** | Discord + Slack support, 500+ stars | Q3 2026 |
-| **Phase 4: Advanced** | Terminal streaming, file transfer | Q4 2026 |
+| **Phase 1: Foundation** | Claude Code notifications working, 50+ GitHub stars | ✅ Done (v1.6.16) |
+| **Phase 2: Multi-Agent** | Support Cursor + Claude Code + Codex, 100+ weekly npm downloads | ✅ Done (v1.6.16) |
+| **Phase 3: Multi-Channel** | Discord + Slack support, 500+ stars | Q2 2026 |
+| **Phase 4: Advanced** | Terminal streaming, file transfer | Q3 2026 |
 
 ---
 
@@ -76,11 +76,13 @@
 **Features:**
 - Two-way chat via tmux send-keys
 - Session lifecycle management (tmux-based)
+- Permission request forwarding (Allow/Deny)
+- Ask-user-question forwarding with multi-step answers
 - Slash command forwarding (`/clear`, `/cost`, etc.)
-- Permission handling (approve/deny)
 - Progress indicator ("thinking")
 - Desktop ↔ phone handoff (seamless)
 - Message queue for concurrent inputs
+- /sessions and /projects commands
 
 ### Tier 3: Terminal Monitoring (Planned)
 
@@ -239,6 +241,7 @@ RIGHT:  ccpoke ──(bridges)──→ [existing tmux] ──→ Claude Code
 **Acceptance Criteria:**
 - Detect Claude Code installation
 - Detect Cursor installation
+- Detect Codex CLI installation
 - Auto-install hooks for detected agents
 - Route events to correct provider
 - Extensible for new agents
@@ -498,7 +501,7 @@ RIGHT:  ccpoke ──(bridges)──→ [existing tmux] ──→ Claude Code
 |--------|--------|--------|
 | GitHub stars | 50+ | ✅ 55+ |
 | npm weekly downloads | 50+ | ✅ 100+ |
-| Supported agents | 1 (Claude) | ✅ Done |
+| Supported agents | 1 (Claude) | ✅ 3 (Claude, Cursor, Codex) |
 | User feedback | Positive on HN/Reddit | ✅ Done |
 
 ### Phase 2 (2026 Q2)
@@ -523,11 +526,11 @@ RIGHT:  ccpoke ──(bridges)──→ [existing tmux] ──→ Claude Code
 
 ## Roadmap Summary
 
-See detailed roadmap in [project-roadmap.md](./project-roadmap.md)
+See detailed roadmap in phases below.
 
 **High-Level:**
 1. ✅ **Phase 1:** Foundation (Claude Code, Telegram, Git diff)
-2. 🔄 **Phase 2:** Multi-agent (Cursor, provider architecture)
+2. ✅ **Phase 2:** Multi-agent (Cursor, Codex CLI, provider architecture)
 3. 📋 **Phase 3:** Multi-channel (Discord, Slack)
 4. 🚀 **Phase 4:** Advanced features (streaming, file transfer)
 5. 🌟 **Phase 5:** Plugin ecosystem
@@ -551,5 +554,3 @@ See detailed roadmap in [project-roadmap.md](./project-roadmap.md)
 - **[Codebase Summary](./codebase-summary.md)** — Implementation overview
 - **[Code Standards](./code-standards.md)** — Development guidelines
 - **[System Architecture](./system-architecture.md)** — Technical design
-- **[Project Roadmap](./project-roadmap.md)** — Phases and milestones
-- **[Development Vision](./vision.md)** — Detailed strategy and competitive analysis

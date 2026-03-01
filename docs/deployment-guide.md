@@ -116,7 +116,7 @@ pnpm start      # Run compiled bot
 ```bash
 # Check Node.js version
 node --version
-# Should output: v18.0.0 or higher
+# Should output: v20.0.0 or higher
 
 # Check tmux installed
 which tmux
@@ -140,8 +140,15 @@ After first setup, ccpoke creates:
 ├── config.json            # User configuration (created by setup)
 ├── state.json             # Chat session state
 ├── sessions.json          # Active sessions (auto-updated)
+├── responses/             # Response detail files (24h TTL, max 100)
 └── hooks/
-    └── stop-notify.sh     # Stop hook script
+    ├── claude-code-stop.sh
+    ├── claude-code-session-start.sh
+    ├── claude-code-notification.sh
+    ├── claude-code-pre-tool-use.sh
+    ├── claude-code-permission-request.sh
+    ├── codex-stop.sh
+    └── cursor-stop.sh
 ```
 
 ### config.json
@@ -157,8 +164,9 @@ After first setup, ccpoke creates:
   "user_id": 9876543210,
   "hook_port": 9377,
   "hook_secret": "abc123def456ghi789jkl012mno345pqr",
-  "agents": ["claude-code", "cursor"],
-  "language": "en"
+  "agents": ["claude-code", "codex", "cursor"],
+  "language": "en",
+  "projects": ["/Users/you/projects/my-app"]
 }
 ```
 
@@ -279,9 +287,8 @@ This allows bot to see group messages (not needed for 1:1 chat, but safe).
 ```
 /mybots → Select bot → Commands
 /start — Connect to ccpoke
-/ping — Check if bot is alive
-/status — Show bot status
-/help — Show available commands
+/sessions — List active agent sessions
+/projects — List configured projects
 ```
 
 ---
@@ -296,19 +303,15 @@ npx -y ccpoke
 
 **Output:**
 ```
-🤖 ccpoke v1.5.4
+🤖 ccpoke v1.6.16
 
-✅ Configuration loaded from ~/.ccpoke/config.json
+✅ Configuration loaded
 ✅ Telegram bot connected: @my_ccpoke_bot
 ✅ Hook server listening on 127.0.0.1:9377
-✅ Session monitor started (30s interval)
+✅ Tunnel connected
+✅ Session monitor started (15s interval)
 
-🎉 Bot is ready!
-   Press Ctrl+C to stop
-
-[info] Session started: abc123 (project: my-app)
-[info] Received hook event from Claude Code
-[info] Sending notification to Telegram...
+🎉 Bot is ready! Press Ctrl+C to stop
 ```
 
 **To stop:** `Ctrl+C`
@@ -429,7 +432,9 @@ pm2 delete ccpoke
 
 ## Cloudflare Tunnel Setup
 
-**Optional:** Expose hook endpoint to internet (for future remote monitoring).
+ccpoke includes a built-in auto-tunnel via `cloudflared` that starts automatically on boot. The tunnel exposes the local hook server for remote access (e.g., Telegram Mini App response viewer).
+
+For manual tunnel setup with a custom domain:
 
 ### Install cloudflared
 
@@ -559,7 +564,7 @@ Hooks are automatically removed by `ccpoke uninstall` command:
 ccpoke uninstall
 ```
 
-Or manually edit `~/.claude/settings.json` to remove the Stop hook entry.
+Or manually edit agent config files to remove hook entries.
 
 ---
 
@@ -632,30 +637,19 @@ cat ~/.ccpoke/sessions.json
 
 ---
 
-## Performance Optimization
+## Performance
 
-### Memory Usage
+ccpoke uses bounded in-memory collections with hardcoded limits:
 
-**Reduce session history:**
-```json
-// In ~/.ccpoke/config.json
-"max_sessions_in_memory": 10,
-"session_cleanup_interval_ms": 3600000
-```
+| Resource | Limit | Notes |
+|----------|-------|-------|
+| Sessions in memory | 200 max | LRU eviction in SessionMap |
+| Stored responses | 100 max | 24h TTL, auto-cleanup |
+| Message queue | 20 per session | Memory only, lost on restart |
+| Pending replies | 100 max | 10 min TTL |
+| Scan interval | 15s | Periodic tmux pane scan |
 
-### CPU Usage
-
-**Increase scan interval (slower updates):**
-```json
-"session_scan_interval_ms": 60000  // 60s instead of 30s
-```
-
-### Disk I/O
-
-**Reduce persistence frequency:**
-```json
-"persist_interval_ms": 300000  // 5min instead of 30s
-```
+No tuning config keys — limits are hardcoded for simplicity.
 
 ---
 

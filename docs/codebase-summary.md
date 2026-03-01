@@ -4,9 +4,9 @@
 
 - **Language:** TypeScript 5.7.3, targeting ES2022 with ESM modules
 - **Runtime:** Node.js ≥20
-- **Lines of Code:** ~4,208 LOC in src/ (42 TS files)
+- **Lines of Code:** ~7,897 LOC in src/ (56 TS files)
 - **Architecture:** Multi-agent provider pattern with channel abstraction
-- **Version:** 1.5.4
+- **Version:** 1.6.16
 
 ---
 
@@ -14,14 +14,14 @@
 
 ```
 ccpoke/
-├── src/                        # Main application source (4,208 LOC)
-│   ├── index.ts               # Entry point, bot lifecycle orchestration (177 LOC)
+├── src/                        # Main application source (~7,897 LOC)
+│   ├── index.ts               # Entry point, bot lifecycle orchestration (228 LOC)
 │   ├── config-manager.ts      # Config persistence & schema migration (127 LOC)
 │   ├── agent/                 # Multi-agent provider framework
 │   ├── channel/               # Notification channels (Telegram, extensible)
 │   ├── server/                # Express API server
 │   ├── tmux/                  # Terminal session management
-│   ├── commands/              # CLI commands (setup, uninstall, update, help)
+│   ├── commands/              # CLI commands (setup, uninstall, update, help, project)
 │   ├── i18n/                  # Internationalization (EN, VI, ZH)
 │   └── utils/                 # Shared utilities
 ├── web/                        # Web dashboard (Astro-based)
@@ -48,21 +48,26 @@ Implements the **Provider Pattern** for multi-agent support.
 |------|-----|-----------------|
 | **types.ts** | 41 | Interface definitions: `AgentProvider`, `AgentEventResult`, `NotificationEvent` |
 | **agent-registry.ts** | 30 | Registry pattern for discovering/loading agents |
-| **agent-handler.ts** | 136 | Central hook event dispatcher (stop, session_start, notification hooks) |
+| **agent-handler.ts** | 301 | Central hook event dispatcher (stop, session_start, notification, permission_request, ask_user_question hooks) |
 | **chat-session-resolver.ts** | 5 | Bridges notifications to tmux session linking |
 
 #### Agent Adapters
 
 **Claude Code Adapter** (`claude-code/`)
-- **claude-code-installer.ts** (171 LOC) — Manages hook scripts, `settings.json` configuration
+- **claude-code-installer.ts** (443 LOC) — Manages hook scripts, `settings.json` configuration for 5+ hook types
 - **claude-code-parser.ts** (163 LOC) — Parses NDJSON transcript files for event extraction
-- **claude-code-provider.ts** (89 LOC) — Implements `AgentProvider` interface
+- **claude-code-provider.ts** (89 LOC) — Implements `AgentProvider` interface (settleDelayMs=500, submitKeys=["Enter"])
 
 **Cursor Adapter** (`cursor/`)
 - **cursor-installer.ts** (118 LOC) — Manages `hooks.json` configuration
-- **cursor-parser.ts** (112 LOC) — Parses Cursor's transcript format
-- **cursor-provider.ts** (91 LOC) — Implements `AgentProvider` interface
+- **cursor-parser.ts** (112 LOC) — Parses Cursor's transcript format with fallback resolution
+- **cursor-provider.ts** (91 LOC) — Implements `AgentProvider` interface (settleDelayMs=0, submitKeys=["Enter"])
 - **cursor-state-reader.ts** (69 LOC) — Reads SQLite DB for Cursor state
+
+**Codex CLI Adapter** (`codex/`)
+- **codex-installer.ts** (170 LOC) — TOML-based hook configuration for Codex
+- **codex-parser.ts** (98 LOC) — Parses Codex notify events + rollout JSONL
+- **codex-provider.ts** (98 LOC) — Implements `AgentProvider` interface (settleDelayMs=500, submitKeys=["Escape","Enter"])
 
 ### Notification Channels (`src/channel/`)
 
@@ -73,11 +78,17 @@ Implements the **Adapter Pattern** for multi-channel support.
 | File | LOC | Responsibility |
 |------|-----|-----------------|
 | **types.ts** | 25 | `NotificationChannel` interface definition |
-| **telegram-channel.ts** | 239 | Bot lifecycle, Telegram handlers, notification formatting |
+| **telegram-channel.ts** | 730 | Bot lifecycle, Telegram handlers, notification formatting, session management |
 | **telegram-sender.ts** | 97 | Message sending, pagination, Markdown escaping |
 | **pending-reply-store.ts** | 43 | In-memory store for tracking pending replies (10min TTL) |
 | **session-list.ts** | 60 | `/sessions` command formatting with state emojis and Chat buttons |
 | **prompt-handler.ts** | 163 | Forwards elicitation_dialog and idle_prompt events with force_reply |
+| **permission-request-handler.ts** | 192 | Forward tool-use Allow/Deny decisions to Telegram inline keyboard |
+| **ask-question-handler.ts** | 377 | Forward AskUserQuestion to Telegram with multi-step inline keyboards |
+| **ask-question-keyboard-builder.ts** | - | Build dynamic inline keyboards for question responses |
+| **ask-question-tui-injector.ts** | - | Inject keystroke answers into terminal UI |
+| **project-list.ts** | - | Format /projects inline keyboard with project paths |
+| **escape-markdown.ts** | - | MarkdownV2 escaping utilities |
 
 ### Terminal Session Management (`src/tmux/`)
 
@@ -87,10 +98,10 @@ Implements the **Bridge Pattern** for tmux operations.
 
 | File | LOC | Responsibility |
 |------|-----|-----------------|
-| **tmux-bridge.ts** | 89 | Low-level tmux CLI wrapper (send-keys, capture-pane) |
-| **tmux-scanner.ts** | 108 | Pane detection, process tree search, session discovery |
-| **session-map.ts** | 160 | Session registry, persistence, state tracking (idle/busy/blocked/unknown) |
-| **session-state.ts** | 114 | Message queue, keystroke injection, state machine |
+| **tmux-bridge.ts** | 89 | Low-level tmux CLI wrapper (send-keys, capture-pane, create-window, kill-pane) |
+| **tmux-scanner.ts** | 264 | Multi-agent pane detection, process tree search, session discovery (AGENT_PATTERNS array) |
+| **session-map.ts** | 160 | Session registry, persistence, state tracking (idle/busy/blocked/unknown), LRU eviction |
+| **session-state.ts** | 114 | Message queue, keystroke injection, state machine, agent-specific submitKeys |
 | **tmux-session-resolver.ts** | 67 | Links notification sessions to tmux targets |
 
 ### API Server (`src/server/`)
@@ -119,6 +130,7 @@ Handles config persistence and schema migrations.
 | `setup` | setup.ts | 266 | Interactive configuration wizard |
 | `update` | update.ts | 159 | Check for npm updates |
 | `uninstall` | uninstall.ts | 51 | Remove hooks, config, state |
+| `project` | project.ts | 175 | Manage project paths and launch settings |
 | `help` | help.ts | 24 | Display help information |
 
 ### Internationalization (`src/i18n/`)
@@ -137,27 +149,32 @@ Handles config persistence and schema migrations.
 | File | LOC | Purpose |
 |------|-----|---------|
 | **constants.ts** | - | Global constants (ports, defaults, limits) |
-| **paths.ts** | - | File paths (~/.ccpoke, ~/.claude, etc.) |
+| **paths.ts** | - | File paths (~/.ccpoke, ~/.claude, ~/.cursor, codex paths) |
 | **git-collector.ts** | - | Git diff extraction and formatting |
 | **markdown.ts** | - | Markdown to Telegram MarkdownV2 conversion |
-| **response-store.ts** | - | Stores responses by session ID |
+| **response-store.ts** | - | Stores responses by session ID (24h TTL, max 100) |
 | **stats-format.ts** | - | Formats execution stats (duration, tokens) |
-| **tunnel.ts** | - | Cloudflare tunnel integration |
+| **tunnel.ts** | - | Cloudflare tunnel integration with retry logic and auto-restart |
 | **version-check.ts** | - | npm version checking |
-| **install-detection.ts** | - | Detects installed agents (Claude Code, Cursor) |
+| **install-detection.ts** | - | Detects installed agents (Claude Code, Cursor, Codex) |
+| **shell-completion.ts** | - | zsh/bash tab completion generation |
+| **path-prompt.ts** | - | Interactive path input with tab completion |
 | **log.ts** | - | Structured logging (debug, info, warn, error) |
 
 ### Entry Point (`src/index.ts`)
 
-**177 LOC** — Orchestrates the complete bot lifecycle:
+**228 LOC** — Orchestrates the complete bot lifecycle:
 
 1. Load configuration
 2. Initialize logging
-3. Register agents
-4. Create Telegram bot
-5. Start Express server
-6. Handle graceful shutdown
-7. Start session monitoring
+3. Register agents (including Codex)
+4. Ensure hooks installed for all agents
+5. Create Telegram bot
+6. Start Express server
+7. Start session scanner
+8. Install shell completion
+9. Ensure tunnel auto-restart
+10. Handle graceful shutdown
 
 ---
 
@@ -170,11 +187,23 @@ Handles config persistence and schema migrations.
 ```typescript
 interface AgentProvider {
   name: string;
+  displayName: string;
+  settleDelayMs: number;
+  submitKeys: string[];
   detect(): Promise<boolean>;
   installHook(config: HookConfig): Promise<void>;
   parseEvent(raw: unknown): AgentEventResult;
+  synchronous(): boolean;
 }
 ```
+
+**Agent Support Matrix:**
+
+| Agent | Display Name | settleDelayMs | submitKeys |
+|---|---|---|---|
+| claude-code | Claude Code | 500 | ["Enter"] |
+| cursor | Cursor CLI | 0 | ["Enter"] |
+| codex | Codex CLI | 500 | ["Escape", "Enter"] |
 
 **Benefits:**
 - Easy to add new agents (implement interface)
@@ -219,13 +248,14 @@ interface NotificationChannel {
 **Purpose:** Session lifecycle management.
 
 ```
-idle → waiting_for_input → busy → idle
+idle → blocked → busy → idle
+  └─────→ busy ────→ idle
 ```
 
 - **idle** — No activity, ready to accept messages
-- **waiting_for_input** — User sent message, waiting for response
-- **busy** — Agent processing, don't interrupt
-- Timeouts trigger transitions to idle
+- **blocked** — Waiting for user input (elicitation or permission request hook)
+- **busy** — Agent processing, queue messages
+- **unknown** — Unable to determine state
 
 ### 6. Store Pattern
 

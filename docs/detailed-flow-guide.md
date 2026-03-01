@@ -25,11 +25,14 @@ graph TB
     subgraph LOCAL["May local cua ban"]
         CC["Claude Code<br/>(trong tmux)"]
         CUR["Cursor<br/>(trong tmux)"]
-        CODEX["Codex CLI<br/>(future)"]
+        CODEX["Codex CLI<br/>(trong tmux)"]
 
         subgraph SERVER["Express Server - port 9377<br/>Chi bind localhost 127.0.0.1"]
             HOOK_STOP["POST /hook/stop"]
             HOOK_START["POST /hook/session-start"]
+            HOOK_NOTIF["POST /hook/notification"]
+            HOOK_ASK["POST /hook/ask-user-question"]
+            HOOK_PERM["POST /hook/permission-request"]
             API_RESP["GET /api/responses/:id"]
             HEALTH["GET /health"]
         end
@@ -41,17 +44,17 @@ graph TB
         subgraph TMUX_STACK["TmuxBridge + Scanner"]
             TB["sendKeys (inject text)"]
             CP["capturePane"]
-            SC["scanClaudePanes (15s)"]
+            SC["scanAgentPanes (15s)"]
         end
 
-        TMUX_SESS["tmux sessions<br/>(Claude Code dang chay)"]
+        TMUX_SESS["tmux sessions<br/>(AI agents dang chay)"]
     end
 
     PHONE["Dien thoai cua ban<br/>(Telegram App)"]
 
     CC -->|"stop hook<br/>(curl POST)"| HOOK_STOP
     CUR -->|"stop hook<br/>(curl POST)"| HOOK_STOP
-    CODEX -.->|"future"| HOOK_STOP
+    CODEX -->|"notify hook<br/>(curl POST)"| HOOK_STOP
 
     HOOK_STOP --> AH
     HOOK_START --> AH
@@ -335,12 +338,10 @@ flowchart LR
     end
 
     subgraph PASSIVE["Cach 2: Periodic Scan (thu dong, moi 15s)"]
-        TIMER["setInterval 15s"] --> SCAN["scanClaudePanes()"]
+        TIMER["setInterval 15s"] --> SCAN["scanAgentPanes()"]
         SCAN --> LIST["tmux list-panes -a"]
-        LIST --> FILTER{"pane_title chua<br/>claude code?"}
-        FILTER -->|"Co"| ADD["Them vao ket qua"]
-        FILTER -->|"Khong"| TREE["buildProcessTree<br/>Tim process claude<br/>trong tree max depth 4"]
-        TREE -->|"Tim thay"| ADD
+        LIST --> TREE["buildProcessTree<br/>Tim process agent<br/>(AGENT_PATTERNS)<br/>trong tree max depth 4"]
+        TREE -->|"Tim thay"| ADD["Them vao ket qua<br/>voi agentName"]
         TREE -->|"Khong"| SKIP2["Bo qua pane nay"]
         ADD --> COMPARE["So sanh voi sessions hien tai"]
         COMPARE --> NEW["Pane moi, register"]
@@ -436,17 +437,22 @@ graph TB
         STATE["state.json<br/>mode 0o600<br/>---<br/>chat_id: number"]
         SESSIONS["sessions.json<br/>---<br/>Array of:<br/>sessionId, tmuxTarget<br/>project, cwd<br/>state, lastActivity"]
         RESP_DIR["responses/<br/>---<br/>id.json files<br/>24h TTL, max 100"]
-        HOOKS_DIR["hooks/<br/>---<br/>claude-code-stop.sh<br/>claude-code-session-start.sh"]
+        HOOKS_DIR["hooks/<br/>---<br/>claude-code-stop.sh<br/>claude-code-session-start.sh<br/>claude-code-notification.sh<br/>claude-code-pre-tool-use.sh<br/>claude-code-permission-request.sh<br/>codex-stop.sh<br/>cursor-stop.sh"]
     end
 
     subgraph CLAUDE["~/.claude/ -- Thu muc Claude Code"]
-        CLAUDE_SETTINGS["settings.json<br/>---<br/>hooks.Stop<br/>hooks.SessionStart"]
+        CLAUDE_SETTINGS["settings.json<br/>---<br/>hooks.Stop<br/>hooks.SessionStart<br/>hooks.Notification<br/>hooks.PreToolUse"]
         CLAUDE_PROJECTS["projects/encoded/<br/>session.jsonl<br/>---<br/>Transcript NDJSON"]
     end
 
     subgraph CURSOR["~/.cursor/ -- Thu muc Cursor"]
         CURSOR_HOOKS["hooks.json"]
         CURSOR_PROJECTS["projects/.../transcript"]
+    end
+
+    subgraph CODEX_DIR["~/.codex/ -- Thu muc Codex CLI"]
+        CODEX_CONFIG["config.toml<br/>---<br/>notify = [...]"]
+        CODEX_SESSIONS["sessions/<br/>rollout-*.jsonl"]
     end
 
     CFG_R["Doc: startBot(), moi request"]
@@ -481,6 +487,7 @@ graph TB
     style CCPOKE fill:#0f3460,color:#e0e0e0
     style CLAUDE fill:#1a1a2e,color:#e0e0e0
     style CURSOR fill:#1a1a2e,color:#e0e0e0
+    style CODEX_DIR fill:#1a1a2e,color:#e0e0e0
 ```
 
 ### Ai doc/ghi file nao — Quick reference
@@ -491,9 +498,11 @@ graph TB
 | `~/.ccpoke/state.json` | `TelegramChannel` | `TelegramChannel` | Boot, `/start` command |
 | `~/.ccpoke/sessions.json` | `SessionMap.load()` | `SessionMap.save()` | Boot, moi 15s, register, shutdown |
 | `~/.ccpoke/responses/{id}.json` | `GET /api/responses/:id` | `ResponseStore.save()` | Moi stop hook |
-| `~/.ccpoke/hooks/*.sh` | Claude Code (exec) | `ClaudeCodeInstaller` | Setup, ensureHooks |
+| `~/.ccpoke/hooks/*.sh` | Agents (exec) | Agent installers | Setup, ensureHooks |
 | `~/.claude/settings.json` | `ClaudeCodeInstaller` | `ClaudeCodeInstaller` | Setup, verify |
 | `~/.claude/projects/**/*.jsonl` | `ClaudeCodeParser` | Claude Code (tu ghi) | Moi stop hook |
+| `~/.codex/config.toml` | `CodexInstaller` | `CodexInstaller` | Setup, verify |
+| `~/.codex/sessions/**/*.jsonl` | `CodexParser` | Codex CLI (tu ghi) | Moi notify hook |
 
 ### Pattern ghi file an toan (Atomic Write)
 
@@ -527,6 +536,10 @@ graph TD
     TG_CH --> TG_SEND["TelegramSender"]
     TG_CH --> PRS2["PendingReplyStore"]
     TG_CH --> SSM2["SessionStateManager"]
+    TG_CH --> AQH["AskQuestionHandler"]
+    TG_CH --> PRH["PermissionRequestHandler"]
+    TG_CH --> PROMPT_H["PromptHandler"]
+    TG_CH --> PROJ_LIST["ProjectList"]
 
     AGENT_H --> AG_REG["AgentRegistry"]
     AGENT_H --> RESP_STORE
@@ -535,6 +548,7 @@ graph TD
 
     AG_REG --> CC_PROV["ClaudeCodeProvider"]
     AG_REG --> CUR_PROV["CursorProvider"]
+    AG_REG --> CDX_PROV["CodexProvider"]
 
     CC_PROV --> CC_PARSER["ClaudeCodeParser"]
     CC_PROV --> CC_INST["ClaudeCodeInstaller"]
@@ -543,6 +557,10 @@ graph TD
     CUR_PROV --> CUR_PARSER["CursorParser"]
     CUR_PROV --> CUR_INST["CursorInstaller"]
     CUR_PROV --> GIT_COLL
+
+    CDX_PROV --> CDX_PARSER["CodexParser"]
+    CDX_PROV --> CDX_INST["CodexInstaller"]
+    CDX_PROV --> GIT_COLL
 
     TMUX_S --> SM3["SessionMap"]
     TMUX_S --> SSM3["SessionStateManager"]
@@ -575,6 +593,9 @@ graph TD
 | `index.ts` | `TelegramChannel.initialize()` | Boot |
 | `ApiServer` | `AgentHandler.handleStopEvent()` | POST /hook/stop |
 | `ApiServer` | `AgentHandler.handleSessionStart()` | POST /hook/session-start |
+| `ApiServer` | `AgentHandler.handleNotification()` | POST /hook/notification |
+| `ApiServer` | `AgentHandler.handleAskUserQuestion()` | POST /hook/ask-user-question |
+| `ApiServer` | `AgentHandler.handlePermissionRequest()` | POST /hook/permission-request |
 | `AgentHandler` | `AgentProvider.parseEvent()` | Stop hook |
 | `AgentHandler` | `ChatSessionResolver.resolveSessionId()` | Stop hook |
 | `AgentHandler` | `ResponseStore.save()` | Stop hook |
@@ -582,7 +603,7 @@ graph TD
 | `TelegramChannel` | `PendingReplyStore.set/get()` | Chat flow |
 | `TelegramChannel` | `SessionStateManager.injectMessage()` | Chat flow |
 | `SessionStateManager` | `TmuxBridge.sendKeys()` | Inject text |
-| `SessionMap` | `TmuxScanner.scanClaudePanes()` | Periodic scan |
+| `SessionMap` | `TmuxScanner.scanAgentPanes()` | Periodic scan |
 
 ---
 

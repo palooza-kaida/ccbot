@@ -1,6 +1,6 @@
 # Code Standards
 
-This document defines the TypeScript/Node.js conventions, design patterns, and best practices used throughout the ccpoke project.
+Conventions, patterns, and best practices for the ccpoke project.
 
 ---
 
@@ -291,7 +291,7 @@ idle ──→ blocked ──→ busy ──→ idle
 **State Meanings:**
 - **idle** — Session ready, no activity, can receive messages
 - **busy** — Agent processing, don't interrupt
-- **blocked** — Waiting for user input (elicitation hook), expecting reply
+- **blocked** — Waiting for user input (elicitation or permission request), expecting reply
 - **unknown** — Unable to determine state
 
 ### 6. Store Pattern (Persistence)
@@ -614,11 +614,7 @@ export default [
 }
 ```
 
-**Key Settings:**
-- 2-space indentation
-- Double quotes for strings
-- Trailing commas (ES5 compatible)
-- LF line endings
+2-space indent, double quotes, trailing commas (ES5), LF line endings.
 
 ### Pre-Commit Hook
 
@@ -636,38 +632,7 @@ pnpm format
 
 ## Documentation Comments
 
-**Use JSDoc for public APIs:**
-
-```typescript
-/**
- * Parses a Claude Code NDJSON transcript.
- * @param transcriptPath - Path to transcript file
- * @returns Array of parsed events
- * @throws {ParseError} If transcript is malformed
- */
-export async function parseTranscript(transcriptPath: string): Promise<AgentEvent[]> {
-  // ...
-}
-
-/**
- * Session state machine for managing message queue and injection.
- * @example
- * const state = new SessionState(session, bridge);
- * await state.injectMessage('hello');
- */
-export class SessionState {
-  // ...
-}
-```
-
-**Avoid over-documentation:**
-```typescript
-// ❌ Avoid: Obvious comments
-const name = 'Claude Code';  // The name is Claude Code
-
-// ✅ Good: Explain why, not what
-const name = 'Claude Code';  // Agent name for logging and user display
-```
+**BANNED:** No inline comments, block comments, or JSDoc. Code must be self-explanatory through clear naming and structure. If a comment feels needed, refactor the code for clarity instead.
 
 ---
 
@@ -791,31 +756,23 @@ class SessionMap {
 ### Cleanup
 
 ```typescript
-// ✅ Good: Cleanup resources with explicit destroy methods
 class Service {
   private _pendingReplies = new PendingReplyStore();
   private _scanInterval: ReturnType<typeof setInterval> | null = null;
 
   async shutdown(): Promise<void> {
-    // Explicit cleanup for in-memory collections
-    await this._pendingReplies.destroy();  // Clear all pending TTLs
-
-    // Clear timers
+    await this._pendingReplies.destroy();
     if (this._scanInterval) clearInterval(this._scanInterval);
-
-    // Close connections
     await this._bot.close();
     await this._server.close();
   }
 }
 
-// ✅ Good: Bounded collections with eviction
 class SessionMap {
   private _sessions = new Map<string, TmuxSession>();
   private static readonly MAX_SESSIONS = 200;
 
   register(sessionId: string, ...): void {
-    // LRU eviction when limit exceeded
     if (this._sessions.size >= SessionMap.MAX_SESSIONS
         && !this._sessions.has(sessionId)) {
       const oldest = this._getOldestSession();
@@ -828,14 +785,14 @@ class SessionMap {
 
 **Patterns:**
 - **Explicit destroy()** — Collections with timers/listeners
-- **Bounded collections** — MAX_SIZE constant with LRU eviction
-- **Guard double-execution** — Track shutdown state to prevent re-entrance
+- **Bounded collections** — MAX_SIZE with LRU eviction
+- **Guard double-execution** — Track shutdown state
 - **Warn on data loss** — Log pending items before shutdown
 
 ---
 
-## Related Documentation
+## Related
 
-- **[Codebase Summary](./codebase-summary.md)** — Module structure and responsibilities
-- **[System Architecture](./system-architecture.md)** — Component interactions and data flows
-- **[Project Overview](./project-overview-pdr.md)** — Vision and requirements
+- [Codebase Summary](./codebase-summary.md) — Module structure
+- [System Architecture](./system-architecture.md) — Component interactions
+- [Project Overview](./project-overview-pdr.md) — Vision and requirements

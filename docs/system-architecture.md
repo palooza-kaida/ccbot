@@ -12,8 +12,8 @@ This document describes the overall system architecture, component interactions,
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐            │
-│  │ Claude Code  │  │   Cursor     │  │ Future Agents│            │
-│  │   (Agent)    │  │   (Agent)    │  │    (TBD)     │            │
+│  │ Claude Code  │  │   Cursor     │  │  Codex CLI   │            │
+│  │   (Agent)    │  │   (Agent)    │  │   (Agent)    │            │
 │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘            │
 │         │                 │                 │                    │
 │         │ Hook Event      │ Hook Event      │ Hook Event         │
@@ -75,10 +75,11 @@ This document describes the overall system architecture, component interactions,
 **Responsibility:** Detect and integrate multiple AI coding agents.
 
 **Components:**
-- **AgentRegistry** — Maintains list of available agents
+- **AgentRegistry** — Maintains list of available agents (Claude Code, Cursor, Codex CLI)
 - **ClaudeCodeProvider** — Claude Code integration
 - **CursorProvider** — Cursor integration
-- **AgentHandler** — Central event dispatcher
+- **CodexProvider** — Codex CLI integration
+- **AgentHandler** — Central event dispatcher for all hook types
 
 **Key Operations:**
 ```
@@ -106,8 +107,10 @@ Emit to Notification Channel
 **Responsibility:** Send notifications to users via Telegram.
 
 **Components:**
-- **TelegramChannel** — Bot lifecycle and message handling
+- **TelegramChannel** — Bot lifecycle and message handling (sessions, permission requests, ask-question)
 - **TelegramSender** — Message formatting and pagination
+- **PermissionRequestHandler** — Forward tool-use Allow/Deny to Telegram
+- **AskQuestionHandler** — Forward AskUserQuestion events to Telegram
 - **PendingReplyStore** — Tracks pending user replies (10min TTL, auto-cleanup on shutdown)
 
 **Key Operations:**
@@ -155,6 +158,7 @@ Auto-cleanup on timeout or explicit destroy()
 interface TmuxSession {
   sessionId: string;           // Unique ID
   tmuxTarget: string;          // tmux target (session:window)
+  agent: AgentName;            // Agent name (claude-code, cursor, codex)
   project: string;             // Project name (from path)
   cwd: string;                 // Working directory
   label: string;               // Display label
@@ -222,9 +226,10 @@ Uses `ps` tree to find processes running in panes:
 tmux pane → shell process → child processes
 ```
 
-Detects agents by matching process names:
-- `claude` for Claude Code
-- `cursor` for Cursor IDE
+Detects agents by matching AGENT_PATTERNS:
+- `Claude` for Claude Code
+- `Cursor` for Cursor IDE
+- `codex` for Codex CLI
 
 ---
 
@@ -520,16 +525,21 @@ index.ts (Entry Point)
   │  │  ├─ ClaudeCodeProvider
   │  │  │  ├─ ClaudeCodeParser
   │  │  │  └─ ClaudeCodeInstaller
-  │  │  └─ CursorProvider
-  │  │     ├─ CursorParser
-  │  │     ├─ CursorInstaller
-  │  │     └─ CursorStateReader
+  │  │  ├─ CursorProvider
+  │  │  │  ├─ CursorParser
+  │  │  │  ├─ CursorInstaller
+  │  │  │  └─ CursorStateReader
+  │  │  └─ CodexProvider
+  │  │     ├─ CodexParser
+  │  │     └─ CodexInstaller
   │  ├─ SessionResolver
   │  │  └─ SessionMap
   │  └─ TelegramChannel (Observer)
   ├─ TelegramChannel (Initialization)
   │  ├─ TelegramSender
   │  ├─ PendingReplyStore
+  │  ├─ PermissionRequestHandler
+  │  ├─ AskQuestionHandler
   │  ├─ SessionResolver
   │  └─ ResponseStore
   ├─ ApiServer (Express)
@@ -558,7 +568,9 @@ index.ts (Entry Point)
 │   ├─ telegram_bot_token
 │   ├─ user_id
 │   ├─ hook_port (default: 9377)
-│   └─ hook_secret
+│   ├─ hook_secret
+│   ├─ agents: ["claude-code", "cursor", "codex"]
+│   └─ projects: {...}
 │
 ├── state.json            # Chat state
 │   ├─ chat_id
@@ -566,17 +578,33 @@ index.ts (Entry Point)
 │   └─ last_activity
 │
 ├── sessions.json         # Active sessions (persist on restart)
-│   └─ [{sessionId, tmuxTarget, project, cwd, status, ...}]
+│   └─ [{sessionId, tmuxTarget, agent, project, cwd, status, ...}]
+│
+├── responses/            # Response files (24h TTL, max 100)
+│   └─ id.json
 │
 └── hooks/
-    └── stop-notify.sh    # Stop hook script
-       └─ Called by Claude Code
-          └─ curl to /hook/stop endpoint
+    ├── claude-code-stop.sh
+    ├── claude-code-session-start.sh
+    ├── claude-code-permission-request.sh
+    ├── claude-code-ask-user-question.sh
+    ├── cursor-stop.sh
+    ├── cursor-session-start.sh
+    └── codex-stop.sh
 
 ~/.claude/
 └── settings.json         # Claude Code settings (modified by setup)
     └─ hooks:
-       └─ Stop: ~/.ccpoke/hooks/stop-notify.sh
+       ├─ Stop
+       ├─ SessionStart
+       ├─ PreToolUse (permission request)
+       └─ ElicitationDialog (user input)
+
+~/.cursor/
+└── hooks.json            # Cursor hook config
+
+~/.codex/
+└── config.toml           # Codex CLI config (if used)
 ```
 
 ### Schema Migrations
@@ -664,6 +692,9 @@ cloudflared tunnel run
 | **Telegram API error** | Network/API down | Message fails | Retry with exponential backoff |
 | **tmux unavailable** | No tmux session | Can't inject | Skip session operations, log |
 | **Config file missing** | ~/.ccpoke/config.json gone | Bot can't start | Prompt user to re-run setup |
+| **Permission request injection failure** | tmux pane dead | Deny not sent | Log error, timeout after 30s |
+| **Ask-question timeout** | User doesn't respond | TUI waiting | Timeout after 120s, auto-skip |
+| **Project launch failure** | Invalid project path | Session can't start | Log error, skip project |
 
 ### Graceful Degradation
 
@@ -754,19 +785,15 @@ describe('Hook Integration', () => {
 
 ### E2E Tests (Manual)
 
-```
-1. Start bot: pnpm dev
-2. Run Claude Code in tmux
-3. Trigger agent response
-4. Verify Telegram notification arrives
-5. Test message reply injection
-```
+1. Start bot: `pnpm dev`
+2. Run agent in tmux → trigger response → verify Telegram notification
+3. Test message reply injection via Chat button
 
 ---
 
-## Related Documentation
+## Related
 
-- **[Codebase Summary](./codebase-summary.md)** — Module structure and files
-- **[Code Standards](./code-standards.md)** — Implementation patterns and conventions
-- **[Project Overview](./project-overview-pdr.md)** — Vision and requirements
-- **[CLI Commands](./commands.md)** — User-facing commands and setup
+- [Codebase Summary](./codebase-summary.md) — Module structure and files
+- [Code Standards](./code-standards.md) — Implementation patterns
+- [Project Overview](./project-overview-pdr.md) — Vision and requirements
+- [CLI Commands](./commands.md) — User-facing commands
